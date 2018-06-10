@@ -11,10 +11,22 @@ namespace HASMLib.Core.MemoryZone
         protected UInt12[] Value;
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Constant;
-        public override int FixedSize => Length;
+		public override int FixedSize 
+		{
+			get
+			{
+				int a = 5; // 1 + 3 + 1
+				switch (Length) {
+					case Length_Single: a += 2; break; 
+					case Length_Double: a += 3; break; 
+					case Length_Quad: 	a += 8; break;
+				}
+				return a * 8 / 12; //To get 12-bit representation
+			}
+		}
 
-		protected const byte Length_Single = 1;
-		protected const byte Length_Double = 2;
+		protected const byte Length_Single 	= 1;
+		protected const byte Length_Double 	= 2;
 		protected const byte Length_Quad	= 3;
 
 		public override byte[] ToBytes ()

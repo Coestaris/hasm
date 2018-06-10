@@ -13,7 +13,7 @@ namespace HASMLib.Core.MemoryZone
 		public const byte VariableType_Quad   = 3;
 
 		public override MemZoneFlashElementType Type => MemZoneFlashElementType.Variable;
-		public override int FixedSize => 3;
+		public override int FixedSize => 4; //(1 + 3 + 1) * 8 / 12;
 
 		public override byte[] ToBytes ()
 		{

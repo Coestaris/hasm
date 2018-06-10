@@ -12,18 +12,20 @@ namespace HASMLib
 {
     public class HASMSource
     {
-        public string Source { get; }
+		public string Source { get; set; }
 
-        public HASMSource(FileStream fs)
+		public HASMSource(HASMMachine machine, FileStream fs)
         {
 			byte[] bytes = new byte[fs.Length];
 			fs.Read (bytes, 0, (int)fs.Length);
 			Source = new string(bytes.Select(p => (char)p).ToArray());
+			Machine = machine;
         }
 
-        public HASMSource(string source)
+		public HASMSource(HASMMachine machine, string source)
         {
 			Source = source;
+			Machine = machine;
         }
 
         public List<Instruction> instructions = new List<Instruction>()
@@ -34,18 +36,53 @@ namespace HASMLib
             new InstructionNOP(0x4)
         };
 
+		public List<MemZoneFlashElement> ParseResult { get; private set; }
+		public HASMMachine Machine { get ; set; }
+		public int UsedFlash 
+		{
+			get
+			{
+				return ParseResult.Sum (p => p.FixedSize);
+			}
+		}
+
+		public byte[] OutputCompiled()
+		{
+			List<byte> bytes = new List<byte> ();
+			foreach (var item in ParseResult) {
+				bytes.AddRange (item.ToBytes ());
+			}
+			return bytes.ToArray ();
+		}
+
+		public void OutputCompiled(string fileName)
+		{
+			File.WriteAllBytes (fileName, OutputCompiled ());
+		}
+
+		private Regex LabelRegex = new Regex(@"^\w{1,100}:");
+		private Regex CommentRegex = new Regex(@";[\d\W\s\w]{0,}$");
+		private Regex multipleSpaceRegex = new Regex(@"[ \t]{1,}");
+		private Regex commaSpaceRegex = new Regex(@",[ \t]{1,}");
+
+		private List<Tuple<string, byte>> Variables;
+		private List<Tuple<string, UInt24, Constant>> _namedConsts;
+		private int _constIndex;
+
+		private void ResetGLobals()
+		{
+			ParseResult = null;
+			Variables = new List<Tuple<string, byte>> ();
+			_constIndex = 0;
+			_namedConsts = new List<Tuple<string, UInt24, Constant>>();
+		}
+
         private List<string> PrepareSource(string input)
         {
-
-            input = multipleSpace.Replace(input, " ");
-            input = commaSpace.Replace(input, ",");
+			input = multipleSpaceRegex.Replace(input, " ");
+			input = commaSpaceRegex.Replace(input, ",");
             return input.Split('\n').ToList();
         }
-
-        private Regex LabelRegex = new Regex(@"^\w{1,100}:");
-        private Regex CommentRegex = new Regex(@";[\d\W\s\w]{0,}$");
-        private Regex multipleSpace = new Regex(@"[ \t]{1,}");
-        private Regex commaSpace = new Regex(@",[ \t]{1,}");
 
         private void FindCommentAndLabel(ref string input, out string commentStr, out string labelStr)
         {
@@ -91,16 +128,15 @@ namespace HASMLib
 
             //Если указан указатель, то наносим его простой переменной во флеш память
 			if (!string.IsNullOrEmpty (label)) {
-				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, ++_index));
+				int constIndex = ++_constIndex;
+				_namedConsts.Add(new Tuple<string, UInt24, Constant>(label, (UInt24)constIndex, new Constant() {Value = index}));
+				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
 			}
+
             //Закидываем во флеш нашу инструкцию без параметров
 			result.Add(new MemZoneFlashElementInstruction(instruction, null));
             return result;
         }
-
-		private List<Tuple<string, byte>> Variables;
-		private int _index;
-
 
 		public List<MemZoneFlashElement> GetFlashElementsWithArguents(Instruction instruction,  string label, string[] stringParts, int index, out ParseError error)
         {
@@ -119,6 +155,13 @@ namespace HASMLib
 					instruction.Name.Match(stringParts[0]).Index);
                 return null;
             }
+
+			//Если указан указатель, то наносим его простой переменной во флеш память
+			if (!string.IsNullOrEmpty (label)) {
+				int constIndex = ++_constIndex;
+				_namedConsts.Add(new Tuple<string, UInt24, Constant>(label, (UInt24)constIndex, new Constant() {Value = index}));
+				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
+			}
 
 			int argIndex = 0;
 			var usedIndexes = new List<Tuple<UInt24, bool>>();
@@ -145,8 +188,8 @@ namespace HASMLib
 				{
 					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
 					{
-						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_index), true));
-						result.Add(constant.ToFlashElement(_index));
+						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_constIndex), true));
+						result.Add(constant.ToFlashElement(_constIndex));
 					};
 
 					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Register) 
@@ -161,34 +204,43 @@ namespace HASMLib
 				}
 				if (isConst) 
 				{
-					usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_index), true));
-					result.Add (constant.ToFlashElement (_index));
+					usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_constIndex), true));
+					result.Add (constant.ToFlashElement (_constIndex));
 				}
 				else 
 				{
-					
-					if (constError.Type == ParseErrorType.Constant_BaseOverflow || constError.Type == ParseErrorType.Constant_TooLong)
+					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.ConstantOrRegister
+						|| instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
+					{
+						if(_namedConsts.Select(p => p.Item1).Contains(argument))
+						{
+							int constantIndex = _namedConsts.Select (p => p.Item1).ToList ().IndexOf (argument);
+							usedIndexes.Add (new Tuple<UInt24, bool> (_namedConsts[constantIndex].Item2, true));
+							result.Add (_namedConsts[constantIndex].Item3.ToFlashElement (_namedConsts[constantIndex].Item2));
+						}
+					} 
+					else if (constError.Type == ParseErrorType.Constant_BaseOverflow || constError.Type == ParseErrorType.Constant_TooLong)
 					{
 						error = constError;
 						return null;
+					} 
+					else if (isVar) 
+					{
+						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
+						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
+						result.Add(new MemZoneFlashElementVariable (
+							(UInt24)varIndex,
+							Variables [varIndex].Item2
+						));
 					}
-				}
-				if (isVar) 
-				{
-					int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
-					usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
-					result.Add(new MemZoneFlashElementVariable (
-						(UInt24)varIndex,
-						Variables [varIndex].Item2
-					));
-				}
-				else
-				{
-					error = new ParseError (
-						ParseErrorType.Syntax_UnknownVariableName,
-						index,
-						label.Length + 2 + stringParts.Take (argIndex).Sum (p => p.Length));
-					return null;
+					else
+					{
+						error = new ParseError (
+							ParseErrorType.Syntax_UnknownVariableName,
+							index,
+							label.Length + 2 + stringParts.Take (argIndex).Sum (p => p.Length));
+						return null;
+					}
 				}
 				argIndex++;
             }
@@ -196,10 +248,29 @@ namespace HASMLib
 			result.Add(new MemZoneFlashElementInstruction(instruction, usedIndexes));
 
 			error = null;
-			return null;
+			return result;
         }
 
-        public List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError)
+		private void SetupRegisters(HASMMachine machine)
+		{
+			Variables.AddRange(machine.GetRegisterNames ().Select(p => new Tuple<string, byte>(p, MemZoneFlashElementVariable.VariableType_Single)));
+		}
+
+		public ParseError Parse()
+		{
+			ParseError err;
+			ParseResult = Parse (Machine, out err);
+
+			if (err != null)
+				return err;
+
+			if (ParseResult == null)
+				return new ParseError (ParseErrorType.Other_UnknownError, 0);
+
+			return null;
+		}
+
+        private List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError)
         {
             // OPT        REQ       OPT            OPT
             //label: instruction a1, a2, a3 ... ; comment
@@ -209,9 +280,10 @@ namespace HASMLib
             //label: instruction                ; comment
             //etc
 
+			ResetGLobals ();
+			SetupRegisters (machine);
+
             List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
-			Variables = new List<Tuple<string, byte>> ();
-			Variables.AddRange(machine.GetRegisterNames ().Select(p => new Tuple<string, byte>(p, MemZoneFlashElementVariable.VariableType_Single)));
 
             //Очистка строк от лишних пробелов, табов
             List<string> lines = PrepareSource(Source);
@@ -251,6 +323,7 @@ namespace HASMLib
                                 parseError = error;
                                 return null;
                             }
+							result.AddRange (flashElements);
                         }
                         else
                         {
@@ -261,6 +334,7 @@ namespace HASMLib
                                 parseError = error;
                                 return null;
                             }
+							result.AddRange (flashElements);
                         }
 
                         found = true;

@@ -22,16 +22,17 @@ namespace HASM
             machine.SetRegisters("R{0}", 24);
             machine.ClearRegisters();
 
-			HASMSource source = new HASMSource (richTextBox1.Text);
+			HASMSource source = new HASMSource (machine, richTextBox1.Text);
 
-			ParseError pe;
-			var parseResult = source.Parse (machine, out pe);
+			ParseError pe = source.Parse();
 
 			if (pe != null) {
 				MessageBox.Show (string.Format ("{0} at (Line: {1}: Index: {2})", pe.Type, pe.Line, pe.Index),
 					"Error", MessageBoxButtons.OK);
-			} else
-				MessageBox.Show ("OK!");
+			} else {
+				MessageBox.Show (string.Format("OK! Used Flash: {0} 12-bit number", source.UsedFlash));
+				source.OutputCompiled ("test.hasmc");
+			}
         }
     }
 }

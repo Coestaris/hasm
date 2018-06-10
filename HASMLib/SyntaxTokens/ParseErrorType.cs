@@ -9,7 +9,8 @@
         Instruction_WrongParameterCount,
         Instruction_UnknownInstruction,
         Other_OutOfFlash,
+		Other_UnknownError,
 		Syntax_AmbiguityBetweenVarAndConst,
-		Syntax_UnknownVariableName
+		Syntax_UnknownVariableName,
     }
 }

@@ -14,15 +14,10 @@ namespace HASMLib.Core.MemoryZone
 
         public override int FixedSize 
         {
-            get
+            get 
             {
-                //Index of instruction
-                int size = 2;
-
-                if (Parameters == null)
-                    return size;
-
-				return size + Parameters.Count * 2;
+				if(Parameters == null) return 4;
+				else return (4 + 3 * Parameters.Count) * 8 / 12; //To get 12-representation of 8-bit
             }
         }
 

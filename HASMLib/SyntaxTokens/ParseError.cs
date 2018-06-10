@@ -18,6 +18,7 @@
         {
             Type = type;
             Index = index;
+			Line = line;
         }
 
 

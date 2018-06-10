@@ -6,8 +6,8 @@
 		protected const byte Element_Var = 2;
 		protected const byte Element_Instruction = 3;
 
-        public virtual int FixedSize => 0;
-        public virtual MemZoneFlashElementType Type => MemZoneFlashElementType.Undefined;
+		public abstract int FixedSize { get; }
+		public abstract MemZoneFlashElementType Type { get; }
        
 		public abstract byte[] ToBytes();
     }
