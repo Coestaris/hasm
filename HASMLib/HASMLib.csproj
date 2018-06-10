@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0A3A3DCD-CBD8-47CE-A0C1-906BDCABC5BB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HASMLib</RootNamespace>
+    <AssemblyName>HASMLib</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementVariableUInt24.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
+    <Compile Include="Core\MemZone\MemZoneVariable.cs" />
+    <Compile Include="Core\MemZone\MemZoneVariableUint48.cs" />
+    <Compile Include="Core\MemZone\MemZoneVariableUint24.cs" />
+    <Compile Include="Core\MemZone\MemZoneVariableUint12.cs" />
+    <Compile Include="Core\UInt48.cs" />
+    <Compile Include="Core\UInt24.cs" />
+    <Compile Include="HASMMachine.cs" />
+    <Compile Include="HASMMachineBannedFeatures.cs" />
+    <Compile Include="HASMSource.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\MemZone.cs" />
+    <Compile Include="SyntaxTokens\Constant.cs" />
+    <Compile Include="SyntaxTokens\Constants\ConstantBinFormat.cs" />
+    <Compile Include="SyntaxTokens\Constants\ConstantDecFormat.cs" />
+    <Compile Include="SyntaxTokens\Constants\ConstantFormat.cs" />
+    <Compile Include="SyntaxTokens\Constants\ConstantHexFormat.cs" />
+    <Compile Include="SyntaxTokens\Constants\ConstantLengthQualifier.cs" />
+    <Compile Include="SyntaxTokens\Instruction.cs" />
+    <Compile Include="Core\UInt12.cs" />
+    <Compile Include="SyntaxTokens\InstructionParameter.cs" />
+    <Compile Include="SyntaxTokens\InstructionParameterType.cs" />
+    <Compile Include="SyntaxTokens\Instructions\InstructionADD.cs" />
+    <Compile Include="SyntaxTokens\Instructions\InstructionNOP.cs" />
+    <Compile Include="SyntaxTokens\Instructions\InstructionJMP.cs" />
+    <Compile Include="SyntaxTokens\Instructions\InstructionMOV.cs" />
+    <Compile Include="SyntaxTokens\ParseError.cs" />
+    <Compile Include="SyntaxTokens\ParseErrorType.cs" />
+    <Compile Include="SyntaxTokens\Register.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
