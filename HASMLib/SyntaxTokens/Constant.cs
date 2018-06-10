@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using HASMLib.SyntaxTokens.Constants;
+using HASMLib.Core.MemoryZone;
+using HASMLib.Core;
 
 namespace HASMLib.SyntaxTokens
 {
@@ -37,5 +39,19 @@ namespace HASMLib.SyntaxTokens
             constant = null;
             return new ParseError(ParseErrorType.Constant_WrongFormat, 0);
         }
+
+		public MemZoneFlashElementConstant ToFlashElement(int index)
+		{
+			switch (Length) 
+			{
+				case ConstantLengthQualifier.Single:
+					return new MemZoneFlashElementConstantUInt12 ((UInt12)Value, index);
+				case ConstantLengthQualifier.Double:
+					return new MemZoneFlashElementConstantUInt24 ((UInt24)Value, index);
+				case ConstantLengthQualifier.Quad:	
+					return new MemZoneFlashElementConstantUInt48 ((UInt48)Value, index);
+			}
+			return null;
+		}
     }
 }

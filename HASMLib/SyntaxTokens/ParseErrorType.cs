@@ -8,6 +8,8 @@
         Constant_UnknownConstantLengthQualifier,
         Instruction_WrongParameterCount,
         Instruction_UnknownInstruction,
-        Other_OutOfFlash
+        Other_OutOfFlash,
+		Syntax_AmbiguityBetweenVarAndConst,
+		Syntax_UnknownVariableName
     }
 }

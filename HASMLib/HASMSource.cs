@@ -16,11 +16,14 @@ namespace HASMLib
 
         public HASMSource(FileStream fs)
         {
+			byte[] bytes = new byte[fs.Length];
+			fs.Read (bytes, 0, (int)fs.Length);
+			Source = new string(bytes.Select(p => (char)p).ToArray());
         }
 
         public HASMSource(string source)
         {
-            
+			Source = source;
         }
 
         public List<Instruction> instructions = new List<Instruction>()
@@ -87,16 +90,22 @@ namespace HASMLib
             }
 
             //Если указан указатель, то наносим его простой переменной во флеш память
-            if (!string.IsNullOrEmpty(label))
-                result.Add(new MemZoneFlashElementVariableUInt24((UInt24)index, label));
-
+			if (!string.IsNullOrEmpty (label)) {
+				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, ++_index));
+			}
             //Закидываем во флеш нашу инструкцию без параметров
-            result.Add(new MemZoneFlashElementInstruction(instruction));
+			result.Add(new MemZoneFlashElementInstruction(instruction, null));
             return result;
         }
 
-        public List<MemZoneFlashElement> GetFlashElementsWithArguents(Instruction instruction, string label, string line, int index, out ParseError error)
+		private List<Tuple<string, byte>> Variables;
+		private int _index;
+
+
+		public List<MemZoneFlashElement> GetFlashElementsWithArguents(Instruction instruction,  string label, string[] stringParts, int index, out ParseError error)
         {
+			var result = new List<MemZoneFlashElement>();
+
             //Выделяем со строки параметры в отдельный массив
             string argumentPart = stringParts[1];
             string[] arguments = argumentPart.Split(',');
@@ -107,15 +116,87 @@ namespace HASMLib
                 error = new ParseError(
                     ParseErrorType.Instruction_WrongParameterCount,
                     index,
-                    instruction.Name.Match(line).Index);
+					instruction.Name.Match(stringParts[0]).Index);
                 return null;
             }
+
+			int argIndex = 0;
+			var usedIndexes = new List<Tuple<UInt24, bool>>();
 
             //Проверяем типы аргументов
             foreach (var argument in arguments)
             {
+				Constant constant = null;
+				var constError = Constant.Parse(argument, out constant);
 
+				var isConst = constant != null;
+				var isVar = Variables.Select (p => p.Item1).Contains (argument);
+
+				if (isVar && isConst && instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister) 
+				{
+					error = new ParseError (
+						ParseErrorType.Syntax_AmbiguityBetweenVarAndConst,
+						index,
+						label.Length + 2 + stringParts.Take (argIndex).Sum (p => p.Length));
+						return null;
+				}
+
+				if (isVar && isConst)
+				{
+					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
+					{
+						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_index), true));
+						result.Add(constant.ToFlashElement(_index));
+					};
+
+					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Register) 
+					{
+						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
+						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
+						result.Add(new MemZoneFlashElementVariable(
+							(UInt24)varIndex,
+							Variables [varIndex].Item2
+						));
+					}
+				}
+				if (isConst) 
+				{
+					usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_index), true));
+					result.Add (constant.ToFlashElement (_index));
+				}
+				else 
+				{
+					
+					if (constError.Type == ParseErrorType.Constant_BaseOverflow || constError.Type == ParseErrorType.Constant_TooLong)
+					{
+						error = constError;
+						return null;
+					}
+				}
+				if (isVar) 
+				{
+					int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
+					usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
+					result.Add(new MemZoneFlashElementVariable (
+						(UInt24)varIndex,
+						Variables [varIndex].Item2
+					));
+				}
+				else
+				{
+					error = new ParseError (
+						ParseErrorType.Syntax_UnknownVariableName,
+						index,
+						label.Length + 2 + stringParts.Take (argIndex).Sum (p => p.Length));
+					return null;
+				}
+				argIndex++;
             }
+
+			result.Add(new MemZoneFlashElementInstruction(instruction, usedIndexes));
+
+			error = null;
+			return null;
         }
 
         public List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError)
@@ -129,6 +210,8 @@ namespace HASMLib
             //etc
 
             List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
+			Variables = new List<Tuple<string, byte>> ();
+			Variables.AddRange(machine.GetRegisterNames ().Select(p => new Tuple<string, byte>(p, MemZoneFlashElementVariable.VariableType_Single)));
 
             //Очистка строк от лишних пробелов, табов
             List<string> lines = PrepareSource(Source);
@@ -137,7 +220,10 @@ namespace HASMLib
             {
                 string line = lines[index];
 
-                FindCommentAndLabel(ref line, out string comment, out string label);
+				string comment = "";
+				string label = "";
+
+                FindCommentAndLabel(ref line, out comment, out label);
 
                 //Дополнительно удаляем лишние символы со строки
                 line = line.Trim(' ', '\t');
@@ -158,7 +244,8 @@ namespace HASMLib
                         //Если нету аргументов
                         if (stringParts.Length == 1)
                         {
-                            var flashElements = GetFlashElementsNoArguents(instruction, label, line, index, out var error);
+							ParseError error;
+                            var flashElements = GetFlashElementsNoArguents(instruction, label, line, index, out error);
                             if(flashElements == null)
                             {
                                 parseError = error;
@@ -167,7 +254,8 @@ namespace HASMLib
                         }
                         else
                         {
-                            var flashElements = GetFlashElementsWithArguents(instruction, label, line, index, out var error);
+							ParseError error;
+							var flashElements = GetFlashElementsWithArguents(instruction, label, stringParts, index, out error);
                             if (flashElements == null)
                             {
                                 parseError = error;
@@ -201,7 +289,7 @@ namespace HASMLib
             }
 
             parseError = null;
-            return null;
+			return result;
         }
     }
 }

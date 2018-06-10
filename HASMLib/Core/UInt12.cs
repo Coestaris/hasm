@@ -90,5 +90,13 @@ namespace HASMLib.Core
         {
             return new UInt12() { Value = (UInt16)(a.Value / b.Value) };
         }
+
+		public byte[] ToBytes()
+		{
+			return new byte[2] {
+				(byte)((Value) & 0xFF),
+				(byte)((Value >> 8) & 0xFF),
+			};
+		}
     }
 }

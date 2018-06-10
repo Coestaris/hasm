@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -44,8 +44,6 @@
     <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
-    <Compile Include="Core\MemZone\MemZoneFlashElementVariableUInt24.cs" />
-    <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
     <Compile Include="Core\MemZone\MemZoneVariable.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint48.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint24.cs" />
@@ -74,6 +72,11 @@
     <Compile Include="SyntaxTokens\ParseError.cs" />
     <Compile Include="SyntaxTokens\ParseErrorType.cs" />
     <Compile Include="SyntaxTokens\Register.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementConstant.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt24.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt12.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt48.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

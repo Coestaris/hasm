@@ -1,4 +1,6 @@
 ﻿using HASMLib.SyntaxTokens;
+using System.Linq;
+using System.Collections.Generic;
 using System;
 
 namespace HASMLib.Core.MemoryZone
@@ -6,7 +8,7 @@ namespace HASMLib.Core.MemoryZone
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
         private UInt24 InstructionNumber;
-        private object[] Parameters;
+		private List<Tuple<UInt24, bool>> Parameters;
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
 
@@ -20,22 +22,37 @@ namespace HASMLib.Core.MemoryZone
                 if (Parameters == null)
                     return size;
 
-                foreach (var a in Parameters)
-                    if (a.GetType() == typeof(UInt24)) size += 2;
-                    else size += ((string)a).Length;
-
-                return size;
+				return size + Parameters.Count * 2;
             }
         }
 
-        public MemZoneFlashElementInstruction(Instruction instruction, params object[] arguments)
+		private const byte Parameter_Const = 1;
+		private const byte Parameter_Var   = 2;
+
+		public override byte[] ToBytes ()
+		{
+			// 1. (1 byte)  	- is: const (0), var (1) or instruction (2)
+			// 2. (3 bytes) 	- Instruction number
+			// 3. (3 * n byte)	- Arguments: 1st byte - (1) or (2): constant or variable
+			//					-	2st and 3d bytes: index of constant of variable
+			List<byte> bytes = new List<byte>();
+
+			bytes.Add (Element_Instruction);								//Its a instrucion
+			bytes.AddRange (InstructionNumber.ToBytes ());					//Instrucion number
+			if(Parameters == null)
+				return bytes.ToArray ();
+
+			foreach (var item in Parameters) {
+				bytes.Add (item.Item2 ? Parameter_Const : Parameter_Var);	//Const or variable
+				bytes.AddRange(item.Item1.ToBytes ());						//Index of argument
+			}
+
+			return bytes.ToArray ();
+		}
+
+		public MemZoneFlashElementInstruction(Instruction instruction, List<Tuple<UInt24, bool>> arguments)
         {
-            InstructionNumber = instruction.Index;
-            foreach (var item in arguments)
-            {
-                if (item.GetType() != typeof(UInt24) && item.GetType() != typeof(string))
-                    throw new ArgumentException();
-            }
+			InstructionNumber = instruction.Index;
             Parameters = arguments;
         }
     }

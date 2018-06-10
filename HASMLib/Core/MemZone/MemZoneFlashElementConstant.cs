@@ -1,0 +1,36 @@
+﻿using System.Linq;
+using System.Collections.Generic;
+
+namespace HASMLib.Core.MemoryZone
+{
+    public class MemZoneFlashElementConstant : MemZoneFlashElement
+    {
+		public int Index;
+
+		protected byte Length;
+        protected UInt12[] Value;
+
+        public override MemZoneFlashElementType Type => MemZoneFlashElementType.Constant;
+        public override int FixedSize => Length;
+
+		protected const byte Length_Single = 1;
+		protected const byte Length_Double = 2;
+		protected const byte Length_Quad	= 3;
+
+		public override byte[] ToBytes ()
+		{
+			// 1. (1 byte)  - is: const (0), var (1) or instruction (2)
+			// 2. (3 bytes) - const global index
+			// 3. (1 byte)  - length: 1 - single, 2 - double, 3 - quad(n)
+			// 4. (n bytes) - data
+			List<byte> bytes = new List<byte>();
+			bytes.Add(Element_Const);					// Is Const;
+			bytes.AddRange(((UInt24)Index).ToBytes()); 	// Global Index
+			bytes.Add(Length);							// Length of const
+			foreach (var item in Value) {
+				bytes.AddRange (item.ToBytes ());		// Data
+			}
+			return bytes.ToArray();
+		}
+    }
+}

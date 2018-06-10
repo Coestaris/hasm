@@ -110,6 +110,15 @@ namespace HASMLib.Core
             };
         }
 
+		public byte[] ToBytes()
+		{
+			return new byte[3] {
+				(byte)((Value) & 0xFF),
+				(byte)((Value >> 8) & 0xFF),
+				(byte)((Value >> 16) & 0xFF),
+			};
+		}
+
         public static UInt24 FromUInt12(UInt12[] data)
         {
             if (data.Length != 2)

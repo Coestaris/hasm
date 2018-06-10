@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
+
 
 namespace HASMLib
 {
@@ -21,6 +23,7 @@ namespace HASMLib
             for (int i = 0; i < count; i++)
                 MemZone.RAMAllocate((UInt12)0, string.Format(NameFormat, i));
 
+			_registerNameFormat = NameFormat;
             RegisterCount = count;
         }
 
@@ -33,6 +36,14 @@ namespace HASMLib
             }
         }
 
+		public List<string> GetRegisterNames()
+		{
+			var a = new List<string> ();
+			for (int i = 0; i < RegisterCount; i++)
+				a.Add(string.Format(_registerNameFormat, i));
+			return a;
+		}
+
         public UInt32 RegisterCount;
 
         public UInt32 RAM { get; set; }
@@ -42,6 +53,8 @@ namespace HASMLib
         public MemZone MemZone;
         
         public HASMMachineBannedFeatures BannedFeatures { get; set; }
+
+		private string _registerNameFormat;
 
         public UInt12 Run(HASMSource source)
         {
