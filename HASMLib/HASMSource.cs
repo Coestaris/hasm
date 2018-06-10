@@ -126,10 +126,14 @@ namespace HASMLib
                 return null;
             }
 
-            //Если указан указатель, то наносим его простой переменной во флеш память
-			if (!string.IsNullOrEmpty (label)) {
+            //Если указан указатель
+			if (!string.IsNullOrEmpty (label)) 
+			{
+				//Расчет нового индекса константы	
 				int constIndex = ++_constIndex;
+				//Заносим данную констатнту в список именных констант
 				_namedConsts.Add(new Tuple<string, UInt24, Constant>(label, (UInt24)constIndex, new Constant() {Value = index}));
+				//Записываем его во флеш память
 				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
 			}
 
@@ -156,84 +160,143 @@ namespace HASMLib
                 return null;
             }
 
-			//Если указан указатель, то наносим его простой переменной во флеш память
+			//Если указан указатель
 			if (!string.IsNullOrEmpty (label)) {
+				//Расчет нового индекса константы	
 				int constIndex = ++_constIndex;
+				//Заносим данную констатнту в список именных констант
 				_namedConsts.Add(new Tuple<string, UInt24, Constant>(label, (UInt24)constIndex, new Constant() {Value = index}));
+				//Записываем его во флеш память
 				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
 			}
 
+			//Индекс текущего аргумента
 			int argIndex = 0;
+
+			//Список последовательных индексов, что используются в инструкции
+			// true -  константа, false - переменная
 			var usedIndexes = new List<Tuple<UInt24, bool>>();
 
             //Проверяем типы аргументов
             foreach (var argument in arguments)
             {
 				Constant constant = null;
+
+				//Попытка пропарсить константу
 				var constError = Constant.Parse(argument, out constant);
 
+				//Грубое определние типа нашего аргумента
 				var isConst = constant != null;
 				var isVar = Variables.Select (p => p.Item1).Contains (argument);
 
+
+				//Если допустимо и константа и переменная, то выходит неоднозначность
 				if (isVar && isConst && instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister) 
 				{
 					error = new ParseError (
 						ParseErrorType.Syntax_AmbiguityBetweenVarAndConst,
 						index,
 						label.Length + 2 + stringParts.Take (argIndex).Sum (p => p.Length));
-						return null;
+					return null;
 				}
 
+				//Если мы определили, что это может быть как переменная, так и коснтанта, 
+				//то смотрим что от нас хочет инструкция
 				if (isVar && isConst)
 				{
+					//Если необходима коснтанта
 					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
 					{
+						//Запоминаем индекс константы
 						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_constIndex), true));
+						//Записываем во флеш константу
 						result.Add(constant.ToFlashElement(_constIndex));
 					};
 
+					//Если необходима переменная
 					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Register) 
 					{
+						//Получаем индекс переменной со списка переменных
 						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
+						//Запоминаем индекс переменной
 						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
+						//Записываем переменную во флеш
 						result.Add(new MemZoneFlashElementVariable(
 							(UInt24)varIndex,
 							Variables [varIndex].Item2
 						));
 					}
 				}
+
+				//Если это однозначно константа, не переменная
 				if (isConst) 
 				{
+
+					//А ожидалась константа, то ошибка
+					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Register) {
+						error = new ParseError (
+							ParseErrorType.Syntax_ExpectedVar,
+							index,
+							label.Length + 2 + stringParts.Take(argIndex).Sum (p => p.Length));
+						return null;						
+					}
+
+					//Запоминаем индекс константы
 					usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_constIndex), true));
+					//Заносим константу во флеш
 					result.Add (constant.ToFlashElement (_constIndex));
 				}
-				else 
+				else //Если это не константа... 
 				{
-					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.ConstantOrRegister
-						|| instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
+					//Если это однозначно переменная...
+					if (isVar) 
 					{
-						if(_namedConsts.Select(p => p.Item1).Contains(argument))
-						{
-							int constantIndex = _namedConsts.Select (p => p.Item1).ToList ().IndexOf (argument);
-							usedIndexes.Add (new Tuple<UInt24, bool> (_namedConsts[constantIndex].Item2, true));
-							result.Add (_namedConsts[constantIndex].Item3.ToFlashElement (_namedConsts[constantIndex].Item2));
+						
+						//А ожидалась константа, то ошибка
+						if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) {
+							error = new ParseError (
+								ParseErrorType.Syntax_ExpectedСonst,
+								index,
+								label.Length + 2 + stringParts.Take(argIndex).Sum (p => p.Length));
+							return null;						
 						}
-					} 
-					else if (constError.Type == ParseErrorType.Constant_BaseOverflow || constError.Type == ParseErrorType.Constant_TooLong)
-					{
-						error = constError;
-						return null;
-					} 
-					else if (isVar) 
-					{
+
+						//Получаем индекс переменной со списка переменных 
 						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
+						//Запоминаем индекс переменной
 						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
+						//Записываем переменную во флеш
 						result.Add(new MemZoneFlashElementVariable (
 							(UInt24)varIndex,
 							Variables [varIndex].Item2
 						));
 					}
-					else
+					else //Если это не переменная, а просили константу
+					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.ConstantOrRegister ||
+					    instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
+					{
+						//То, возможно, это именная константа...
+						if(_namedConsts.Select(p => p.Item1).Contains(argument))
+						{
+							//Получения индекса константы со списка
+							int constantIndex = _namedConsts.Select (p => p.Item1).ToList ().IndexOf (argument);
+							//Запоминания индекса
+							usedIndexes.Add (new Tuple<UInt24, bool> (_namedConsts[constantIndex].Item2, true));
+							//Запись константы во флеш
+							result.Add (_namedConsts[constantIndex].Item3.ToFlashElement (_namedConsts[constantIndex].Item2));
+						}
+					}
+					else //Если удалось частично пропарсить константу, но были переполнения и тд...
+					if (constError.Type == ParseErrorType.Constant_BaseOverflow || constError.Type == ParseErrorType.Constant_TooLong)
+					{
+						//Вернуть новую ошибку с типо старой
+						error = new ParseError(
+							constError.Type, 
+							index,
+							label.Length + 2 + stringParts.Take(argIndex).Sum (p => p.Length));
+						return null;
+					} 
+					else //Если ничего не известно, то вернем что неивесное имя переменной
 					{
 						error = new ParseError (
 							ParseErrorType.Syntax_UnknownVariableName,
@@ -246,7 +309,6 @@ namespace HASMLib
             }
 
 			result.Add(new MemZoneFlashElementInstruction(instruction, usedIndexes));
-
 			error = null;
 			return result;
         }
@@ -272,98 +334,107 @@ namespace HASMLib
 
         private List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError)
         {
-            // OPT        REQ       OPT            OPT
-            //label: instruction a1, a2, a3 ... ; comment
+			// OPT        REQ       OPT            OPT
+			//label: instruction a1, a2, a3 ... ; comment
+			
+			//Examples
+			//       instruction a1, a2, a3 ... ; comment
+			//label: instruction                ; comment
+			//etc
 
-            //Examples
-            //       instruction a1, a2, a3 ... ; comment
-            //label: instruction                ; comment
-            //etc
+			try 
+			{
+				//Обнуляем глобальные переменые
+				ResetGLobals ();
+				//Заносим регистры в список переменных
+				SetupRegisters (machine);
 
-			ResetGLobals ();
-			SetupRegisters (machine);
+	            List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
 
-            List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
+	            //Очистка строк от лишних пробелов, табов
+	            List<string> lines = PrepareSource(Source);
 
-            //Очистка строк от лишних пробелов, табов
-            List<string> lines = PrepareSource(Source);
+	            for (var index = 0; index < lines.Count; index++)
+	            {
+	                string line = lines[index];
+					string comment = "";
+					string label = "";
 
-            for (var index = 0; index < lines.Count; index++)
-            {
-                string line = lines[index];
+	                FindCommentAndLabel(ref line, out comment, out label);
 
-				string comment = "";
-				string label = "";
+	                //Дополнительно удаляем лишние символы со строки
+	                line = line.Trim(' ', '\t');
 
-                FindCommentAndLabel(ref line, out comment, out label);
+					//Переменная для отслеживания успеха поиска инструкции
+	                bool found = false;
 
-                //Дополнительно удаляем лишние символы со строки
-                line = line.Trim(' ', '\t');
-                //Переменная для отслеживания успеха поиска инструкции
+	                foreach (var instruction in instructions)
+	                {
+	                    //Если регулярка инструкции присутсвует в строке
+	                    //Все обязаны иметь в себе "^" (начало строки), чтобы
+	                    //избегать некоректный поиск в строке!
+	                    if (instruction.Name.Match(line).Success)
+	                    {
+	                        //Делим строку спейсом, молясь о том, что это сработает!
+	                        string[] stringParts = line.Split(' ');
 
-                bool found = false;
+	                        //Если нету аргументов
+	                        if (stringParts.Length == 1)
+	                        {
+								ParseError error;
+								//Попытка пропарсить строку
+	                            var flashElements = GetFlashElementsNoArguents(instruction, label, line, index, out error);
+	                            if(flashElements == null)
+	                            {
+	                                parseError = error;
+	                                return null;
+	                            }
+								result.AddRange (flashElements);
+	                        }
+	                        else
+	                        {
+								ParseError error;
+								//Попытка пропарсить строку
+								var flashElements = GetFlashElementsWithArguents(instruction, label, stringParts, index, out error);
+	                            if (flashElements == null)
+	                            {
+	                                parseError = error;
+	                                return null;
+	                            }
+								result.AddRange (flashElements);
+	                        }
+	                        found = true;
+	                        break;
+	                    }
 
-                foreach (var instruction in instructions)
-                {
-                    //Если регулярка инструкции присутсвует в строке
-                    //Все обязаны иметь в себе "^" (начало строки), чтобы
-                    //избегать некоректный поиск в строке!
-                    if (instruction.Name.Match(line).Success)
-                    {
-                        //Делим строку спейсом, молясь о том, что это сработает!
-                        string[] stringParts = line.Split(' ');
+	                }
 
-                        //Если нету аргументов
-                        if (stringParts.Length == 1)
-                        {
-							ParseError error;
-                            var flashElements = GetFlashElementsNoArguents(instruction, label, line, index, out error);
-                            if(flashElements == null)
-                            {
-                                parseError = error;
-                                return null;
-                            }
-							result.AddRange (flashElements);
-                        }
-                        else
-                        {
-							ParseError error;
-							var flashElements = GetFlashElementsWithArguents(instruction, label, stringParts, index, out error);
-                            if (flashElements == null)
-                            {
-                                parseError = error;
-                                return null;
-                            }
-							result.AddRange (flashElements);
-                        }
+	                //Если не было найдено то ошибка
+	                if (!found)
+	                {
+	                    parseError = new ParseError(
+	                        ParseErrorType.Instruction_UnknownInstruction,
+	                        index,
+	                        label.Length + 2);
+	                    return null;
+	                }
+	            }
 
-                        found = true;
-                        break;
-                    }
+				//Если размер программы превышает максимально допустимый для этой машины
+	            int totalFlashSize = result.Sum(p => p.FixedSize);
+	            if(totalFlashSize > machine.Flash)
+	            {
+	                parseError = new ParseError(ParseErrorType.Other_OutOfFlash, 0, 0);
+	                return null;
+	            }
 
-                }
-
-                //Если не было найдено то ошибка
-                if (!found)
-                {
-                    parseError = new ParseError(
-                        ParseErrorType.Instruction_UnknownInstruction,
-                        index,
-                        label.Length + 2);
-                    return null;
-                }
-            }
-
-            int totalFlashSize = result.Sum(p => p.FixedSize);
-
-            if(totalFlashSize > machine.Flash)
-            {
-                parseError = new ParseError(ParseErrorType.Other_OutOfFlash, 0, 0);
-                return null;
-            }
-
-            parseError = null;
-			return result;
-        }
+	            parseError = null;
+				return result;
+			} catch 
+			{
+				parseError = null;
+				return null;
+			}
+		}
     }
 }
