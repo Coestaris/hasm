@@ -1,4 +1,4 @@
-﻿namespace HASMLib.SyntaxTokens
+﻿namespace HASMLib.Parser
 {
 
     public class ParseError

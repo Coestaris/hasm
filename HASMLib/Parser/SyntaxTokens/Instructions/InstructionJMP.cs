@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HASMLib.Core;
 
-namespace HASMLib.SyntaxTokens.Instructions
+namespace HASMLib.Parser.SyntaxTokens.Instructions
 {
     public class InstructionJMP : Instruction
     {

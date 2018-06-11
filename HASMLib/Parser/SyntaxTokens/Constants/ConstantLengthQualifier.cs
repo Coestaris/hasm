@@ -1,4 +1,4 @@
-﻿namespace HASMLib.SyntaxTokens.Constants
+﻿namespace HASMLib.Parser.SyntaxTokens.Constants
 {
     public enum ConstantLengthQualifier
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using HASMLib.SyntaxTokens.Constants;
+using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Core;
 
-namespace HASMLib.SyntaxTokens
+namespace HASMLib.Parser.SyntaxTokens
 {
     public class Constant
     {

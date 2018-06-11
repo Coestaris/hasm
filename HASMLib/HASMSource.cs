@@ -1,7 +1,9 @@
 ﻿using HASMLib.Core.MemoryZone;
 using HASMLib.Core;
-using HASMLib.SyntaxTokens;
-using HASMLib.SyntaxTokens.Instructions;
+using HASMLib.Parser;
+using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Parser.SyntaxTokens.Instructions;
+
 using System;
 using System.Collections.Generic;
 using System.IO;

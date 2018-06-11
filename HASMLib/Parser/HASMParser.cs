@@ -3,12 +3,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
-using HASMLib.SyntaxTokens;
-using HASMLib.SyntaxTokens.Instructions;
+using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Parser.SyntaxTokens.Instructions;
 using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
 
-namespace HASMLib
+namespace HASMLib.Parser
 {
 	internal class HASMParser
 	{

@@ -55,29 +55,33 @@
     <Compile Include="HASMSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\MemZone.cs" />
-    <Compile Include="SyntaxTokens\Constant.cs" />
-    <Compile Include="SyntaxTokens\Constants\ConstantBinFormat.cs" />
-    <Compile Include="SyntaxTokens\Constants\ConstantDecFormat.cs" />
-    <Compile Include="SyntaxTokens\Constants\ConstantFormat.cs" />
-    <Compile Include="SyntaxTokens\Constants\ConstantHexFormat.cs" />
-    <Compile Include="SyntaxTokens\Constants\ConstantLengthQualifier.cs" />
-    <Compile Include="SyntaxTokens\Instruction.cs" />
     <Compile Include="Core\UInt12.cs" />
-    <Compile Include="SyntaxTokens\InstructionParameter.cs" />
-    <Compile Include="SyntaxTokens\InstructionParameterType.cs" />
-    <Compile Include="SyntaxTokens\Instructions\InstructionADD.cs" />
-    <Compile Include="SyntaxTokens\Instructions\InstructionNOP.cs" />
-    <Compile Include="SyntaxTokens\Instructions\InstructionJMP.cs" />
-    <Compile Include="SyntaxTokens\Instructions\InstructionMOV.cs" />
-    <Compile Include="SyntaxTokens\ParseError.cs" />
-    <Compile Include="SyntaxTokens\ParseErrorType.cs" />
-    <Compile Include="SyntaxTokens\Register.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstant.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt24.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt12.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt48.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
-    <Compile Include="HASMParser.cs" />
+    <Compile Include="Parser\HASMParser.cs" />
+    <Compile Include="Parser\SyntaxTokens\Constant.cs" />
+    <Compile Include="Parser\SyntaxTokens\Constants\ConstantBinFormat.cs" />
+    <Compile Include="Parser\SyntaxTokens\Constants\ConstantDecFormat.cs" />
+    <Compile Include="Parser\SyntaxTokens\Constants\ConstantFormat.cs" />
+    <Compile Include="Parser\SyntaxTokens\Constants\ConstantHexFormat.cs" />
+    <Compile Include="Parser\SyntaxTokens\Constants\ConstantLengthQualifier.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instruction.cs" />
+    <Compile Include="Parser\SyntaxTokens\InstructionParameter.cs" />
+    <Compile Include="Parser\SyntaxTokens\InstructionParameterType.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionADD.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionJMP.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionMOV.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionNOP.cs" />
+    <Compile Include="Parser\SyntaxTokens\Register.cs" />
+    <Compile Include="Parser\ParseError.cs" />
+    <Compile Include="Parser\ParseErrorType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Parser\" />
+    <Folder Include="Parser\SyntaxTokens\" />
+  </ItemGroup>
 </Project>

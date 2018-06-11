@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HASMLib.SyntaxTokens
+namespace HASMLib.Parser.SyntaxTokens
 {
     public enum InstructionParameterType
     {

@@ -1,4 +1,4 @@
-﻿using HASMLib.SyntaxTokens;
+﻿using HASMLib.Parser.SyntaxTokens;
 using System.Linq;
 using System.Collections.Generic;
 using System;

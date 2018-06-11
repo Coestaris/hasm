@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace HASMLib.SyntaxTokens.Constants
+namespace HASMLib.Parser.SyntaxTokens.Constants
 {
     internal class ConstantBinFormat : ConstantFormat
     {

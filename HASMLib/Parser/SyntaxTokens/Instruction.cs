@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using HASMLib.Core;
 
-namespace HASMLib.SyntaxTokens
+namespace HASMLib.Parser.SyntaxTokens
 {
     public abstract class Instruction
     {
