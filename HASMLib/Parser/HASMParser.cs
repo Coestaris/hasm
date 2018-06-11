@@ -288,14 +288,18 @@ namespace HASMLib.Parser
 							instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
 						{
 							//То, возможно, это именная константа...
-							if(_namedConsts.Select(p => p.Item1).Contains(argument))
+							if (_namedConsts.Select (p => p.Item1).Contains (argument)) 
 							{
 								//Получения индекса константы со списка
 								int constantIndex = _namedConsts.Select (p => p.Item1).ToList ().IndexOf (argument);
 								//Запоминания индекса
-								usedIndexes.Add (new Tuple<UInt24, bool> (_namedConsts[constantIndex].Item2, true));
+								usedIndexes.Add (new Tuple<UInt24, bool> (_namedConsts [constantIndex].Item2, true));
 								//Запись константы во флеш
-								result.Add (_namedConsts[constantIndex].Item3.ToFlashElement (_namedConsts[constantIndex].Item2));
+								result.Add (_namedConsts [constantIndex].Item3.ToFlashElement (_namedConsts [constantIndex].Item2));
+							} else
+							{
+								error = NewParseError (ParseErrorType.Syntax_UnknownConstName, label, stringParts, argIndex, index);
+								return null;									
 							}
 						}
 						else //Если удалось частично пропарсить константу, но были переполнения и тд...
@@ -379,7 +383,7 @@ namespace HASMLib.Parser
 								}
 								result.AddRange (flashElements);
 							}
-							else
+							else if(stringParts.Length == 2)
 							{
 								ParseError error;
 								//Попытка пропарсить строку
@@ -390,6 +394,10 @@ namespace HASMLib.Parser
 									return null;
 								}
 								result.AddRange (flashElements);
+							} else 
+							{
+								parseError = NewParseError(ParseErrorType.Syntax_UnExpectedToken, label, stringParts, 2, index);
+								return null;
 							}
 							found = true;
 							break;
@@ -412,7 +420,7 @@ namespace HASMLib.Parser
 				int totalFlashSize = result.Sum(p => p.FixedSize);
 				if(totalFlashSize > machine.Flash)
 				{
-					parseError = new ParseError(ParseErrorType.Other_OutOfFlash, 0, 0);
+					parseError = new ParseError(ParseErrorType.Other_OutOfFlash);
 					return null;
 				}
 

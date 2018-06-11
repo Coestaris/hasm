@@ -65,7 +65,7 @@ namespace HASMLib
 				return err;
 
 			if (ParseResult == null)
-				return new ParseError (ParseErrorType.Other_UnknownError, 0);
+				return new ParseError (ParseErrorType.Other_UnknownError);
 
 			return null;
 		}

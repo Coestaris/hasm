@@ -3,10 +3,24 @@
 
     public class ParseError
     {
+		private const int NullValue = -1;
+
         public override string ToString()
         {
-            return string.Format("{0} at index {1}:{2}", Type.ToString(), Line, Index);
+			if 		(Line != NullValue && Index != NullValue) 
+				return string.Format("Error {0} at line: {1}, index: {2}", Type.ToString(), Line, Index);
+			else if (Line == NullValue && Index != NullValue) 
+				return string.Format("Error {0} at index {1}", Type.ToString(), Index);
+			else if (Line != NullValue && Index == NullValue) 
+				return string.Format("Error {0} at line {1}", Type.ToString(), Line);
+			else 
+				return string.Format("Error {0}", Type.ToString());
         }
+
+		public ParseError(ParseErrorType type)
+		{
+			Type = type;
+		}
 
         public ParseError(ParseErrorType type, int index)
         {
@@ -23,7 +37,7 @@
 
 
         public ParseErrorType Type { get; set; }
-        public int Line { get; set; }
-        public int Index { get; set; }
+		public int Line { get; set; } = NullValue;
+		public int Index { get; set; } = NullValue;
     }
 }

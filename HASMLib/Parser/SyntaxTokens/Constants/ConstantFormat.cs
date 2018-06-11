@@ -46,7 +46,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
                         return Parse(str, ConstantLengthQualifier.Quad, out constant);
                     default:
                         constant = null;
-                        return new ParseError(ParseErrorType.Constant_UnknownConstantLengthQualifier, 0);
+                        return new ParseError(ParseErrorType.Constant_UnknownConstantLengthQualifier);
                 }
             }
         }

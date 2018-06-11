@@ -1,5 +1,4 @@
 ﻿using HASMLib;
-using HASMLib.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,12 +22,14 @@ namespace HASM
 
 			HASMSource source = new HASMSource (machine, richTextBox1.Text);
 
-			ParseError pe = source.Parse();
+			HASMLib.Parser.ParseError pe = source.Parse();
 
-			if (pe != null) {
-				MessageBox.Show (string.Format ("{0} at (Line: {1}: Index: {2})", pe.Type, pe.Line, pe.Index),
-					"Error", MessageBoxButtons.OK);
-			} else {
+			if (pe != null) 
+			{
+				MessageBox.Show (pe.ToString(), "Error", MessageBoxButtons.OK);
+			}
+			else
+			{
 				MessageBox.Show (string.Format("OK! Used Flash: {0} 12-bit number", source.UsedFlash));
 				source.OutputCompiled ("test.hasmc");
 			}

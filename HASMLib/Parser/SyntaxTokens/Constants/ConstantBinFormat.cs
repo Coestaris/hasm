@@ -20,13 +20,13 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
             }
             catch (OverflowException)
             {
-                return new ParseError(ParseErrorType.Constant_TooLong, 0);
+                return new ParseError(ParseErrorType.Constant_TooLong);
             }
 
             constant.Length = Length;
 
             if (CheckMaxValues(constant.Value, constant.Length))
-                return new ParseError(ParseErrorType.Constant_BaseOverflow, 0);
+                return new ParseError(ParseErrorType.Constant_BaseOverflow);
 
             return null;
         }

@@ -12,7 +12,9 @@
 		Other_UnknownError,
 		Syntax_AmbiguityBetweenVarAndConst,
 		Syntax_UnknownVariableName,
+		Syntax_UnknownConstName,
 		Syntax_ExpectedVar,
-		Syntax_ExpectedСonst
+		Syntax_ExpectedСonst,
+		Syntax_UnExpectedToken
     }
 }
