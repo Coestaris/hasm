@@ -77,6 +77,7 @@
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt12.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt48.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
+    <Compile Include="HASMParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
