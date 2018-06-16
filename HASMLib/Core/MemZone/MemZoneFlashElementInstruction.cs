@@ -11,6 +11,10 @@ namespace HASMLib.Core.MemoryZone
         public UInt24 InstructionNumber;
 		public List<HASMParser.ObjectReference> Parameters;
 
+        public UInt24 RuntimeIndex;
+        public UInt24 RuntimeAbsoluteIndex;
+
+
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
 
         public override int FixedSize 
@@ -30,7 +34,7 @@ namespace HASMLib.Core.MemoryZone
 			// 1. (1 byte)  	- is: const (0), var (1) or instruction (2)
 			// 2. (3 bytes) 	- Instruction number
 			// 3. (3 * n byte)	- Arguments: 1st byte - (1) or (2): constant or variable
-			//					-	2st and 3d bytes: index of constant of variable
+			//					- 2st and 3d bytes: index of constant of variable
 			List<byte> bytes = new List<byte>();
 
 			bytes.Add (Element_Instruction);								//Its a instrucion
