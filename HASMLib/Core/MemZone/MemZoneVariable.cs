@@ -2,10 +2,9 @@
 {
     public class MemZoneVariable
     {
-        protected MemZone Zone;
+        public MemZoneVariableLength Length;
 
         public string Name;
-        public int RAMOffster;
-        public int Length;
+        public int UID;
     }
 }

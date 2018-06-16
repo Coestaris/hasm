@@ -2,30 +2,20 @@
 {
     internal class MemZoneVariableUInt24 : MemZoneVariable
     {
-        public MemZoneVariableUInt24(MemZone zone, string name, UInt24 value)
+        public UInt24 Value;
+
+        public MemZoneVariableUInt24(UInt24 value, string name)
         {
-            Length = 2;
+            Length = MemZoneVariableLength.Double;
+            Value = value;
             Name = name;
-            Zone = zone;
-
-            RAMOffster = zone.offset;
-
-            SetValue(zone, value);
         }
 
-        public UInt12 GetValue(MemZone zone)
+        public MemZoneVariableUInt24(UInt24 value, int uid)
         {
-            return UInt24.FromUInt12(zone.RAMGetRange(RAMOffster, Length));
-        }
-
-        public void SetValue(MemZone zone, UInt24 value)
-        {
-            zone.RAMSetRange(RAMOffster, value.ToUInt12());
-        }
-
-        public override string ToString()
-        {
-            return GetValue(Zone).ToString();
+            Length = MemZoneVariableLength.Double;
+            Value = value;
+            UID = uid;
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using HASMLib;
+using HASMLib.Runtime;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +32,11 @@ namespace HASM
 			}
 			else
 			{
-				MessageBox.Show (string.Format("OK! Used Flash: {0} 12-bit number", source.UsedFlash));
-				source.OutputCompiled ("test.hasmc");
-			}
+                IOStream stream = new IOStream();
+                RuntimeMachine runtimeMachine = machine.CreateRuntimeMachine(source, stream);
+
+                //stream.write
+            }
         }
     }
 }

@@ -12,19 +12,27 @@ namespace HASMLib.Parser
 {
 	internal class HASMParser
 	{
+        internal enum ReferenceType
+        {
+            Constant,
+            Variable
+        }
 
 		#region Globals
-		private List<Tuple<string, byte>> Variables;
+		private List<Tuple<string, MemZoneVariableLength>> Variables;
 		private List<Tuple<string, UInt24, Constant>> _namedConsts;
 		private int _constIndex;
+        private int _varIndex;
 
-		public List<Instruction> instructions = new List<Instruction>()
+		public static List<Instruction> instructions = new List<Instruction>()
 		{
 			new InstructionADD(0x1),
 			new InstructionJMP(0x2),
 			new InstructionMOV(0x3),
-			new InstructionNOP(0x4)
-		};
+			new InstructionNOP(0x4),
+            new InstructionOUT(0x5),
+            new InstructionLDI(0x6)
+        };
 		#endregion
 
 
@@ -80,14 +88,20 @@ namespace HASMLib.Parser
 		#region Help Methods
 		private void ResetGLobals()
 		{
-			Variables = new List<Tuple<string, byte>> ();
+			Variables = new List<Tuple<string, MemZoneVariableLength>> ();
 			_constIndex = 0;
 			_namedConsts = new List<Tuple<string, UInt24, Constant>>();
 		}
 
-		private void SetupRegisters(HASMMachine machine)
+		private List<MemZoneFlashElement> SetupRegisters(HASMMachine machine)
 		{
-			Variables.AddRange(machine.GetRegisterNames ().Select(p => new Tuple<string, byte>(p, MemZoneFlashElementVariable.VariableType_Single)));
+            var result = new List<MemZoneFlashElement>();
+            machine.GetRegisterNames().ForEach(p =>
+            {
+                Variables.Add(new Tuple<string, MemZoneVariableLength>(p, MemZoneVariableLength.Single));
+                result.Add(new MemZoneFlashElementVariable((UInt12)(_varIndex++), MemZoneVariableLength.Single));
+            });
+            return result;
 		}
 
 		private ParseError NewParseError(ParseErrorType error, string label, string[] stringParts, int argIndex, int index)
@@ -196,7 +210,7 @@ namespace HASMLib.Parser
 
 			//Список последовательных индексов, что используются в инструкции
 			// true -  константа, false - переменная
-			var usedIndexes = new List<Tuple<UInt24, bool>>();
+			var usedIndexes = new List<Tuple<UInt24, ReferenceType>>();
 
 			//Проверяем типы аргументов
 			foreach (var argument in arguments)
@@ -226,7 +240,7 @@ namespace HASMLib.Parser
 					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
 					{
 						//Запоминаем индекс константы
-						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_constIndex), true));
+						usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)(++_constIndex), ReferenceType.Constant));
 						//Записываем во флеш константу
 						result.Add(constant.ToFlashElement(_constIndex));
 					};
@@ -237,12 +251,7 @@ namespace HASMLib.Parser
 						//Получаем индекс переменной со списка переменных
 						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
 						//Запоминаем индекс переменной
-						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
-						//Записываем переменную во флеш
-						result.Add(new MemZoneFlashElementVariable(
-							(UInt24)varIndex,
-							Variables [varIndex].Item2
-						));
+						usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)varIndex, ReferenceType.Variable));
 					}
 				}
 
@@ -257,7 +266,7 @@ namespace HASMLib.Parser
 					}
 
 					//Запоминаем индекс константы
-					usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)(++_constIndex), true));
+					usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)(++_constIndex), ReferenceType.Constant));
 					//Заносим константу во флеш
 					result.Add (constant.ToFlashElement (_constIndex));
 				}
@@ -276,12 +285,7 @@ namespace HASMLib.Parser
 						//Получаем индекс переменной со списка переменных 
 						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
 						//Запоминаем индекс переменной
-						usedIndexes.Add (new Tuple<UInt24, bool> ((UInt24)varIndex, false));
-						//Записываем переменную во флеш
-						result.Add(new MemZoneFlashElementVariable (
-							(UInt24)varIndex,
-							Variables [varIndex].Item2
-						));
+						usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)varIndex, ReferenceType.Variable));
 					}
 					else //Если это не переменная, а просили константу
 						if (instruction.ParameterTypes [argIndex] == InstructionParameterType.ConstantOrRegister ||
@@ -293,7 +297,7 @@ namespace HASMLib.Parser
 								//Получения индекса константы со списка
 								int constantIndex = _namedConsts.Select (p => p.Item1).ToList ().IndexOf (argument);
 								//Запоминания индекса
-								usedIndexes.Add (new Tuple<UInt24, bool> (_namedConsts [constantIndex].Item2, true));
+								usedIndexes.Add (new Tuple<UInt24, ReferenceType> (_namedConsts [constantIndex].Item2, ReferenceType.Constant));
 								//Запись константы во флеш
 								result.Add (_namedConsts [constantIndex].Item3.ToFlashElement (_namedConsts [constantIndex].Item2));
 							} else
@@ -338,12 +342,13 @@ namespace HASMLib.Parser
 			{
 				//Обнуляем глобальные переменые
 				ResetGLobals ();
-				//Заносим регистры в список переменных
-				SetupRegisters (machine);
 
 				List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
 
-				//Очистка строк от лишних пробелов, табов
+				//Заносим регистры в список переменных
+				result.AddRange(SetupRegisters(machine));
+	
+                //Очистка строк от лишних пробелов, табов
 				List<string> lines = PrepareSource(Source);
 
 				for (var index = 0; index < lines.Count; index++)
@@ -415,6 +420,14 @@ namespace HASMLib.Parser
 						return null;
 					}
 				}
+
+                //Помещаем все константы в начало флеша для удобства дебага
+                //Выбираем с массива константы
+                var constants = result.FindAll(p => p.Type == MemZoneFlashElementType.Constant).ToList();
+                //Удаляем их из коллекции
+                result.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
+                //Пихаем в ее начало
+                result.InsertRange(0, constants);
 
 				//Если размер программы превышает максимально допустимый для этой машины
 				int totalFlashSize = result.Sum(p => p.FixedSize);

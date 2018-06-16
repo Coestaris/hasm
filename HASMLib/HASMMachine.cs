@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
-
+using HASMLib.Runtime;
 
 namespace HASMLib
 {
@@ -15,13 +15,14 @@ namespace HASMLib
             EEPROM = eeprom;
             Flash = flash;
 
-            MemZone = new MemZone((int)RAM);
+            MemZone = new MemZone((int)flash, (int)ram, null);
         }
 
         public void SetRegisters(string NameFormat, uint count)
         {
             for (int i = 0; i < count; i++)
-                MemZone.RAMAllocate((UInt12)0, string.Format(NameFormat, i));
+                MemZone.RAM.Add(new MemZoneVariableUInt12(0, string.Format(NameFormat, i)));
+                //MemZone.RAMAllocate((UInt12)0, string.Format(NameFormat, i));
 
 			_registerNameFormat = NameFormat;
             RegisterCount = count;
@@ -30,10 +31,7 @@ namespace HASMLib
         public void ClearRegisters()
         {
             for (int i = 0; i < RegisterCount; i++)
-            {
-                var a = (MemZoneVariableUInt12)MemZone.RAMGetVariable(i);
-                a.SetValue(MemZone, 0);
-            }
+                ((MemZoneVariableUInt12)MemZone.RAM[i]).Value = 0;
         }
 
 		public List<string> GetRegisterNames()
@@ -56,9 +54,11 @@ namespace HASMLib
 
 		private string _registerNameFormat;
 
-        public UInt12 Run(HASMSource source)
+        public RuntimeMachine CreateRuntimeMachine(HASMSource source, IOStream iostream)
         {
-            return 0;
+            var rm = new RuntimeMachine(this, source);
+            MemZone.Flash = source.ParseResult;
+            return rm;
         }
     }
 }

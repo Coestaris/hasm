@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.button1 = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
@@ -49,7 +48,7 @@
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(356, 288);
             this.richTextBox1.TabIndex = 1;
-            this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
+            this.richTextBox1.Text = "        ldi    R1, 0x55 \ninit: add  R2, R1\n        out   R2  \n        jmp init  ";
             // 
             // Form1
             // 

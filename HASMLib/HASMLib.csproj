@@ -45,6 +45,7 @@
     <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
     <Compile Include="Core\MemZone\MemZoneVariable.cs" />
+    <Compile Include="Core\MemZone\MemZoneVariableLength.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint48.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint24.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint12.cs" />
@@ -53,6 +54,8 @@
     <Compile Include="HASMMachine.cs" />
     <Compile Include="HASMMachineBannedFeatures.cs" />
     <Compile Include="HASMSource.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionLDI.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionOUT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\MemZone.cs" />
     <Compile Include="Core\UInt12.cs" />
@@ -78,10 +81,9 @@
     <Compile Include="Parser\SyntaxTokens\Register.cs" />
     <Compile Include="Parser\ParseError.cs" />
     <Compile Include="Parser\ParseErrorType.cs" />
+    <Compile Include="Runtime\IOStream.cs" />
+    <Compile Include="Runtime\RuntimeMachine.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Parser\" />
-    <Folder Include="Parser\SyntaxTokens\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

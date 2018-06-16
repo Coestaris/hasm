@@ -117,11 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="richTextBox1.Text" xml:space="preserve">
-    <value>init: mov R1, R6 ;Set R1 as R5
-        mov R2, R5  ;Set R2 as 0xF
-        add R1, R2     ; Adding R1 to R2, putting retsult to R1
-        nop            ; Doing nothing
-        jmp init       ; Goto "init</value>
-  </data>
 </root>
