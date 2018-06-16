@@ -18,9 +18,47 @@ namespace HASMLib.Parser
             Variable
         }
 
-		#region Globals
-		private List<Tuple<string, MemZoneVariableLength>> Variables;
-		private List<Tuple<string, UInt24, Constant>> _namedConsts;
+        internal struct Variable
+        {
+            public string Name;
+            public MemZoneVariableLength Length;
+
+            public Variable(string name, MemZoneVariableLength length)
+            {
+                Name = name;
+                Length = length;
+            }
+        }
+
+        internal struct NamedConstant
+        {
+            public string Name;
+            public UInt24 Index;
+            public Constant Value;
+
+            public NamedConstant(string name, UInt24 index, Constant value)
+            {
+                Name = name;
+                Index = index;
+                Value = value;
+            }
+        }
+
+        internal struct ObjectReference
+        {
+            public UInt24 Index;
+            public ReferenceType Type;
+
+            public ObjectReference(UInt24 index, ReferenceType type)
+            {
+                Index = index;
+                Type = type;
+            }
+        }
+
+        #region Globals
+        private List<Variable> Variables;
+		private List<NamedConstant> _namedConsts;
 		private int _constIndex;
         private int _varIndex;
 
@@ -88,9 +126,9 @@ namespace HASMLib.Parser
 		#region Help Methods
 		private void ResetGLobals()
 		{
-			Variables = new List<Tuple<string, MemZoneVariableLength>> ();
+			Variables = new List<Variable> ();
 			_constIndex = 0;
-			_namedConsts = new List<Tuple<string, UInt24, Constant>>();
+			_namedConsts = new List<NamedConstant>();
 		}
 
 		private List<MemZoneFlashElement> SetupRegisters(HASMMachine machine)
@@ -98,7 +136,7 @@ namespace HASMLib.Parser
             var result = new List<MemZoneFlashElement>();
             machine.GetRegisterNames().ForEach(p =>
             {
-                Variables.Add(new Tuple<string, MemZoneVariableLength>(p, MemZoneVariableLength.Single));
+                Variables.Add(new Variable(p, MemZoneVariableLength.Single));
                 result.Add(new MemZoneFlashElementVariable((UInt12)(_varIndex++), MemZoneVariableLength.Single));
             });
             return result;
@@ -163,7 +201,7 @@ namespace HASMLib.Parser
 				//Расчет нового индекса константы	
 				int constIndex = ++_constIndex;
 				//Заносим данную констатнту в список именных констант
-				_namedConsts.Add(new Tuple<string, UInt24, Constant>(label, (UInt24)constIndex, new Constant() {Value = index}));
+				_namedConsts.Add(new NamedConstant(label, (UInt24)constIndex, new Constant() {Value = index}));
 				//Записываем его во флеш память
 				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
 			}
@@ -200,7 +238,7 @@ namespace HASMLib.Parser
 				//Расчет нового индекса константы	
 				int constIndex = ++_constIndex;
 				//Заносим данную констатнту в список именных констант
-				_namedConsts.Add(new Tuple<string, UInt24, Constant>(label, (UInt24)constIndex, new Constant() {Value = index}));
+				_namedConsts.Add(new NamedConstant(label, (UInt24)constIndex, new Constant() {Value = index}));
 				//Записываем его во флеш память
 				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
 			}
@@ -209,8 +247,7 @@ namespace HASMLib.Parser
 			int argIndex = 0;
 
 			//Список последовательных индексов, что используются в инструкции
-			// true -  константа, false - переменная
-			var usedIndexes = new List<Tuple<UInt24, ReferenceType>>();
+			var usedIndexes = new List<ObjectReference>();
 
 			//Проверяем типы аргументов
 			foreach (var argument in arguments)
@@ -222,7 +259,7 @@ namespace HASMLib.Parser
 
 				//Грубое определние типа нашего аргумента
 				var isConst = constant != null;
-				var isVar = Variables.Select (p => p.Item1).Contains (argument);
+				var isVar = Variables.Select (p => p.Name).Contains (argument);
 
 
 				//Если допустимо и константа и переменная, то выходит неоднозначность
@@ -240,7 +277,7 @@ namespace HASMLib.Parser
 					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
 					{
 						//Запоминаем индекс константы
-						usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)(++_constIndex), ReferenceType.Constant));
+						usedIndexes.Add (new ObjectReference((UInt24)(++_constIndex), ReferenceType.Constant));
 						//Записываем во флеш константу
 						result.Add(constant.ToFlashElement(_constIndex));
 					};
@@ -249,9 +286,9 @@ namespace HASMLib.Parser
 					if (instruction.ParameterTypes [argIndex] == InstructionParameterType.Register) 
 					{
 						//Получаем индекс переменной со списка переменных
-						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
+						int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(argument);
 						//Запоминаем индекс переменной
-						usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)varIndex, ReferenceType.Variable));
+						usedIndexes.Add (new ObjectReference((UInt24)varIndex, ReferenceType.Variable));
 					}
 				}
 
@@ -266,7 +303,7 @@ namespace HASMLib.Parser
 					}
 
 					//Запоминаем индекс константы
-					usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)(++_constIndex), ReferenceType.Constant));
+					usedIndexes.Add (new ObjectReference((UInt24)(++_constIndex), ReferenceType.Constant));
 					//Заносим константу во флеш
 					result.Add (constant.ToFlashElement (_constIndex));
 				}
@@ -283,23 +320,23 @@ namespace HASMLib.Parser
 						}
 
 						//Получаем индекс переменной со списка переменных 
-						int varIndex = Variables.Select(p => p.Item1).ToList().IndexOf(argument);
+						int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(argument);
 						//Запоминаем индекс переменной
-						usedIndexes.Add (new Tuple<UInt24, ReferenceType> ((UInt24)varIndex, ReferenceType.Variable));
+						usedIndexes.Add (new ObjectReference((UInt24)varIndex, ReferenceType.Variable));
 					}
 					else //Если это не переменная, а просили константу
 						if (instruction.ParameterTypes [argIndex] == InstructionParameterType.ConstantOrRegister ||
 							instruction.ParameterTypes [argIndex] == InstructionParameterType.Constant) 
 						{
 							//То, возможно, это именная константа...
-							if (_namedConsts.Select (p => p.Item1).Contains (argument)) 
+							if (_namedConsts.Select (p => p.Name).Contains (argument)) 
 							{
 								//Получения индекса константы со списка
-								int constantIndex = _namedConsts.Select (p => p.Item1).ToList ().IndexOf (argument);
+								int constantIndex = _namedConsts.Select (p => p.Name).ToList ().IndexOf (argument);
 								//Запоминания индекса
-								usedIndexes.Add (new Tuple<UInt24, ReferenceType> (_namedConsts [constantIndex].Item2, ReferenceType.Constant));
+								usedIndexes.Add (new ObjectReference(_namedConsts [constantIndex].Index, ReferenceType.Constant));
 								//Запись константы во флеш
-								result.Add (_namedConsts [constantIndex].Item3.ToFlashElement (_namedConsts [constantIndex].Item2));
+								result.Add (_namedConsts [constantIndex].Value.ToFlashElement (_namedConsts [constantIndex].Index));
 							} else
 							{
 								error = NewParseError (ParseErrorType.Syntax_UnknownConstName, label, stringParts, argIndex, index);

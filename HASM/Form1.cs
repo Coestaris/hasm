@@ -35,6 +35,7 @@ namespace HASM
                 IOStream stream = new IOStream();
                 RuntimeMachine runtimeMachine = machine.CreateRuntimeMachine(source, stream);
 
+                runtimeMachine.Run();
                 //stream.write
             }
         }

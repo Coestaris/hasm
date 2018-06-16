@@ -20,11 +20,7 @@ namespace HASMLib
 
         public void SetRegisters(string NameFormat, uint count)
         {
-            for (int i = 0; i < count; i++)
-                MemZone.RAM.Add(new MemZoneVariableUInt12(0, string.Format(NameFormat, i)));
-                //MemZone.RAMAllocate((UInt12)0, string.Format(NameFormat, i));
-
-			_registerNameFormat = NameFormat;
+            _registerNameFormat = NameFormat;
             RegisterCount = count;
         }
 
@@ -57,6 +53,7 @@ namespace HASMLib
         public RuntimeMachine CreateRuntimeMachine(HASMSource source, IOStream iostream)
         {
             var rm = new RuntimeMachine(this, source);
+            MemZone.Clear();
             MemZone.Flash = source.ParseResult;
             return rm;
         }

@@ -1,4 +1,5 @@
-﻿using HASMLib.Core.MemoryZone;
+﻿using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
 using System.Collections.Generic;
 
 namespace HASMLib.Runtime
@@ -40,17 +41,38 @@ namespace HASMLib.Runtime
 
         public void Run()
         {
+            var constants = new List<UInt24, > 
+
             foreach (var item in _source.ParseResult)
             {
                 switch (item.Type)
                 {
                     case MemZoneFlashElementType.Variable:
                         var var = ((MemZoneFlashElementVariable)item);
+                        switch (var.VariableType)
+                        {
+                            case MemZoneVariableLength.Single:
+                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt12(0, var.Index));
+                                break;
+                            case MemZoneVariableLength.Double:
+                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt24(0, var.Index));
+                                break;
+                            case MemZoneVariableLength.Quad:
+                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt48(0, var.Index));
+                                break;
+                        }
                         break;
+
+
                     case MemZoneFlashElementType.Instruction:
                         break;
+
+
                     case MemZoneFlashElementType.Constant:
+                        
                         break;
+
+
                     case MemZoneFlashElementType.Undefined:
                         break;
                 }
