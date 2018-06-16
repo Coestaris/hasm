@@ -1,11 +1,8 @@
-﻿using System;
+﻿using HASMLib.Core;
+using HASMLib.Runtime;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-using HASMLib.Core;
+using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens
 {
@@ -16,6 +13,6 @@ namespace HASMLib.Parser.SyntaxTokens
         public int ParameterCount { get; protected set; }
         public List<InstructionParameterType> ParameterTypes { get; protected set; }
 
-        public abstract void Apply(MemZone memZone, List<InstructionParameter> parameters);
+        public abstract void Apply(MemZone memZone, List<NamedConstant> constants, List<InstructionParameter> parameters, RuntimeMachine runtimeMachine);
     }
 }

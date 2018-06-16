@@ -15,14 +15,14 @@
         {
             Length = LengthQualifier.Quad;
             Value = value;
-            UID = uid;
+            Index = uid;
         }
 
         public MemZoneVariableUInt48(UInt48 value, int uid, string name)
         {
             Length = LengthQualifier.Quad;
             Value = value;
-            UID = uid;
+            Index = uid;
             Name = name;
         }
     }

@@ -7,6 +7,6 @@ namespace HASMLib.Core.MemoryZone
         public LengthQualifier Length;
 
         public string Name;
-        public int UID;
+        public int Index;
     }
 }

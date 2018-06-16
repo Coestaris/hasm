@@ -18,9 +18,9 @@ namespace HASMLib.Core.MemoryZone
 			{
 				int a = 5; // 1 + 3 + 1
 				switch (Length) {
-					case LengthQualifier.Single: a += 2; break; 
-					case LengthQualifier.Double: a += 3; break; 
-					case LengthQualifier.Quad  : a += 8; break;
+					case LengthQualifier.Single : a += 2; break; 
+					case LengthQualifier.Double : a += 3; break; 
+					case LengthQualifier.Quad   : a += 8; break;
 				}
 				return a * 8 / 12; //To get 12-bit representation
 			}
@@ -28,8 +28,13 @@ namespace HASMLib.Core.MemoryZone
 
         public Constant ToConstant()
         {
-            return null;
-            //return new Constant()
+            switch (Length)
+            {
+                case LengthQualifier.Single : return new Constant(Value[0], LengthQualifier.Single);
+                case LengthQualifier.Double : return new Constant(UInt24.FromUInt12(Value), LengthQualifier.Double);
+                case LengthQualifier.Quad   : return new Constant(UInt48.FromUInt12(Value), LengthQualifier.Quad);
+                default                     : return null;
+            }
         }
 
 		public override byte[] ToBytes ()

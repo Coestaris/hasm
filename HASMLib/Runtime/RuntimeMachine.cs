@@ -3,6 +3,9 @@ using HASMLib.Core.MemoryZone;
 using static HASMLib.Parser.HASMParser;
 
 using System.Collections.Generic;
+using HASMLib.Parser.SyntaxTokens;
+using System.Linq;
+using HASMLib.Parser;
 
 namespace HASMLib.Runtime
 {
@@ -44,8 +47,15 @@ namespace HASMLib.Runtime
         private string _constantFormat = "_constant{0}";
         private string _variableFormat = "_var{0}";
 
+        public enum RunOutput
+        {
+            UnknownConstantReference,
+            UnknownVariableReference,
 
-        public void Run()
+            OK
+        }
+
+        public RunOutput Run()
         {
             var constants = new List<NamedConstant>(); 
 
@@ -58,19 +68,42 @@ namespace HASMLib.Runtime
                         switch (var.VariableType)
                         {
                             case LengthQualifier.Single:
-                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt12(0, var.Index));
+                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt12(0, var.Index, string.Format(_variableFormat, var.Index)));
                                 break;
                             case LengthQualifier.Double:
-                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt24(0, var.Index));
+                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt24(0, var.Index, string.Format(_variableFormat, var.Index)));
                                 break;
                             case LengthQualifier.Quad:
-                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt48(0, var.Index));
+                                _machine.MemZone.RAM.Add(new MemZoneVariableUInt48(0, var.Index, string.Format(_variableFormat, var.Index)));
                                 break;
                         }
                         break;
 
 
                     case MemZoneFlashElementType.Instruction:
+                        var instruction = (MemZoneFlashElementInstruction)item;
+
+                        //Проверяем валидность ссылок
+                        foreach (var parameter in instruction.Parameters)
+                        {
+                            switch (parameter.Type)
+                            {
+                                case ReferenceType.Constant:
+                                    if(!constants.Exists( p => p.Index == parameter.Index ))
+                                        return RunOutput.UnknownConstantReference;
+                                    break;
+
+                                case ReferenceType.Variable:
+                                    if (!_machine.MemZone.RAM.Exists(p => p.Index == parameter.Index))
+                                        return RunOutput.UnknownConstantReference;
+                                    break;
+                            }
+                        }
+
+                        //Если все ОК, то запускаем нашу инструкцию
+                        instructions[instruction.InstructionNumber].Apply(
+                            _machine.MemZone, constants, instruction.Parameters, this);
+
                         break;
 
 
@@ -88,6 +121,8 @@ namespace HASMLib.Runtime
                         break;
                 }
             }
+
+            return RunOutput.OK;
         }
     }
 }

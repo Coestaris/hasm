@@ -4,9 +4,9 @@ using HASMLib.Core;
 
 namespace HASMLib.Parser
 {
-    internal partial class HASMParser
+    public partial class HASMParser
 	{
-        internal struct NamedConstant
+        public struct NamedConstant
         {
             public string Name;
             public UInt24 Index;

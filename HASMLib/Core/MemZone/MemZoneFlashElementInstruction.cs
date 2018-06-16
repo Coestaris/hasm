@@ -8,8 +8,8 @@ namespace HASMLib.Core.MemoryZone
 {
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
-        private UInt24 InstructionNumber;
-		private List<HASMParser.ObjectReference> Parameters;
+        public UInt24 InstructionNumber;
+		public List<HASMParser.ObjectReference> Parameters;
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
 
