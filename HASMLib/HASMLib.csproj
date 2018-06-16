@@ -85,6 +85,7 @@
     <Compile Include="Parser\ParseErrorType.cs" />
     <Compile Include="Runtime\IOStream.cs" />
     <Compile Include="Runtime\RuntimeMachine.cs" />
+    <Compile Include="Runtime\RuntimeOutputCode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

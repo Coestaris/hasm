@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using HASMLib.Core;
+﻿using HASMLib.Core;
 using HASMLib.Runtime;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens.Instructions
 {
@@ -23,9 +21,22 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             };
         }
 
-        public override void Apply(MemZone memZone, List<HASMParser.NamedConstant> constants, List<InstructionParameter> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            throw new NotImplementedException();
+            if(parameters[0].Type == ReferenceType.Constant)
+            {
+                var source = GetConst(constants, parameters[0].Index);
+
+                runtimeMachine.OutBytes(source.Constant.ToUInt12());
+            }
+            else
+            {
+                var source = GetVar(memZone, parameters[0].Index);
+
+                runtimeMachine.OutBytes(source.ToUInt12());
+            }
+
+            return RuntimeOutputCode.OK;
         }
     }
 }

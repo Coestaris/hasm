@@ -2,9 +2,9 @@
 
 namespace HASMLib.Parser
 {
-    internal partial class HASMParser
+    public partial class HASMParser
 	{
-        internal struct ObjectReference
+        public struct ObjectReference
         {
             public UInt24 Index;
             public ReferenceType Type;

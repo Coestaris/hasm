@@ -10,7 +10,7 @@ using HASMLib.Core.MemoryZone;
 
 namespace HASMLib.Parser
 {
-    internal partial class HASMParser
+    public partial class HASMParser
 	{
         #region Globals
         private List<Variable> Variables;
@@ -20,12 +20,12 @@ namespace HASMLib.Parser
 
 		public static List<Instruction> instructions = new List<Instruction>()
 		{
-			new InstructionADD(0x1),
-			new InstructionJMP(0x2),
-			new InstructionMOV(0x3),
-			new InstructionNOP(0x4),
-            new InstructionOUT(0x5),
-            new InstructionLDI(0x6)
+			new InstructionADD(0x0),
+			new InstructionJMP(0x1),
+			new InstructionMOV(0x2),
+			new InstructionNOP(0x3),
+            new InstructionOUT(0x4),
+            new InstructionLDI(0x5)
         };
 		#endregion
 
@@ -292,7 +292,7 @@ namespace HASMLib.Parser
 								//Запоминания индекса
 								usedIndexes.Add (new ObjectReference(_namedConsts [constantIndex].Index, ReferenceType.Constant));
 								//Запись константы во флеш
-								result.Add (_namedConsts [constantIndex].Value.ToFlashElement (_namedConsts [constantIndex].Index));
+								result.Add (_namedConsts [constantIndex].Constant.ToFlashElement (_namedConsts [constantIndex].Index));
 							} else
 							{
 								error = NewParseError (ParseErrorType.Syntax_UnknownConstName, label, stringParts, argIndex, index);

@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -13,6 +14,16 @@ namespace HASMLib.Parser.SyntaxTokens
         public int ParameterCount { get; protected set; }
         public List<InstructionParameterType> ParameterTypes { get; protected set; }
 
-        public abstract void Apply(MemZone memZone, List<NamedConstant> constants, List<InstructionParameter> parameters, RuntimeMachine runtimeMachine);
+        protected MemZoneVariable GetVar(MemZone mz, UInt24 index)
+        {
+            return mz.RAM.Find(p => p.Index == index);
+        }
+
+        protected NamedConstant GetConst(List<NamedConstant> constants, UInt24 index)
+        {
+            return constants.Find(p => p.Index == index);
+        }
+
+        public abstract RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine);
     }
 }

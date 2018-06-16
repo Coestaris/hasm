@@ -1,8 +1,8 @@
 ﻿namespace HASMLib.Parser
 {
-    internal partial class HASMParser
+    public partial class HASMParser
 	{
-        internal enum ReferenceType
+        public enum ReferenceType
         {
             Constant,
             Variable

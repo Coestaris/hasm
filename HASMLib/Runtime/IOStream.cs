@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HASMLib.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace HASMLib.Runtime
 {
-    public class IOStream : Stream
+    public class IOStream
     {
         private RuntimeMachine _runtimeMachine;
 
-        private List<byte> _buffer;
+        private List<UInt12> _buffer;
 
-        private void UpdateBuffer()
+        private void UpdateBuffer(List<UInt12> inBuffer)
         {
-            _buffer.AddRange(_runtimeMachine.OutBuffer);
+            _buffer.AddRange(inBuffer);
         }
 
         public IOStream()
@@ -28,61 +29,83 @@ namespace HASMLib.Runtime
             _isInited = true;
             _runtimeMachine = runtimeMachine;
             _runtimeMachine.OutBufferUpdated += UpdateBuffer;
+            _runtimeMachine.OnBufferFlushed += Flushed;
+            _runtimeMachine.OnBufferClosed += Closed;
+
             Flush();
         }
 
+        private void Closed()
+        {
+            _isOpened = false;
+        }
+
+        private void Flushed()
+        {
+            _isOpened = true;
+            Flush();
+        }
+
+        private bool _isOpened;
         private bool _isInited;
 
         public bool IsOpened
         {
             get
             {
-                return _isInited && _runtimeMachine.IsRunning;
+                return _isInited && _isOpened;
             }
         }
 
-        public override bool CanRead => _isInited && _buffer.Count != 0;
+        public bool CanRead => _isInited && _buffer.Count != 0;
 
-        public override bool CanSeek => false;
+        public bool CanSeek => false;
 
-        public override bool CanWrite => _isInited && IsOpened;
+        public bool CanWrite => IsOpened;
 
-        public override long Length => _buffer.Count;
+        public long Length => _buffer.Count;
 
-        public override long Position
+        public long Position
         {
             get => throw new NotSupportedException();
             set => throw new NotSupportedException();
         }
 
-        public override void Flush()
+        public void Flush()
         {
-            _buffer = new List<byte>();
+            _buffer = new List<UInt12>();
         }
 
-        public override int Read(byte[] buffer, int offset, int count)
+        public List<UInt12> ReadAll()
+        {
+            UInt12[] buffer = new UInt12[Length];
+            Read(buffer, 0, (int)Length);
+            return buffer.ToList();
+        }
+
+        public int Read(UInt12[] buffer, int offset, int count)
         {
             if (count > _buffer.Count)
                 throw new ArgumentException();
 
-            Buffer.BlockCopy(_buffer.ToArray(), 0, buffer, offset, count);
+            _buffer.CopyTo(0, buffer, offset, count);
             _buffer.RemoveRange(0, count);
             return count;
         }
 
-        public override long Seek(long offset, SeekOrigin origin)
+        public long Seek(long offset, SeekOrigin origin)
         {
             throw new NotSupportedException();
         }
 
-        public override void SetLength(long value)
+        public void SetLength(long value)
         {
             throw new NotSupportedException();
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        public void Write(UInt12[] buffer, int offset, int count)
         {
-            List<byte> inBuffer = buffer.Skip(offset).Take(count).ToList();
+            List<UInt12> inBuffer = buffer.Skip(offset).Take(count).ToList();
             _runtimeMachine.InbufferRecieved(inBuffer);
         }
     }

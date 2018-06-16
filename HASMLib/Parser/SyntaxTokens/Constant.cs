@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Core;
+using System.Linq;
 
 namespace HASMLib.Parser.SyntaxTokens
 {
@@ -49,7 +50,21 @@ namespace HASMLib.Parser.SyntaxTokens
             return new ParseError(ParseErrorType.Constant_WrongFormat, 0);
         }
 
-		public MemZoneFlashElementConstant ToFlashElement(int index)
+        public List<UInt12> ToUInt12()
+        {
+            switch (Length)
+            {
+                case LengthQualifier.Single:
+                    return new List<UInt12>() { (UInt12)Value };
+                case LengthQualifier.Double:
+                    return ((UInt24)Value).ToUInt12().ToList();
+                case LengthQualifier.Quad:
+                    return ((UInt48)Value).ToUInt12().ToList();
+            }
+            return null;
+        }
+
+        public MemZoneFlashElementConstant ToFlashElement(int index)
 		{
 			switch (Length) 
 			{

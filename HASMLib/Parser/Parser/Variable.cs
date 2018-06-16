@@ -4,9 +4,9 @@ using HASMLib.Parser.SyntaxTokens;
 
 namespace HASMLib.Parser
 {
-    internal partial class HASMParser
+    public partial class HASMParser
 	{
-        internal struct Variable
+        public struct Variable
         {
             public string Name;
             public LengthQualifier Length;

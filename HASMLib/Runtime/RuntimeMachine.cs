@@ -1,17 +1,16 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
-using static HASMLib.Parser.HASMParser;
-
 using System.Collections.Generic;
-using HASMLib.Parser.SyntaxTokens;
-using System.Linq;
-using HASMLib.Parser;
+using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Runtime
 {
+
     public class RuntimeMachine
     {
-        internal delegate void RuntimeMachineOutBufferUpdated();
+        internal delegate void RuntimeMachineIOHandler();
+        internal delegate void RuntimeMachineIOBufferHandler(List<UInt12> data);
+
 
         private HASMMachine _machine;
 
@@ -23,21 +22,21 @@ namespace HASMLib.Runtime
             _source = source;
         }
 
-        internal void InbufferRecieved(List<byte> inBuffer)
+        internal void InbufferRecieved(List<UInt12> inBuffer)
         {
             InBuffer.AddRange(inBuffer);
         }
 
-        private void OutBytes(List<byte> bytes)
+        internal void OutBytes(List<UInt12> bytes)
         {
-            OutBuffer.AddRange(bytes);
-            OutBufferUpdated?.Invoke();
+            OutBufferUpdated?.Invoke(bytes);
         }
 
-        internal event RuntimeMachineOutBufferUpdated OutBufferUpdated;
+        internal event RuntimeMachineIOHandler OnBufferFlushed;
+        internal event RuntimeMachineIOHandler OnBufferClosed;
+        internal event RuntimeMachineIOBufferHandler OutBufferUpdated;
 
-        internal List<byte> OutBuffer;
-        internal List<byte>  InBuffer;
+        internal List<UInt12> InBuffer;
 
         public bool IsRunning
         {
@@ -47,15 +46,19 @@ namespace HASMLib.Runtime
         private string _constantFormat = "_constant{0}";
         private string _variableFormat = "_var{0}";
 
-        public enum RunOutput
+        public RuntimeOutputCode Run()
         {
-            UnknownConstantReference,
-            UnknownVariableReference,
+            InBuffer = new List<UInt12>();
+            OnBufferFlushed?.Invoke();
 
-            OK
+            var result = RunInternal();
+
+            OnBufferClosed?.Invoke();
+
+            return result;
         }
 
-        public RunOutput Run()
+        private RuntimeOutputCode RunInternal()
         {
             var constants = new List<NamedConstant>(); 
 
@@ -90,19 +93,22 @@ namespace HASMLib.Runtime
                             {
                                 case ReferenceType.Constant:
                                     if(!constants.Exists( p => p.Index == parameter.Index ))
-                                        return RunOutput.UnknownConstantReference;
+                                        return RuntimeOutputCode.UnknownConstantReference;
                                     break;
 
                                 case ReferenceType.Variable:
                                     if (!_machine.MemZone.RAM.Exists(p => p.Index == parameter.Index))
-                                        return RunOutput.UnknownConstantReference;
+                                        return RuntimeOutputCode.UnknownConstantReference;
                                     break;
                             }
                         }
 
                         //Если все ОК, то запускаем нашу инструкцию
-                        instructions[instruction.InstructionNumber].Apply(
+                        RuntimeOutputCode output = instructions[instruction.InstructionNumber].Apply(
                             _machine.MemZone, constants, instruction.Parameters, this);
+
+                        if (output != RuntimeOutputCode.OK)
+                            return output;
 
                         break;
 
@@ -122,7 +128,7 @@ namespace HASMLib.Runtime
                 }
             }
 
-            return RunOutput.OK;
+            return RuntimeOutputCode.OK;
         }
     }
 }
