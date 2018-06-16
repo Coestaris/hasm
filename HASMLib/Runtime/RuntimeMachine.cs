@@ -1,5 +1,6 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
+using System;
 using System.Collections.Generic;
 using static HASMLib.Parser.HASMParser;
 
@@ -11,6 +12,9 @@ namespace HASMLib.Runtime
         internal delegate void RuntimeMachineIOHandler();
         internal delegate void RuntimeMachineIOBufferHandler(List<UInt12> data);
 
+        public TimeSpan TimeOfRunning { get; private set; }
+
+        public int Ticks { get; private set; }
 
         private HASMMachine _machine;
 
@@ -48,12 +52,17 @@ namespace HASMLib.Runtime
 
         public RuntimeOutputCode Run()
         {
+            DateTime startTime = DateTime.Now;
+
+            Ticks = 0;
             InBuffer = new List<UInt12>();
             OnBufferFlushed?.Invoke();
 
             var result = RunInternal();
 
             OnBufferClosed?.Invoke();
+
+            TimeOfRunning = TimeSpan.FromMilliseconds((DateTime.Now - startTime).TotalMilliseconds);
 
             return result;
         }
@@ -64,6 +73,7 @@ namespace HASMLib.Runtime
 
             foreach (var item in _source.ParseResult)
             {
+                Ticks++;
                 switch (item.Type)
                 {
                     case MemZoneFlashElementType.Variable:

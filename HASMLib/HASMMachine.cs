@@ -50,11 +50,15 @@ namespace HASMLib
 
 		private string _registerNameFormat;
 
-        public RuntimeMachine CreateRuntimeMachine(HASMSource source, IOStream iostream)
+        public RuntimeMachine CreateRuntimeMachine(HASMSource source, IOStream iostream = null)
         {
             var rm = new RuntimeMachine(this, source);
             MemZone.Clear();
             MemZone.Flash = source.ParseResult;
+
+            if (iostream != null)
+                iostream.Init(rm);
+
             return rm;
         }
     }

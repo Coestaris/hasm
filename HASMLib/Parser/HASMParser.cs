@@ -58,7 +58,7 @@ namespace HASMLib.Parser
 		{
 			input = multipleSpaceRegex.Replace(input, PrepareSourceSpaceReplace);
 			input = commaSpaceRegex.Replace(input, PrepareSourceMultiCommaReplace);
-			return input.Split('\n').ToList();
+			return input.Split('\n').ToList().FindAll(p => !string.IsNullOrEmpty(p)).ToList();
 		}
 
 		private string CleanUpLine(string input)

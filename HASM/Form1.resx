@@ -117,4 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="richTextBox1.Text" xml:space="preserve">
+    <value>init:	ldi R1, 0x55_d	; Set R1 as 0x55 (double)
+	ldi R2, 0x77_d	; Set R2 as 0x77 (double)
+logic:	mov R4, R1	; Set R4 as R1
+	add R1, R2	; Adding R1 to R2 putting result to R1
+	mov R3, R2	; Set R4 as R2
+	mov R2, R4	; Set R2 as R4
+output:	out R1		; Output R1
+	out R2		; Output R2
+	out R3		; Output R3</value>
+  </data>
 </root>

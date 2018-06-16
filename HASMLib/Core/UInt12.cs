@@ -31,6 +31,11 @@ namespace HASMLib.Core
             return a.Value != b.Value;
         }
 
+        public static implicit operator char(UInt12 a)
+        {
+            return (char)((UInt16)a);
+        }
+
         public static implicit operator byte(UInt12 a)
         {
             return (byte)(a.Value & 0xFF);

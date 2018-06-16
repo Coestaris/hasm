@@ -1,20 +1,17 @@
 ﻿using HASMLib.Core.MemoryZone;
-using HASMLib.Core;
 using HASMLib.Parser;
-using HASMLib.Parser.SyntaxTokens;
-using HASMLib.Parser.SyntaxTokens.Instructions;
-
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System;
 
 namespace HASMLib
 {
-	public class HASMSource
+    public class HASMSource
     {
-		public string Source { get; set; }
+        public TimeSpan ParseTime { get; private set; }
+
+        public string Source { get; set; }
 
 		public HASMSource(HASMMachine machine, FileStream fs)
         {
@@ -58,6 +55,8 @@ namespace HASMLib
 
 		public ParseError Parse()
 		{
+            DateTime startTime = DateTime.Now; 
+
 			ParseError err;
 			ParseResult = new HASMParser().Parse(Machine, out err, Source);
 
@@ -67,7 +66,9 @@ namespace HASMLib
 			if (ParseResult == null)
 				return new ParseError (ParseErrorType.Other_UnknownError);
 
-			return null;
+            ParseTime = TimeSpan.FromMilliseconds((DateTime.Now - startTime).TotalMilliseconds);
+
+            return null;
 		}
     }
 }
