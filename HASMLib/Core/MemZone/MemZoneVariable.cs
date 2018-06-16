@@ -1,8 +1,10 @@
-﻿namespace HASMLib.Core.MemoryZone
+﻿using HASMLib.Parser.SyntaxTokens;
+
+namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneVariable
     {
-        public MemZoneVariableLength Length;
+        public LengthQualifier Length;
 
         public string Name;
         public int UID;

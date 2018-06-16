@@ -26,8 +26,8 @@ namespace HASMLib
 
         public void ClearRegisters()
         {
-            for (int i = 0; i < RegisterCount; i++)
-                ((MemZoneVariableUInt12)MemZone.RAM[i]).Value = 0;
+            if (MemZone.RAM.Count > RegisterCount)
+                MemZone.RAM.RemoveRange(0, (int)RegisterCount);
         }
 
 		public List<string> GetRegisterNames()

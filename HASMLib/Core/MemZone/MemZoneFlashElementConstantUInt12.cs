@@ -4,7 +4,7 @@
     {
 		public MemZoneFlashElementConstantUInt12(UInt12 value, int index)
         {
-			Length = Length_Single;
+			Length = LengthQualifier.Single;
 			Value = new UInt12[]{ value };
 			Index = index;
 		}

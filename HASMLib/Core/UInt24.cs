@@ -126,5 +126,15 @@ namespace HASMLib.Core
 
             return new UInt24() { Value = (((uint)data[1] << 12) | data[0]) & 0xFFFFFF };
         }
+
+        public override bool Equals(object obj)
+        {
+            return (GetType() == obj.GetType()) && (Value == ((UInt24)obj).Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)Value;
+        }
     }
 }

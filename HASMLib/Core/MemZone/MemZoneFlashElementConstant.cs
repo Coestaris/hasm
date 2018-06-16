@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
+using HASMLib.Parser.SyntaxTokens;
 
 namespace HASMLib.Core.MemoryZone
 {
@@ -7,7 +8,7 @@ namespace HASMLib.Core.MemoryZone
     {
 		public int Index;
 
-		protected byte Length;
+		protected LengthQualifier Length;
         protected UInt12[] Value;
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Constant;
@@ -17,17 +18,19 @@ namespace HASMLib.Core.MemoryZone
 			{
 				int a = 5; // 1 + 3 + 1
 				switch (Length) {
-					case Length_Single: a += 2; break; 
-					case Length_Double: a += 3; break; 
-					case Length_Quad: 	a += 8; break;
+					case LengthQualifier.Single: a += 2; break; 
+					case LengthQualifier.Double: a += 3; break; 
+					case LengthQualifier.Quad  : a += 8; break;
 				}
 				return a * 8 / 12; //To get 12-bit representation
 			}
 		}
 
-		protected const byte Length_Single 	= 1;
-		protected const byte Length_Double 	= 2;
-		protected const byte Length_Quad	= 3;
+        public Constant ToConstant()
+        {
+            return null;
+            //return new Constant()
+        }
 
 		public override byte[] ToBytes ()
 		{
@@ -38,7 +41,7 @@ namespace HASMLib.Core.MemoryZone
 			List<byte> bytes = new List<byte>();
 			bytes.Add(Element_Const);					// Is Const;
 			bytes.AddRange(((UInt24)Index).ToBytes()); 	// Global Index
-			bytes.Add(Length);							// Length of const
+			bytes.Add((byte)Length);							// Length of const
 			foreach (var item in Value) {
 				bytes.AddRange (item.ToBytes ());		// Data
 			}

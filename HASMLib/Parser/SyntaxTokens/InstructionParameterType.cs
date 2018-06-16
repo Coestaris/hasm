@@ -8,8 +8,8 @@ namespace HASMLib.Parser.SyntaxTokens
 {
     public enum InstructionParameterType
     {
-        Constant,
         Register,
+        Constant,
         ConstantOrRegister
     }
 }

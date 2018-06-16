@@ -10,52 +10,8 @@ using HASMLib.Core.MemoryZone;
 
 namespace HASMLib.Parser
 {
-	internal class HASMParser
+    internal partial class HASMParser
 	{
-        internal enum ReferenceType
-        {
-            Constant,
-            Variable
-        }
-
-        internal struct Variable
-        {
-            public string Name;
-            public MemZoneVariableLength Length;
-
-            public Variable(string name, MemZoneVariableLength length)
-            {
-                Name = name;
-                Length = length;
-            }
-        }
-
-        internal struct NamedConstant
-        {
-            public string Name;
-            public UInt24 Index;
-            public Constant Value;
-
-            public NamedConstant(string name, UInt24 index, Constant value)
-            {
-                Name = name;
-                Index = index;
-                Value = value;
-            }
-        }
-
-        internal struct ObjectReference
-        {
-            public UInt24 Index;
-            public ReferenceType Type;
-
-            public ObjectReference(UInt24 index, ReferenceType type)
-            {
-                Index = index;
-                Type = type;
-            }
-        }
-
         #region Globals
         private List<Variable> Variables;
 		private List<NamedConstant> _namedConsts;
@@ -136,8 +92,8 @@ namespace HASMLib.Parser
             var result = new List<MemZoneFlashElement>();
             machine.GetRegisterNames().ForEach(p =>
             {
-                Variables.Add(new Variable(p, MemZoneVariableLength.Single));
-                result.Add(new MemZoneFlashElementVariable((UInt12)(_varIndex++), MemZoneVariableLength.Single));
+                Variables.Add(new Variable(p, LengthQualifier.Single));
+                result.Add(new MemZoneFlashElementVariable((UInt12)(_varIndex++), LengthQualifier.Single));
             });
             return result;
 		}
@@ -201,7 +157,7 @@ namespace HASMLib.Parser
 				//Расчет нового индекса константы	
 				int constIndex = ++_constIndex;
 				//Заносим данную констатнту в список именных констант
-				_namedConsts.Add(new NamedConstant(label, (UInt24)constIndex, new Constant() {Value = index}));
+				_namedConsts.Add(new NamedConstant(label, (UInt24)constIndex, new Constant(index, LengthQualifier.Double)));
 				//Записываем его во флеш память
 				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
 			}
@@ -238,7 +194,7 @@ namespace HASMLib.Parser
 				//Расчет нового индекса константы	
 				int constIndex = ++_constIndex;
 				//Заносим данную констатнту в список именных констант
-				_namedConsts.Add(new NamedConstant(label, (UInt24)constIndex, new Constant() {Value = index}));
+				_namedConsts.Add(new NamedConstant(label, (UInt24)constIndex, new Constant(index, LengthQualifier.Double)));
 				//Записываем его во флеш память
 				result.Add (new MemZoneFlashElementConstantUInt24 ((UInt24)index, constIndex));
 			}

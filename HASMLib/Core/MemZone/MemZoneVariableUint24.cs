@@ -6,16 +6,24 @@
 
         public MemZoneVariableUInt24(UInt24 value, string name)
         {
-            Length = MemZoneVariableLength.Double;
+            Length = LengthQualifier.Double;
             Value = value;
             Name = name;
         }
 
         public MemZoneVariableUInt24(UInt24 value, int uid)
         {
-            Length = MemZoneVariableLength.Double;
+            Length = LengthQualifier.Double;
             Value = value;
             UID = uid;
+        }
+        
+        public MemZoneVariableUInt24(UInt24 value, int uid, string name)
+        {
+            Length = LengthQualifier.Double;
+            Value = value;
+            UID = uid;
+            Name = name;
         }
     }
 }

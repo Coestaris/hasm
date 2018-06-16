@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HASMLib.Core;
+using System;
 using System.Text.RegularExpressions;
 
 namespace HASMLib.Parser.SyntaxTokens.Constants
@@ -9,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
 
         public override Regex Regex => _regex;
 
-        protected override ParseError Parse(string str, ConstantLengthQualifier Length, out Constant constant)
+        protected override ParseError Parse(string str, LengthQualifier Length, out Constant constant)
         {
             constant = new Constant();
             str = str.Remove(0, 2);

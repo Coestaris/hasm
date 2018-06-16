@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using HASMLib.Core;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace HASMLib.Parser.SyntaxTokens.Constants
@@ -11,15 +12,15 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
         protected const long DMaxValue = 0xFFFFF;
         protected const long QMaxValue = 0xFFFFFFFFFFFF;
 
-        public bool CheckMaxValues(long value, ConstantLengthQualifier qualifier)
+        public bool CheckMaxValues(long value, LengthQualifier qualifier)
         {
             switch (qualifier)
             {
-                case ConstantLengthQualifier.Single:
+                case LengthQualifier.Single:
                     return value > SMaxValue;
-                case ConstantLengthQualifier.Double:
+                case LengthQualifier.Double:
                     return value > DMaxValue;
-                case ConstantLengthQualifier.Quad:
+                case LengthQualifier.Quad:
                     return value > QMaxValue;
                 default:
                     return false;
@@ -30,7 +31,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
         {
             if (char.IsDigit(str.Last()))
             {
-                return Parse(str, ConstantLengthQualifier.Single, out constant);
+                return Parse(str, LengthQualifier.Single, out constant);
             } else
             {
                 char c = str.Last();
@@ -39,11 +40,11 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
                 switch (c)
                 {
                     case 's':
-                        return Parse(str, ConstantLengthQualifier.Single, out constant);
+                        return Parse(str, LengthQualifier.Single, out constant);
                     case 'd':
-                        return Parse(str, ConstantLengthQualifier.Double, out constant);
+                        return Parse(str, LengthQualifier.Double, out constant);
                     case 'q':
-                        return Parse(str, ConstantLengthQualifier.Quad, out constant);
+                        return Parse(str, LengthQualifier.Quad, out constant);
                     default:
                         constant = null;
                         return new ParseError(ParseErrorType.Constant_UnknownConstantLengthQualifier);
@@ -51,6 +52,6 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
             }
         }
 
-        protected virtual ParseError Parse(string str, ConstantLengthQualifier Length, out Constant constant) { constant = null; return null; }
+        protected virtual ParseError Parse(string str, LengthQualifier Length, out Constant constant) { constant = null; return null; }
     }
 }

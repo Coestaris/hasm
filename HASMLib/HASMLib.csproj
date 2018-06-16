@@ -45,7 +45,6 @@
     <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
     <Compile Include="Core\MemZone\MemZoneVariable.cs" />
-    <Compile Include="Core\MemZone\MemZoneVariableLength.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint48.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint24.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint12.cs" />
@@ -54,6 +53,12 @@
     <Compile Include="HASMMachine.cs" />
     <Compile Include="HASMMachineBannedFeatures.cs" />
     <Compile Include="HASMSource.cs" />
+    <Compile Include="Parser\Parser\NamedConstant.cs" />
+    <Compile Include="Parser\Parser\ObjectReference.cs" />
+    <Compile Include="Parser\Parser\ReferenceType.cs" />
+    <Compile Include="Parser\Parser\Variable.cs" />
+    <Compile Include="Parser\SyntaxTokens\InstructionParameter.cs" />
+    <Compile Include="Parser\SyntaxTokens\InstructionParameterType.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionLDI.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionOUT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,15 +75,12 @@
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantDecFormat.cs" />
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantFormat.cs" />
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantHexFormat.cs" />
-    <Compile Include="Parser\SyntaxTokens\Constants\ConstantLengthQualifier.cs" />
+    <Compile Include="Core\LengthQualifier.cs" />
     <Compile Include="Parser\SyntaxTokens\Instruction.cs" />
-    <Compile Include="Parser\SyntaxTokens\InstructionParameter.cs" />
-    <Compile Include="Parser\SyntaxTokens\InstructionParameterType.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionADD.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionJMP.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionMOV.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionNOP.cs" />
-    <Compile Include="Parser\SyntaxTokens\Register.cs" />
     <Compile Include="Parser\ParseError.cs" />
     <Compile Include="Parser\ParseErrorType.cs" />
     <Compile Include="Runtime\IOStream.cs" />

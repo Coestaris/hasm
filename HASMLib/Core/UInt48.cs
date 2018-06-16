@@ -136,5 +136,15 @@ namespace HASMLib.Core
                               data[0]         ) & 0xFFFFFFFFFFFFUL
             };
         }
+
+        public override bool Equals(object obj)
+        {
+            return (GetType() == obj.GetType()) && (Value == ((UInt48)obj).Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)Value;
+        }
     }
 }

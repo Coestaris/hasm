@@ -9,9 +9,18 @@ namespace HASMLib.Parser.SyntaxTokens
     public class Constant
     {
         public Int64 Value;
-        public ConstantLengthQualifier Length;
+        public LengthQualifier Length;
 
-        internal Constant() { }
+        internal Constant()
+        {
+
+        }
+
+        internal Constant(Int64 value, LengthQualifier lq)
+        {
+            Length = lq;
+            Value = value;
+        }
 
         private static List<ConstantFormat> _formats = new List<ConstantFormat>()
         {
@@ -23,8 +32,8 @@ namespace HASMLib.Parser.SyntaxTokens
         public override string ToString()
         {
             return string.Format("Constant[{0}{1}]", Value, 
-                    (Length == ConstantLengthQualifier.Single ? 's' :
-                     Length == ConstantLengthQualifier.Double ? 'd' :
+                    (Length == LengthQualifier.Single ? 's' :
+                     Length == LengthQualifier.Double ? 'd' :
                      'q'));
         }
 
@@ -44,11 +53,11 @@ namespace HASMLib.Parser.SyntaxTokens
 		{
 			switch (Length) 
 			{
-				case ConstantLengthQualifier.Single:
+				case LengthQualifier.Single:
 					return new MemZoneFlashElementConstantUInt12 ((UInt12)Value, index);
-				case ConstantLengthQualifier.Double:
+				case LengthQualifier.Double:
 					return new MemZoneFlashElementConstantUInt24 ((UInt24)Value, index);
-				case ConstantLengthQualifier.Quad:	
+				case LengthQualifier.Quad:	
 					return new MemZoneFlashElementConstantUInt48 ((UInt48)Value, index);
 			}
 			return null;

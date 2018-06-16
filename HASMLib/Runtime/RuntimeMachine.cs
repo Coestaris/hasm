@@ -1,5 +1,7 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
+using static HASMLib.Parser.HASMParser;
+
 using System.Collections.Generic;
 
 namespace HASMLib.Runtime
@@ -39,9 +41,13 @@ namespace HASMLib.Runtime
             get => false;
         }
 
+        private string _constantFormat = "_constant{0}";
+        private string _variableFormat = "_var{0}";
+
+
         public void Run()
         {
-            var constants = new List<UInt24, > 
+            var constants = new List<NamedConstant>(); 
 
             foreach (var item in _source.ParseResult)
             {
@@ -51,13 +57,13 @@ namespace HASMLib.Runtime
                         var var = ((MemZoneFlashElementVariable)item);
                         switch (var.VariableType)
                         {
-                            case MemZoneVariableLength.Single:
+                            case LengthQualifier.Single:
                                 _machine.MemZone.RAM.Add(new MemZoneVariableUInt12(0, var.Index));
                                 break;
-                            case MemZoneVariableLength.Double:
+                            case LengthQualifier.Double:
                                 _machine.MemZone.RAM.Add(new MemZoneVariableUInt24(0, var.Index));
                                 break;
-                            case MemZoneVariableLength.Quad:
+                            case LengthQualifier.Quad:
                                 _machine.MemZone.RAM.Add(new MemZoneVariableUInt48(0, var.Index));
                                 break;
                         }
@@ -69,7 +75,12 @@ namespace HASMLib.Runtime
 
 
                     case MemZoneFlashElementType.Constant:
-                        
+                        var constant = (MemZoneFlashElementConstant)item;
+
+                        constants.Add(new NamedConstant(
+                            string.Format(_constantFormat, constant.Index),
+                            (UInt24)constant.Index,
+                            constant.ToConstant()));
                         break;
 
 
