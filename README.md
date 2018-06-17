@@ -1,8 +1,8 @@
 HASM
 ========
 
-Реализация ASM на .NET C#
+Р РµР°Р»РёР·Р°С†СЏ Р°СЃСЃРµРјР±Р»РµСЂР° (ASM) РЅР° .NET C#
 
-Проект вдохнавлен AVR-ASM:
-[- Оригинальная Документация](https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_instruction_list.html)
-[- Документация на русском](http://dfe.karelia.ru/koi/posob/avrlab/avrasm-rus.htm)
+РџСЂРѕРµРєС‚ РІРґРѕС…РЅРѕРІР»РµРЅ AVR-ASM:
+[- РћСЂРёРіРёРЅР°Р»СЊРЅР°СЏ РґРѕРєСѓРјРµРЅС‚Р°С†РёСЏ](https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_instruction_list.html)
+[- Р”РѕРєСѓРјРµРЅС‚Р°С†РёСЏ РЅР° СЂСѓСЃСЃРєРѕРј](http://dfe.karelia.ru/koi/posob/avrlab/avrasm-rus.htm)
