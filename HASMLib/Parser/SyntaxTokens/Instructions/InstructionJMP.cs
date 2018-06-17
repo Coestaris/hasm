@@ -23,10 +23,13 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
         public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            var localIndex = (UInt24)(GetConst(constants, parameters[0].Index).Constant.Value);
-            var globalIndex = runtimeMachine.GetGlobalInstructionIndexByLocalOne(localIndex);
+            UInt24 position = 0;
 
-            runtimeMachine.CurrentPosition = (UInt24)globalIndex;
+            if (parameters[0].Type == ReferenceType.Constant)
+                position = (UInt24)GetConst(constants, parameters[0].Index).Constant.Value;
+            else position = (UInt24)GetVar(memZone, parameters[0].Index).GetNumericValue();
+
+            RuntimeMachineJump(position, runtimeMachine);
 
             return RuntimeOutputCode.OK;
         }

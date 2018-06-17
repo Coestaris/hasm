@@ -5,6 +5,7 @@ using HASMLib.Runtime;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -44,7 +45,7 @@ namespace HASM
         {
             if (!isText)
             {
-                richTextBox2.Text = string.Join(", ", Output.Select(p => "0x" + ((int)p).ToString("X")));
+                richTextBox_output.Text = string.Join(", ", Output.Select(p => "0x" + ((int)p).ToString("X")));
             }
         }
 
@@ -54,7 +55,7 @@ namespace HASM
             machine.SetRegisters("R{0}", 24);
             machine.ClearRegisters();
 
-			HASMSource source = new HASMSource (machine, richTextBox1.Text);
+			HASMSource source = new HASMSource (machine, richTextBox_source.Text);
 			ParseError pe = source.Parse();
 
 
@@ -64,7 +65,7 @@ namespace HASM
 			}
 			else
 			{
-                label3.Text = string.Format("Parsed in: {0}. Size: {1} TBN(s)\n", ToPrettyFormat(source.ParseTime), source.UsedFlash);
+                label_info.Text = string.Format("Parsed in: {0}. Size: {1} TBN(s)\n", ToPrettyFormat(source.ParseTime), source.UsedFlash);
 
                 IOStream stream = new IOStream();
                 RuntimeMachine runtimeMachine = machine.CreateRuntimeMachine(source, stream);
@@ -72,14 +73,30 @@ namespace HASM
                 Output = stream.ReadAll();
 
                 OutputText(false);
-                label2.Text = string.Format("Output ( {0} )", (Output.Count == 0 ? "empty" : Output.Count.ToString() + "TBN(s)"));
-                label3.Text += string.Format("Run in: {0}. Steps: {1}", ToPrettyFormat(runtimeMachine.TimeOfRunning), runtimeMachine.Ticks);
+                label_output.Text = string.Format("Output ( {0} )", (Output.Count == 0 ? "empty" : Output.Count.ToString() + "TBN(s)"));
+                label_info.Text += string.Format("Run in: {0}. Steps: {1}", ToPrettyFormat(runtimeMachine.TimeOfRunning), runtimeMachine.Ticks);
             }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            OutputText(checkBox1.Checked);
+            OutputText(checkBox_outputType.Checked);
+        }
+
+        private void button_load_Click(object sender, EventArgs e)
+        {
+            if(openFileDialog_source.ShowDialog() == DialogResult.OK)
+            {
+                richTextBox_source.Text = File.ReadAllText(openFileDialog_source.FileName);
+            }
+        }
+
+        private void button_save_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog_source.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllText(saveFileDialog_source.FileName, richTextBox_source.Text);
+            }
         }
     }
 }

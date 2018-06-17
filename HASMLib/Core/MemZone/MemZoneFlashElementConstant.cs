@@ -48,7 +48,7 @@ namespace HASMLib.Core.MemoryZone
 			bytes.AddRange(((UInt24)Index).ToBytes()); 	// Global Index
 			bytes.Add((byte)Length);							// Length of const
 			foreach (var item in Value) {
-				bytes.AddRange (item.ToBytes ());		// Data
+				bytes.AddRange (item.ToBytes());		// Data
 			}
 			return bytes.ToArray();
 		}

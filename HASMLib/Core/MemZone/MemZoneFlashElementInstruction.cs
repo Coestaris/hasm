@@ -9,51 +9,56 @@ namespace HASMLib.Core.MemoryZone
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
         public UInt24 InstructionNumber;
-		public List<HASMParser.ObjectReference> Parameters;
+        public List<HASMParser.ObjectReference> Parameters;
+        public UInt24 ProgramIndex;
 
-        public UInt24 RuntimeIndex;
         public UInt24 RuntimeAbsoluteIndex;
 
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
 
-        public override int FixedSize 
+        public override int FixedSize
         {
-            get 
+            get
             {
-				if(Parameters == null) return 4;
-				else return (4 + 3 * Parameters.Count) * 8 / 12; //To get 12-representation of 8-bit
+                if (Parameters == null) return 6;
+                else return (4 + 2 + 3 * Parameters.Count) * 8 / 12; //To get 12-representation of 8-bit
             }
         }
 
-		private const byte Parameter_Const = 1;
-		private const byte Parameter_Var   = 2;
+        private const byte Parameter_Const = 1;
+        private const byte Parameter_Var = 2;
 
-		public override byte[] ToBytes ()
-		{
-			// 1. (1 byte)  	- is: const (0), var (1) or instruction (2)
-			// 2. (3 bytes) 	- Instruction number
-			// 3. (3 * n byte)	- Arguments: 1st byte - (1) or (2): constant or variable
-			//					- 2st and 3d bytes: index of constant of variable
-			List<byte> bytes = new List<byte>();
-
-			bytes.Add (Element_Instruction);								//Its a instrucion
-			bytes.AddRange (InstructionNumber.ToBytes ());					//Instrucion number
-			if(Parameters == null)
-				return bytes.ToArray ();
-
-			foreach (var item in Parameters) {
-				bytes.Add (item.Type == HASMParser.ReferenceType.Constant ? Parameter_Const : Parameter_Var);	//Const or variable
-				bytes.AddRange(item.Index.ToBytes ());						//Index of argument
-			}
-
-			return bytes.ToArray ();
-		}
-
-		public MemZoneFlashElementInstruction(Instruction instruction, List<HASMParser.ObjectReference> arguments)
+        public override byte[] ToBytes()
         {
-			InstructionNumber = instruction.Index;
+            // 1. (1 byte)  	- is: const (0), var (1) or instruction (2)
+            // 2. (3 bytes) 	- Instruction number
+            // 3. (3 bytes)     - Instrcution index
+            // 3. (3 * n byte)	- Arguments: 1st byte - (1) or (2): constant or variable
+            //					- 2st and 3d bytes: index of constant of variable
+            List<byte> bytes = new List<byte>();
+
+            bytes.Add(Element_Instruction);                             //Its a instrucion
+            bytes.AddRange(InstructionNumber.ToBytes());                //Instrucion number
+            if (Parameters == null)
+                return bytes.ToArray();
+
+            bytes.AddRange(ProgramIndex.ToBytes());                     //Instrucion index
+
+            foreach (var item in Parameters)
+            {
+                bytes.Add(item.Type == HASMParser.ReferenceType.Constant ? Parameter_Const : Parameter_Var);    //Const or variable
+                bytes.AddRange(item.Index.ToBytes());                       //Index of argument
+            }
+
+            return bytes.ToArray();
+        }
+
+        public MemZoneFlashElementInstruction(Instruction instruction, List<HASMParser.ObjectReference> arguments, UInt24 index)
+        {
+            InstructionNumber = instruction.Index;
             Parameters = arguments;
+            ProgramIndex = index;
         }
     }
 }

@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="richTextBox1.Text" xml:space="preserve">
+  <data name="richTextBox_source.Text" xml:space="preserve">
     <value>init:	ldi R1, 0x55_d	; Set R1 as 0x55 (double)
 	ldi R2, 0x77_d	; Set R2 as 0x77 (double)
 logic:	mov R4, R1	; Set R4 as R1
@@ -128,4 +128,16 @@ output:	out R1		; Output R1
 	out R2		; Output R2
 	out R3		; Output R3</value>
   </data>
+  <metadata name="openFileDialog_source.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>19, 7</value>
+  </metadata>
+  <metadata name="openFileDialog_binnary.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>205, 9</value>
+  </metadata>
+  <metadata name="saveFileDialog_source.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 48</value>
+  </metadata>
+  <metadata name="saveFileDialog_binnary.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>230, 43</value>
+  </metadata>
 </root>

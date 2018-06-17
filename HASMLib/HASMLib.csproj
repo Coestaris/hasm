@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementConstantDummy.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
     <Compile Include="Core\MemZone\MemZoneVariable.cs" />
@@ -59,7 +60,9 @@
     <Compile Include="Parser\Parser\Variable.cs" />
     <Compile Include="Parser\SyntaxTokens\InstructionParameter.cs" />
     <Compile Include="Parser\SyntaxTokens\InstructionParameterType.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\BR\InstructionBREQ.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionLDI.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionCMP.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionOUT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\MemZone.cs" />

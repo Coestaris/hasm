@@ -24,6 +24,13 @@ namespace HASMLib.Parser.SyntaxTokens
             return constants.Find(p => p.Index == index);
         }
 
+        public void RuntimeMachineJump(UInt24 position, RuntimeMachine runtimeMachine)
+        {
+            var localIndex = position;
+            var globalIndex = runtimeMachine.GetGlobalInstructionIndexByLocalOne(localIndex);
+            runtimeMachine.CurrentPosition = (UInt24)(globalIndex - 1);
+        }
+
         public abstract RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine);
     }
 }

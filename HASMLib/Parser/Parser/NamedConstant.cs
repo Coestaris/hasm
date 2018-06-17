@@ -6,7 +6,7 @@ namespace HASMLib.Parser
 {
     public partial class HASMParser
 	{
-        public struct NamedConstant
+        public class NamedConstant
         {
             public string Name;
             public UInt24 Index;

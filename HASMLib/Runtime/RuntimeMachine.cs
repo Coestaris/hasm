@@ -52,7 +52,7 @@ namespace HASMLib.Runtime
         {
             return _source.ParseResult.FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
                 .Select(p => (MemZoneFlashElementInstruction)p)
-                .First(p => p.RuntimeIndex == localIndex).RuntimeAbsoluteIndex;
+                .First(p => p.ProgramIndex == localIndex).RuntimeAbsoluteIndex;
         }
 
         private string _constantFormat = "_constant{0}";
@@ -102,7 +102,6 @@ namespace HASMLib.Runtime
             {
                 if (p.Type == MemZoneFlashElementType.Instruction)
                 {
-                    ((MemZoneFlashElementInstruction)p).RuntimeIndex = instrIndex++;
                     ((MemZoneFlashElementInstruction)p).RuntimeAbsoluteIndex = globalIndex;
                 }
                 globalIndex++;
@@ -110,6 +109,8 @@ namespace HASMLib.Runtime
 
             for (; CurrentPosition < data.Count; CurrentPosition++)
             {
+                Ticks++;
+
                 if(data[CurrentPosition].Type == MemZoneFlashElementType.Variable)
                 {
                     var var = ((MemZoneFlashElementVariable)data[CurrentPosition]);
