@@ -43,12 +43,9 @@ namespace HASMLib.Runtime
 
         internal List<UInt12> InBuffer;
 
-        public bool IsRunning
-        {
-            get => false;
-        }
+		public bool IsRunning { get; private set; }
 
-        internal int GetGlobalInstructionIndexByLocalOne(int localIndex)
+		internal int GetGlobalInstructionIndexByLocalOne(int localIndex)
         {
             return _source.ParseResult.FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
                 .Select(p => (MemZoneFlashElementInstruction)p)
@@ -62,6 +59,8 @@ namespace HASMLib.Runtime
         {
             DateTime startTime = DateTime.Now;
 
+			IsRunning = true;
+
             Ticks = 0;
             InBuffer = new List<UInt12>();
             OnBufferFlushed?.Invoke();
@@ -71,6 +70,8 @@ namespace HASMLib.Runtime
             OnBufferClosed?.Invoke();
 
             TimeOfRunning = TimeSpan.FromMilliseconds((DateTime.Now - startTime).TotalMilliseconds);
+
+			IsRunning = false;
 
             return result;
         }
@@ -95,7 +96,6 @@ namespace HASMLib.Runtime
             //Удаляем их из коллекции
             data.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
 
-            UInt24 instrIndex = 0;
             UInt24 globalIndex = 0;
 
             data.ForEach(p =>
@@ -104,10 +104,10 @@ namespace HASMLib.Runtime
                 {
                     ((MemZoneFlashElementInstruction)p).RuntimeAbsoluteIndex = globalIndex;
                 }
-                globalIndex++;
+                globalIndex += 1;
             });
 
-            for (; CurrentPosition < data.Count; CurrentPosition++)
+            for (; CurrentPosition < data.Count; CurrentPosition += 1)
             {
                 Ticks++;
 
