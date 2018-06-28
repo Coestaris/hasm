@@ -13,6 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             Index = (UInt24)index;
 
+            NameString = "out";
             Name = new Regex("^[Oo][Uu][Tt]");
             ParameterCount = 1;
             ParameterTypes  = new List<InstructionParameterType>()

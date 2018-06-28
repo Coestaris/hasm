@@ -1,5 +1,6 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
+using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,7 +150,7 @@ namespace HASMLib.Runtime
                 }
 
                 //Если все ОК, то запускаем нашу инструкцию
-                RuntimeOutputCode output = instructions[instruction.InstructionNumber].Apply(
+                RuntimeOutputCode output = SourceLineInstruction.Instructions[instruction.InstructionNumber].Apply(
                     _machine.MemZone, constants, instruction.Parameters, this);
 
                 if (output != RuntimeOutputCode.OK)

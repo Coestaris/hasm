@@ -5,6 +5,7 @@
     {
 		private const int NullValue = -1;
 
+
         public override string ToString()
         {
 			if 		(Line != NullValue && Index != NullValue) 
@@ -35,7 +36,15 @@
 			Line = line;
         }
 
+        public ParseError(ParseErrorType type, int line, int index, string fileName)
+        {
+            Type = type;
+            Index = index;
+            Line = line;
+            FileName = fileName;
+        }
 
+        public string FileName { get; set; }
         public ParseErrorType Type { get; set; }
 		public int Line { get; set; } = NullValue;
 		public int Index { get; set; } = NullValue;

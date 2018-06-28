@@ -13,6 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             Index = (UInt24)index;
 
+            NameString = "breq";
             Name = new Regex("^[Bb][Rr][Ee][Qq]");
             ParameterCount = 1;
             ParameterTypes = new List<InstructionParameterType>()

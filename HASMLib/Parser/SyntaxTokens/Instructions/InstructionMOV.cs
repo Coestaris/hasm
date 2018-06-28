@@ -13,6 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             Index = (UInt24)index;
 
+            NameString = "mov";
             Name = new Regex("^[Mm][Oo][Vv]");
             ParameterCount = 2;
             ParameterTypes = new List<InstructionParameterType>()

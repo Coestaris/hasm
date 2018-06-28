@@ -13,6 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             Index = (UInt24)index;
 
+            NameString = "ldi";
             Name = new Regex("^[Ll][Dd][Ii]");
             ParameterCount = 2;
             ParameterTypes = new List<InstructionParameterType>()

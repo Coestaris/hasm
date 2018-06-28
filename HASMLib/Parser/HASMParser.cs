@@ -2,6 +2,7 @@
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Parser.SyntaxTokens.Instructions;
+using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -38,66 +39,60 @@ namespace HASMLib.Parser
         }
 
         private List<UnknownLabelNameError> UnknownLabelNameErrorList;
-
-        public static List<Instruction> instructions = new List<Instruction>()
-        {
-            new InstructionADD(0x0),
-            new InstructionJMP(0x1),
-            new InstructionMOV(0x2),
-            new InstructionNOP(0x3),
-            new InstructionOUT(0x4),
-            new InstructionLDI(0x5),
-            new InstructionCMP(0x6),
-            new InstructionBREQ(0x7)
-        };
         #endregion
 
 
         #region Regex
-        private Regex LabelRegex = new Regex(@"^\w{1,100}:");
-        private Regex CommentRegex = new Regex(@";[\d\W\s\w]{0,}$");
         private Regex multipleSpaceRegex = new Regex(@"[ \t]{1,}");
         private Regex commaSpaceRegex = new Regex(@",[ \t]{1,}");
         #endregion
 
 
         #region Constants
-        private const string LabelReplaceChar = "";
-        private const char LabelTrimChar = ':';
-        private const string CommentReplaceChar = "";
-        private const char CommentTrimChar = ':';
+      
         private const string PrepareSourceSpaceReplace = " ";
         private const string PrepareSourceMultiCommaReplace = ",";
-        private const int ArgumentInstructionIndex = 0;
-        private const int ArgumentArgumentsIndex = 1;
-        private const char ArgumentSplitChar = ',';
-        private readonly char[] StringCleanUpChars = { ' ', '\t', '\r' };
-        private const char GetStringPartsSplitChar = ' ';
+        
+     
         #endregion
 
 
         #region Text Processing Methods
-        private List<string> PrepareSource(string input)
+        private List<SourceLine> PrepareSource(string input, string fileName, out ParseError error)
         {
             input = multipleSpaceRegex.Replace(input, PrepareSourceSpaceReplace);
             input = commaSpaceRegex.Replace(input, PrepareSourceMultiCommaReplace);
-            return input.Split('\n').ToList().FindAll(p => !string.IsNullOrEmpty(p)).ToList();
-        }
 
-        private string CleanUpLine(string input)
-        {
-            return input.Trim(StringCleanUpChars);
-        }
+            var actualLines = input.Split('\n').ToList();
+            var lines = new List<SourceLine>();
+            int index = 0;
 
-        private string[] GetStringParts(string input)
-        {
-            return input.Split(GetStringPartsSplitChar);
-        }
+            foreach (string line in actualLines)
+            {
+                //TODO: чето блять нормальное
+                if(line.StartsWith("#"))
+                {
+                    lines.Add(new SourceLinePreprocessor());
+                }
+                else
+                {
+                    var a = new SourceLineInstruction()
+                    {
+                        LineIndex = index++,
+                        FileName = fileName
+                    };
 
-        private void SplitLineIntoArguments(string[] stringParts, out string instruction, out string[] argumentList)
-        {
-            instruction = stringParts[ArgumentInstructionIndex];
-            argumentList = stringParts[ArgumentArgumentsIndex].Split(ArgumentSplitChar);
+                    error = a.Parse(line);
+
+                    if (error != null)
+                        return null;
+
+                    lines.Add(a);
+                }
+            }
+
+            error = null;
+            return lines;
         }
         #endregion
 
@@ -122,73 +117,17 @@ namespace HASMLib.Parser
             return result;
         }
 
-        private ParseError NewParseError(ParseErrorType error, string label, string[] stringParts, int argIndex, int index)
+        private ParseError NewParseError(ParseErrorType error, SourceLineInstruction line, int argIndex)
         {
             return new ParseError(
                 error,
-                index,
-                label.Length + 2 + stringParts.Take(argIndex).Sum(p => p.Length));
+                line.LineIndex,
+                line.Label.Length + 2 + line.Parameters.Take(argIndex).Sum(p => p.Length));
         }
         #endregion
 
 
         #region Core Parse Methods
-        private void FindCommentAndLabel(ref string input, out string commentStr, out string labelStr)
-        {
-            commentStr = "";
-            labelStr = "";
-
-            //Поиск вхождений указателя в строке
-            Match label = LabelRegex.Match(input);
-            //Поиск вхождений коментария в строке
-            Match comment = CommentRegex.Match(input);
-
-            //Если в строке был найден указатель, то запомнить его,
-            //удалив со строки
-            if (label.Success)
-            {
-                input = LabelRegex.Replace(input, LabelReplaceChar);
-                labelStr = label.Value.TrimEnd(LabelTrimChar);
-            }
-
-            //Если в строке был найден коментарий, то запомнить его,
-            //удалив со строки
-            if (comment.Success)
-            {
-                input = CommentRegex.Replace(input, CommentReplaceChar);
-                commentStr = comment.Value.TrimStart(CommentTrimChar);
-            }
-        }
-
-        public List<MemZoneFlashElement> GetFlashElementsNoArguents(Instruction instruction, string label, string line, int index, out ParseError error)
-        {
-            UInt24 currentInstructionProgramIndex = (UInt24)(_instructionIndex++);
-            
-            var result = new List<MemZoneFlashElement>();
-            error = null;
-
-            //Если инструкция не предполагает отсутсвие параметров то ошибка
-            if (instruction.ParameterCount != 0)
-            {
-                error = new ParseError(
-                    ParseErrorType.Instruction_WrongParameterCount,
-                    index,
-                    instruction.Name.Match(line).Index);
-                return null;
-            }
-
-            //Если указан указатель
-            if (!string.IsNullOrEmpty(label))
-            {
-                //Регистируем эту константу
-                RegisterConstant(label, index, LengthQualifier.Double);
-            }
-
-            //Закидываем во флеш нашу инструкцию без параметров
-            result.Add(new MemZoneFlashElementInstruction(instruction, null, currentInstructionProgramIndex));
-            return result;
-        }
-
         private MemZoneFlashElementConstant RegisterConstant(string name, long value, LengthQualifier lq)
         {
             //Если эта константа требовалась ранее, то подменяем ее!
@@ -223,35 +162,63 @@ namespace HASMLib.Parser
             return new MemZoneFlashElementConstantUInt24((UInt24)value, constIndex);
         }
 
-        public List<MemZoneFlashElement> GetFlashElementsWithArguents(Instruction instruction, string label, string[] stringParts, int index, out ParseError error)
+        private List<MemZoneFlashElement> ProceedInstruction(SourceLineInstruction line, out ParseError error)
         {
-            string instructionName = "";
-            string[] arguments;
+            if (line.Parameters == null) return GetFlashElementsNoArguents(line, out error);
+            else return GetFlashElementsWithArguents(line, out error);
+        }
 
+        private List<MemZoneFlashElement> GetFlashElementsNoArguents(SourceLineInstruction line, out ParseError error)
+        {
             UInt24 currentInstructionProgramIndex = (UInt24)(_instructionIndex++);
-
+            
             var result = new List<MemZoneFlashElement>();
+            error = null;
 
-            //Выделяем со строки параметры в отдельный массив
-            SplitLineIntoArguments(stringParts, out instructionName, out arguments);
-
-
-            //Если кол-во параметров не совпадает с предполагаемым
-            if (arguments.Length != instruction.ParameterCount)
+            //Если инструкция не предполагает отсутсвие параметров то ошибка
+            if (line.Instruction.ParameterCount != 0)
             {
                 error = new ParseError(
                     ParseErrorType.Instruction_WrongParameterCount,
-                    index,
-                    instruction.Name.Match(instructionName).Index);
+                    line.LineIndex,
+                    line.Comment.Length + line.Instruction.NameString.Length,
+                    line.FileName);
                 return null;
             }
 
             //Если указан указатель
-            if (!string.IsNullOrEmpty(label))
+            if (!string.IsNullOrEmpty(line.Label))
             {
-
                 //Регистируем эту константу
-                RegisterConstant(label, currentInstructionProgramIndex, LengthQualifier.Double);
+                RegisterConstant(line.Label, currentInstructionProgramIndex, LengthQualifier.Double);
+            }
+
+            //Закидываем во флеш нашу инструкцию без параметров
+            result.Add(new MemZoneFlashElementInstruction(line.Instruction, null, currentInstructionProgramIndex));
+            return result;
+        }
+
+        private List<MemZoneFlashElement> GetFlashElementsWithArguents(SourceLineInstruction line, out ParseError error)
+        {
+            UInt24 currentInstructionProgramIndex = (UInt24)(_instructionIndex++);
+            var result = new List<MemZoneFlashElement>();
+
+            //Если кол-во параметров не совпадает с предполагаемым
+            if (line.Parameters.Length != line.Instruction.ParameterCount)
+            {
+                error = new ParseError(
+                    ParseErrorType.Instruction_WrongParameterCount,
+                    line.LineIndex,
+                    line.Comment.Length + line.Instruction.NameString.Length,
+                    line.FileName);
+                return null;
+            }
+
+            //Если указан указатель
+            if (!string.IsNullOrEmpty(line.Label))
+            {
+                //Регистируем эту константу
+                RegisterConstant(line.Label, currentInstructionProgramIndex, LengthQualifier.Double);
             }
 
             //Индекс текущего аргумента
@@ -261,12 +228,10 @@ namespace HASMLib.Parser
             var usedIndexes = new List<ObjectReference>();
 
             //Проверяем типы аргументов
-            foreach (var argument in arguments)
+            foreach (var argument in line.Parameters)
             {
-                Constant constant = null;
-
                 //Попытка пропарсить константу
-                var constError = Constant.Parse(argument, out constant);
+                var constError = Constant.Parse(argument, out Constant constant);
 
                 //Грубое определние типа нашего аргумента
                 var isConst = constant != null;
@@ -274,9 +239,9 @@ namespace HASMLib.Parser
 
 
                 //Если допустимо и константа и переменная, то выходит неоднозначность
-                if (isVar && isConst && instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister)
+                if (isVar && isConst && line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister)
                 {
-                    error = NewParseError(ParseErrorType.Syntax_AmbiguityBetweenVarAndConst, label, stringParts, argIndex, index);
+                    error = NewParseError(ParseErrorType.Syntax_AmbiguityBetweenVarAndConst, line, argIndex);
                     return null;
                 }
 
@@ -285,7 +250,7 @@ namespace HASMLib.Parser
                 if (isVar && isConst)
                 {
                     //Если необходима коснтанта
-                    if (instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
+                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
                     {
                         //Запоминаем индекс константы
                         usedIndexes.Add(new ObjectReference((UInt24)(++_constIndex), ReferenceType.Constant));
@@ -294,7 +259,7 @@ namespace HASMLib.Parser
                     };
 
                     //Если необходима переменная
-                    if (instruction.ParameterTypes[argIndex] == InstructionParameterType.Register)
+                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Register)
                     {
                         //Получаем индекс переменной со списка переменных
                         int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(argument);
@@ -306,11 +271,10 @@ namespace HASMLib.Parser
                 //Если это однозначно константа, не переменная
                 if (isConst)
                 {
-
                     //А ожидалась константа, то ошибка
-                    if (instruction.ParameterTypes[argIndex] == InstructionParameterType.Register)
+                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Register)
                     {
-                        error = NewParseError(ParseErrorType.Syntax_ExpectedVar, label, stringParts, argIndex, index);
+                        error = NewParseError(ParseErrorType.Syntax_ExpectedVar, line, argIndex);
                         return null;
                     }
 
@@ -324,11 +288,10 @@ namespace HASMLib.Parser
                     //Если это однозначно переменная...
                     if (isVar)
                     {
-
                         //А ожидалась константа, то ошибка
-                        if (instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
+                        if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
                         {
-                            error = NewParseError(ParseErrorType.Syntax_ExpectedСonst, label, stringParts, argIndex, index);
+                            error = NewParseError(ParseErrorType.Syntax_ExpectedСonst, line, argIndex);
                             return null;
                         }
 
@@ -338,8 +301,9 @@ namespace HASMLib.Parser
                         usedIndexes.Add(new ObjectReference((UInt24)varIndex, ReferenceType.Variable));
                     }
                     else //Если это не переменная, а просили константу
-                        if (instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister ||
-                            instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
+                    
+                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister ||
+                        line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
                     {
                         //То, возможно, это именная константа...
                         if (_namedConsts.Select(p => p.Name).Contains(argument))
@@ -377,7 +341,7 @@ namespace HASMLib.Parser
 
                                 UnknownLabelNameErrorList.Add(new UnknownLabelNameError(
                                     argument,
-                                    NewParseError(ParseErrorType.Syntax_UnknownConstName, label, stringParts, argIndex, index),
+                                    NewParseError(ParseErrorType.Syntax_UnknownConstName, line, argIndex),
                                     constIndex,
                                     dummyNamedConstant, dummyConstant));
 
@@ -394,22 +358,22 @@ namespace HASMLib.Parser
                         }
                     }
                     else //Если удалось частично пропарсить константу, но были переполнения и тд...
-                            if (constError.Type == ParseErrorType.Constant_BaseOverflow || constError.Type == ParseErrorType.Constant_TooLong)
+                    if (constError.Type == ParseErrorType.Constant_BaseOverflow || constError.Type == ParseErrorType.Constant_TooLong)
                     {
                         //Вернуть новую ошибку с типо старой
-                        error = NewParseError(constError.Type, label, stringParts, argIndex, index);
+                        error = NewParseError(constError.Type, line, argIndex);
                         return null;
                     }
                     else //Если ничего не известно, то вернем что неивесное имя переменной
                     {
-                        error = NewParseError(ParseErrorType.Syntax_UnknownVariableName, label, stringParts, argIndex, index);
+                        error = NewParseError(ParseErrorType.Syntax_UnknownVariableName, line, argIndex);
                         return null;
                     }
                 }
                 argIndex++;
             }
 
-            result.Add(new MemZoneFlashElementInstruction(instruction, usedIndexes, currentInstructionProgramIndex));
+            result.Add(new MemZoneFlashElementInstruction(line.Instruction, usedIndexes, currentInstructionProgramIndex));
             error = null;
             return result;
         }
@@ -425,129 +389,65 @@ namespace HASMLib.Parser
             //label: instruction                ; comment
             //etc
 
-            try
+            //Обнуляем глобальные переменые
+            ResetGLobals();
+
+            List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
+
+            //Заносим регистры в список переменных
+            result.AddRange(SetupRegisters(machine));
+
+            //Очистка строк от лишних пробелов, табов
+            List<SourceLine> lines = PrepareSource(Source, "onlyFile.hasm", out parseError);
+
+            if (parseError != null)
+                return null;
+
+            foreach (SourceLineInstruction line in lines)
             {
-                //Обнуляем глобальные переменые
-                ResetGLobals();
+                if (line.IsEmpty)
+                    continue;
 
-                List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
-
-                //Заносим регистры в список переменных
-                result.AddRange(SetupRegisters(machine));
-
-                //Очистка строк от лишних пробелов, табов
-                List<string> lines = PrepareSource(Source);
-
-                for (var index = 0; index < lines.Count; index++)
+                var res = ProceedInstruction(line, out parseError);
+                if(parseError != null)
                 {
-                    string line = lines[index];
-                    string comment = "";
-                    string label = "";
-
-                    FindCommentAndLabel(ref line, out comment, out label);
-
-                    //Дополнительно удаляем лишние символы со строки
-                    line = CleanUpLine(line);
-
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    //Переменная для отслеживания успеха поиска инструкции
-                    bool found = false;
-
-                    foreach (var instruction in instructions)
-                    {
-                        //Если регулярка инструкции присутсвует в строке
-                        //Все обязаны иметь в себе "^" (начало строки), чтобы
-                        //избегать некоректный поиск в строке!
-                        if (instruction.Name.Match(line).Success)
-                        {
-                            //Делим строку спейсом, молясь о том, что это сработает!
-                            string[] stringParts = GetStringParts(line);
-
-                            //Если нету аргументов
-                            if (stringParts.Length == 1)
-                            {
-                                ParseError error;
-                                //Попытка пропарсить строку
-                                var flashElements = GetFlashElementsNoArguents(instruction, label, line, index, out error);
-                                if (flashElements == null)
-                                {
-                                    parseError = error;
-                                    return null;
-                                }
-                                result.AddRange(flashElements);
-                            }
-                            else if (stringParts.Length == 2)
-                            {
-                                ParseError error;
-                                //Попытка пропарсить строку
-                                var flashElements = GetFlashElementsWithArguents(instruction, label, stringParts, index, out error);
-                                if (flashElements == null)
-                                {
-                                    parseError = error;
-                                    return null;
-                                }
-                                result.AddRange(flashElements);
-                            }
-                            else
-                            {
-                                parseError = NewParseError(ParseErrorType.Syntax_UnExpectedToken, label, stringParts, 2, index);
-                                return null;
-                            }
-                            found = true;
-                            break;
-                        }
-
-                    }
-
-                    //Если не было найдено то ошибка
-                    if (!found)
-                    {
-                        parseError = new ParseError(
-                            ParseErrorType.Instruction_UnknownInstruction,
-                            index,
-                            label.Length + 2);
-                        return null;
-                    }
-                }
-
-                //Просматриваем все наши "отложенные" константы
-                //Если среди них есть пустые, то бьем тревогу!
-                foreach (var item in UnknownLabelNameErrorList)
-                {
-                    if(item.memZoneFlashElementConstant.isEmpty)
-                    {
-                        parseError = item.ParseError;
-                        return null;
-                    }
-                }
-
-
-                //Помещаем все константы в начало флеша для удобства дебага
-                //Выбираем с массива константы
-                var constants = result.FindAll(p => p.Type == MemZoneFlashElementType.Constant).ToList();
-                //Удаляем их из коллекции
-                result.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
-                //Пихаем в ее начало
-                result.InsertRange(0, constants);
-
-                //Если размер программы превышает максимально допустимый для этой машины
-                int totalFlashSize = result.Sum(p => p.FixedSize);
-                if (totalFlashSize > machine.Flash)
-                {
-                    parseError = new ParseError(ParseErrorType.Other_OutOfFlash);
                     return null;
                 }
 
-                parseError = null;
-                return result;
+                result.AddRange(res);
             }
-            catch
+
+            //Просматриваем все наши "отложенные" константы
+            //Если среди них есть пустые, то бьем тревогу!
+            foreach (var item in UnknownLabelNameErrorList)
             {
-                parseError = null;
+                if(item.memZoneFlashElementConstant.isEmpty)
+                {
+                    parseError = item.ParseError;
+                    return null;
+                }
+            }
+
+
+            //Помещаем все константы в начало флеша для удобства дебага
+            //Выбираем с массива константы
+            var constants = result.FindAll(p => p.Type == MemZoneFlashElementType.Constant).ToList();
+            //Удаляем их из коллекции
+            result.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
+            //Пихаем в ее начало
+            result.InsertRange(0, constants);
+
+            //Если размер программы превышает максимально допустимый для этой машины
+            int totalFlashSize = result.Sum(p => p.FixedSize);
+            if (totalFlashSize > machine.Flash)
+            {
+                parseError = new ParseError(ParseErrorType.Other_OutOfFlash);
                 return null;
             }
+
+            parseError = null;
+            return result;
+           
         }
     }
 }

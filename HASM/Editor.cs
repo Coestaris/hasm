@@ -1,5 +1,4 @@
 ﻿using HASMLib;
-using HASMLib.Core;
 using HASMLib.Parser;
 using HASMLib.Runtime;
 
@@ -58,6 +57,8 @@ namespace HASM
             toolStripComboBox1.SelectedItem = workingFolder.PreferedToCompile;
 
             tabControl1.SelectedIndex = workingFolder.SelectedTab;
+
+            Text = $"HASM Editor { (tabControl1.SelectedTab == null ? "" : " - " + (tabControl1.SelectedTab as TextEditor).Path)}";
         }
 
         private void AddTab(string path)
@@ -301,6 +302,7 @@ namespace HASM
 
             if(error != null)
             {
+                error.Line++;
                 MessageBox.Show(error.ToString());
                 return;
             }
@@ -312,6 +314,8 @@ namespace HASM
 
             var output = iostream.ReadAll();
             richTextBox1.Text = string.Join(", ", output.Select(p => p.ToString("X")));
+
+            toolStripLabel1.Text = $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}. Run in: {Formatter.ToPrettyFormat(runtime.TimeOfRunning)} or {runtime.Ticks} step{(runtime.Ticks == 1 ? "" : "s")}. Result is: {output.Count} TBN{(output.Count == 1 ? "" : "s")}";
         }
 
         private void runToolStripMenuItem_Click(object sender, EventArgs e)

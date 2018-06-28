@@ -9,6 +9,7 @@ namespace HASMLib.Parser.SyntaxTokens
 {
     public abstract class Instruction
     {
+        public string NameString { get; protected set; }
         public UInt24 Index { get; protected set; }
         public Regex Name { get; protected set; }
         public int ParameterCount { get; protected set; }

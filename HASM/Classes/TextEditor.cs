@@ -1,4 +1,5 @@
 ﻿using FastColoredTextBoxNS;
+using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -73,13 +74,18 @@ namespace HASM
                 TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GreenStyle, CommentRegex);
 
 
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueBoldStyle, LabelRegex);
+                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, LabelRegex);
 
                 TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.MaroonStyle, RegisterRegex);
+                
+                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, BinRegex);
+                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, DecRegex);
+                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, HexRegex);
 
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, BinRegex);
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, DecRegex);
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, HexRegex);
+                foreach (var item in HASMLib.Parser.SyntaxTokens.SourceLines.SourceLineInstruction.Instructions)
+                {
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, item.NameString);
+                }
 
             };
 

@@ -13,6 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             Index = (UInt24)index;
 
+            NameString = "jmp";
             Name = new Regex("^[Jj][Mm][Pp]");
             ParameterCount = 1;
             ParameterTypes = new List<InstructionParameterType>()

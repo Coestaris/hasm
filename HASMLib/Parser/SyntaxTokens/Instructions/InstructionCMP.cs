@@ -22,6 +22,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             Index = (UInt24)index;
 
+            NameString = "cmp";
             //CP or CMP
             Name = new Regex("^[Cc]([Mm])?[Pp]");
             ParameterCount = 2;
