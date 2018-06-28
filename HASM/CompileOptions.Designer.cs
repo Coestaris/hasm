@@ -42,12 +42,16 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.Name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.textBox_registerNameFormat = new System.Windows.Forms.TextBox();
+            this.textBox_registerCount = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // button_ok
             // 
-            this.button_ok.Location = new System.Drawing.Point(286, 351);
+            this.button_ok.Location = new System.Drawing.Point(364, 351);
             this.button_ok.Name = "button_ok";
             this.button_ok.Size = new System.Drawing.Size(75, 23);
             this.button_ok.TabIndex = 0;
@@ -57,7 +61,7 @@
             // 
             // button_cancel
             // 
-            this.button_cancel.Location = new System.Drawing.Point(205, 351);
+            this.button_cancel.Location = new System.Drawing.Point(283, 351);
             this.button_cancel.Name = "button_cancel";
             this.button_cancel.Size = new System.Drawing.Size(75, 23);
             this.button_cancel.TabIndex = 1;
@@ -70,7 +74,7 @@
             this.checkedListBox_bf.FormattingEnabled = true;
             this.checkedListBox_bf.Location = new System.Drawing.Point(113, 102);
             this.checkedListBox_bf.Name = "checkedListBox_bf";
-            this.checkedListBox_bf.Size = new System.Drawing.Size(248, 109);
+            this.checkedListBox_bf.Size = new System.Drawing.Size(176, 109);
             this.checkedListBox_bf.TabIndex = 2;
             // 
             // label1
@@ -86,14 +90,14 @@
             // 
             this.textBox_ram.Location = new System.Drawing.Point(113, 15);
             this.textBox_ram.Name = "textBox_ram";
-            this.textBox_ram.Size = new System.Drawing.Size(248, 20);
+            this.textBox_ram.Size = new System.Drawing.Size(126, 20);
             this.textBox_ram.TabIndex = 4;
             // 
             // textBox_flash
             // 
             this.textBox_flash.Location = new System.Drawing.Point(113, 41);
             this.textBox_flash.Name = "textBox_flash";
-            this.textBox_flash.Size = new System.Drawing.Size(248, 20);
+            this.textBox_flash.Size = new System.Drawing.Size(126, 20);
             this.textBox_flash.TabIndex = 6;
             // 
             // label2
@@ -109,7 +113,7 @@
             // 
             this.textBox_eeprom.Location = new System.Drawing.Point(113, 67);
             this.textBox_eeprom.Name = "textBox_eeprom";
-            this.textBox_eeprom.Size = new System.Drawing.Size(248, 20);
+            this.textBox_eeprom.Size = new System.Drawing.Size(126, 20);
             this.textBox_eeprom.TabIndex = 8;
             // 
             // label3
@@ -145,9 +149,9 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Name,
             this.Value});
-            this.dataGridView1.Location = new System.Drawing.Point(80, 217);
+            this.dataGridView1.Location = new System.Drawing.Point(113, 217);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(281, 128);
+            this.dataGridView1.Size = new System.Drawing.Size(326, 128);
             this.dataGridView1.TabIndex = 12;
             // 
             // Name
@@ -160,11 +164,47 @@
             this.Value.HeaderText = "Value";
             this.Value.Name = "Value";
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(245, 15);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(65, 26);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "Register\r\nname format";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(245, 44);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(76, 13);
+            this.label7.TabIndex = 14;
+            this.label7.Text = "Register count";
+            // 
+            // textBox_registerNameFormat
+            // 
+            this.textBox_registerNameFormat.Location = new System.Drawing.Point(327, 15);
+            this.textBox_registerNameFormat.Name = "textBox_registerNameFormat";
+            this.textBox_registerNameFormat.Size = new System.Drawing.Size(101, 20);
+            this.textBox_registerNameFormat.TabIndex = 15;
+            // 
+            // textBox_registerCount
+            // 
+            this.textBox_registerCount.Location = new System.Drawing.Point(327, 41);
+            this.textBox_registerCount.Name = "textBox_registerCount";
+            this.textBox_registerCount.Size = new System.Drawing.Size(101, 20);
+            this.textBox_registerCount.TabIndex = 16;
+            // 
             // CompileOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(373, 386);
+            this.ClientSize = new System.Drawing.Size(448, 386);
+            this.Controls.Add(this.textBox_registerCount);
+            this.Controls.Add(this.textBox_registerNameFormat);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -201,5 +241,9 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Name;
         private System.Windows.Forms.DataGridViewTextBoxColumn Value;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox textBox_registerNameFormat;
+        private System.Windows.Forms.TextBox textBox_registerCount;
     }
 }

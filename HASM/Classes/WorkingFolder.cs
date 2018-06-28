@@ -60,7 +60,8 @@ namespace HASM
 
         [XmlIgnore]
         private int _imgIndex = 0;
-        internal int SelectedTab;
+
+        public int SelectedTab;
 
         public void SetTreeView(TreeView tv)
         {
@@ -75,7 +76,11 @@ namespace HASM
             il.Images.Add("idedir", new Bitmap("ideDirIcon.png"));
 
             _imgIndex = 1;
-            TreeNode parent = new FileNode(removeFunc(Path), Path, true);
+            TreeNode parent = new FileNode(removeFunc(Path), Path, true)
+            {
+                isRoot = true
+            };
+
             AddNodes(removeFunc, Path, parent);
                 
             tv.Nodes.Add(parent);

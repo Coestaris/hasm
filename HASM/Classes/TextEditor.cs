@@ -10,12 +10,14 @@ namespace HASM
     {
         private Regex LabelRegex = new Regex(@"^\w{1,100}:", RegexOptions.Multiline);
         private Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
+        private Regex RegisterRegex = new Regex(@"R\d{0,2}", RegexOptions.Multiline);
+
 
         private Regex BinRegex = new Regex(@"\W0[bB][0-1]{1,100}(_[sdq]){0,1}");
         private Regex DecRegex = new Regex(@"\W\d{1,30}(_[sdq]){0,1}");
         private Regex HexRegex = new Regex(@"\W0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
 
-        public void Close()
+        public bool Close()
         {
             TabPageCollection collection = (Parent as TabControl).TabPages;
             if (IsChanged)
@@ -26,26 +28,36 @@ namespace HASM
                         Save();
                         collection.Remove(this);
                         Dispose(true);
-                        break;
+                        return true;
+
                     case DialogResult.No:
                         collection.Remove(this);
                         Dispose(true);
-                        break;
+                        return true;
+
                     case DialogResult.Cancel:
-                        break;
+                        return false;
+
                     default:
-                        break;
+                        return false;
                 }
             }
             else
             {
                 collection.Remove(this);
                 Dispose(true);
+                return true;
             }
         }
 
         public TextEditor(string path)
         {
+            if(!File.Exists(path))
+            {
+                MessageBox.Show($"Unable to find file {path}");
+                return;
+            }
+
             TextBox = new FastColoredTextBox();
             TextBox.Dock = DockStyle.Fill;
             TextBox.Text = File.ReadAllText(path);
@@ -57,13 +69,18 @@ namespace HASM
             TextBox.VisibleRangeChanged += (obj, args) =>
             {
                 TextBox.VisibleRange.ClearStyle(StyleIndex.All);
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BrownStyle, LabelRegex);
+
+                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GreenStyle, CommentRegex);
+
+
+                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueBoldStyle, LabelRegex);
+
+                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.MaroonStyle, RegisterRegex);
 
                 TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, BinRegex);
                 TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, DecRegex);
                 TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, HexRegex);
 
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GreenStyle, CommentRegex);
             };
 
             TextBox.TextChanged += (obj, args) =>
@@ -89,9 +106,18 @@ namespace HASM
 
         public void Save()
         {
-            Text = DisplayName;
-            IsChanged = false;
-            File.WriteAllText(Path, TextBox.Text);
+            if (IsChanged)
+            {
+                if(!File.Exists(Path))
+                {
+                    MessageBox.Show("File has been deleted or moved");
+                    return;
+                }
+
+                Text = DisplayName;
+                IsChanged = false;
+                File.WriteAllText(Path, TextBox.Text);
+            }
         }
 
         public bool IsChanged = false;

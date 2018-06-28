@@ -6,6 +6,11 @@ namespace HASMLib.Core
     {
         internal UInt16 Value;
 
+        public string ToString(string format)
+        {
+            return Value.ToString(format);
+        }
+
         public override string ToString()
         {
             return Value.ToString();

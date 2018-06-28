@@ -71,7 +71,7 @@ namespace HASMLib.Parser
         private const int ArgumentInstructionIndex = 0;
         private const int ArgumentArgumentsIndex = 1;
         private const char ArgumentSplitChar = ',';
-        private readonly char[] StringCleanUpChars = { ' ', '\t' };
+        private readonly char[] StringCleanUpChars = { ' ', '\t', '\r' };
         private const char GetStringPartsSplitChar = ' ';
         #endregion
 

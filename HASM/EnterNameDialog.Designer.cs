@@ -71,6 +71,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox1);
             this.Name = "EnterNameDialog";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "EnterNameDialog";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EnterNameDialog_FormClosing);
             this.ResumeLayout(false);

@@ -16,6 +16,8 @@ namespace HASM
             textBox_ram.Text = cfg.RAM.ToString();
             textBox_flash.Text = cfg.Flash.ToString();
             textBox_eeprom.Text = cfg.EEPROM.ToString();
+            textBox_registerCount.Text = cfg.RegisterCount.ToString();
+            textBox_registerNameFormat.Text = cfg.RegisterNameFormat;
 
             checkedListBox_bf.Items.Clear();
             foreach(var a in Enum.GetNames(typeof(HASMMachineBannedFeatures)))
@@ -55,6 +57,8 @@ namespace HASM
             config.EEPROM = int.Parse(textBox_eeprom.Text);
             config.Flash = int.Parse(textBox_flash.Text);
             config.RAM = int.Parse(textBox_ram.Text);
+            config.RegisterNameFormat = textBox_registerNameFormat.Text;
+            config.RegisterCount = int.Parse(textBox_registerCount.Text);
 
             HASMMachineBannedFeatures bf = 0;
             foreach(var a in checkedListBox_bf.Items)

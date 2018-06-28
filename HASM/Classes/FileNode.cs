@@ -4,6 +4,8 @@ namespace HASM
 {
     public class FileNode : TreeNode
     {
+        public bool isRoot;
+
         public string AbsolutePath;
         public bool IsDir;
 

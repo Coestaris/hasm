@@ -15,6 +15,10 @@ namespace HASM
 
         public int RAM;
 
+        public string RegisterNameFormat;
+
+        public int RegisterCount;
+
         public int Flash;
 
         public int EEPROM;

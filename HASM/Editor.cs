@@ -136,7 +136,10 @@ namespace HASM
 
             FileNode fnode = e.Node as FileNode;
 
-            contextMenuStrip_node.Show(PointToScreen(e.Location));
+            Point pnt = PointToScreen(e.Location);
+            pnt.Y += menuStrip1.Height;
+
+            contextMenuStrip_node.Show(pnt);
             selectedNode = fnode;
         }
 
@@ -165,7 +168,9 @@ namespace HASM
                 {
                     if (page.Path == selectedNode.AbsolutePath)
                     {
-                        page.Close();
+                        if (!page.Close())
+                            return;
+
                         UpdateOpenedTabs();
                     }
                 }
@@ -193,8 +198,12 @@ namespace HASM
         {
             if (selectedNode != null)
             {
-                var dialog = new EnterNameDialog(selectedNode.IsDir ? selectedNode.AbsolutePath : workingFolder.Path);
-                if(dialog.ShowDialog() == DialogResult.OK)
+                var dialog = new EnterNameDialog(selectedNode.IsDir ? selectedNode.AbsolutePath : workingFolder.Path)
+                {
+                    Text = "Enter name of new dir"
+                };
+
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
@@ -215,7 +224,11 @@ namespace HASM
         {
             if (selectedNode != null)
             {
-                var dialog = new EnterNameDialog(selectedNode.IsDir ? selectedNode.AbsolutePath : workingFolder.Path);
+                var dialog = new EnterNameDialog(selectedNode.IsDir ? selectedNode.AbsolutePath : workingFolder.Path)
+                {
+                    Text = "Enter name of new file"
+                };
+
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     try
@@ -235,7 +248,11 @@ namespace HASM
 
         private void addSourceFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var dialog = new EnterNameDialog(workingFolder.Path);
+            var dialog = new EnterNameDialog(workingFolder.Path)
+            {
+                Text = "Enter name of new file"
+            };
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -266,7 +283,35 @@ namespace HASM
 
         private void Run(string FileName)
         {
-           // HASMMachine machine = new HASMMachine();
+            HASMMachine machine = new HASMMachine((uint)compileConfig.RAM, (uint)compileConfig.EEPROM, (uint)compileConfig.Flash)
+            {
+                BannedFeatures = compileConfig.BannedFeatures
+            };
+
+            machine.SetRegisters(compileConfig.RegisterNameFormat, (uint)compileConfig.RegisterCount);
+
+
+            HASMParser parser = new HASMParser();
+
+            FileStream fs = File.OpenRead(FileName);
+            HASMSource source = new HASMSource(machine, fs);
+            fs.Close();
+
+            ParseError error = source.Parse();
+
+            if(error != null)
+            {
+                MessageBox.Show(error.ToString());
+                return;
+            }
+
+            IOStream iostream = new IOStream();
+            var runtime = machine.CreateRuntimeMachine(source, iostream);
+
+            runtime.Run();
+
+            var output = iostream.ReadAll();
+            richTextBox1.Text = string.Join(", ", output.Select(p => p.ToString("X")));
         }
 
         private void runToolStripMenuItem_Click(object sender, EventArgs e)
@@ -276,6 +321,11 @@ namespace HASM
             {
                 MessageBox.Show("File not found!");
                 return;
+            }
+
+            foreach (TextEditor item in tabControl1.TabPages)
+            {
+                item.Save();
             }
 
             Run(selected.Path);
@@ -291,11 +341,6 @@ namespace HASM
             }
         }
 
-        private void toolStripComboBox1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             workingFolder.PreferedToCompile = (SourceFile)toolStripComboBox1.SelectedItem;
@@ -304,7 +349,131 @@ namespace HASM
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            Text = $"HASM Editor { (tabControl1.SelectedTab == null ? "" : " - " + (tabControl1.SelectedTab as TextEditor).Path)}";
             workingFolder.SelectedTab = tabControl1.SelectedIndex;
+            workingFolder.Save();
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            if (selectedNode != null && !selectedNode.isRoot)
+            {
+                var dialog = new EnterNameDialog(selectedNode.AbsolutePath)
+                {
+                    Text = $"Enter new {(selectedNode.IsDir ? "directory" : "file")} name"
+                };
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        if (selectedNode.IsDir)
+                            Directory.Move(selectedNode.AbsolutePath, dialog.Value);
+                        else
+                        {
+                            
+                            foreach(TextEditor editor in tabControl1.TabPages)
+                                if(editor.Path == selectedNode.AbsolutePath)
+                                {
+                                    if (!editor.Close())
+                                        return;
+
+                                    UpdateOpenedTabs();
+                                }
+
+                            File.Move(selectedNode.AbsolutePath, dialog.Value);
+                        }
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Unable to rename");
+                        return;
+                    }
+
+                    workingFolder.SetTreeView(treeView1);
+                    treeView1.ExpandAll();
+                }
+            }
+        }
+
+        private void treeView1_ItemDrag(object sender, ItemDragEventArgs e)
+        {
+            DoDragDrop(e.Item, DragDropEffects.Move);
+        }
+
+        private void treeView1_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void treeView1_DragDrop(object sender, DragEventArgs e)
+        {
+            Point pt = ((TreeView)sender).PointToClient(new Point(e.X, e.Y));
+            FileNode destinationNode = ((TreeView)sender).GetNodeAt(pt) as FileNode;
+            FileNode sourceNode = (FileNode)e.Data.GetData(typeof(FileNode));
+
+            if (destinationNode == null)
+                destinationNode = ((TreeView)sender).Nodes[0] as FileNode; //root node
+
+            if (!destinationNode.IsDir)
+            {
+                MessageBox.Show("You can move files/dirs only in directories");
+                return;
+            }
+
+            string newPath = destinationNode.AbsolutePath + '/' + Path.GetFileName(sourceNode.AbsolutePath);
+
+            if(!sourceNode.IsDir)
+            {
+                if(File.Exists(newPath))
+                {
+                    MessageBox.Show("File already exists");
+                    return;
+                }
+
+                foreach (TextEditor editor in tabControl1.TabPages)
+                    if (editor.Path == sourceNode.AbsolutePath)
+                    {
+                        if (!editor.Close())
+                            return;
+
+                        UpdateOpenedTabs();
+                    }
+
+                try
+                {
+                    File.Move(sourceNode.AbsolutePath, newPath);
+                }
+                catch
+                {
+                    MessageBox.Show("Unable to rename file");
+                    return;
+                }
+
+                workingFolder.SetTreeView(treeView1);
+                treeView1.ExpandAll();
+            }
+            else
+            {
+                if (Directory.Exists(newPath))
+                {
+                    MessageBox.Show("Directory already exists");
+                    return;
+                }
+
+                try
+                {
+                    Directory.Move(sourceNode.AbsolutePath, newPath);
+                }
+                catch
+                {
+                    MessageBox.Show("Unable to rename dir");
+                    return;
+                }
+
+                workingFolder.SetTreeView(treeView1);
+                treeView1.ExpandAll();
+            }
         }
     }
 }
