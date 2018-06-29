@@ -1,21 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions
 {
+    /// <summary>
+    /// Представляет унарную функцию для выполнения в выражениях
+    /// </summary>
     public class Function
     {
-        public Func<long, long> UnaryFunc;
-        public string FunctionString;
+        /// <summary>
+        /// Действие, которое будет выполнять функция с операндом
+        /// </summary>
+        public Func<long, long> UnaryFunc { get; private set; }
 
+        /// <summary>
+        /// Имя, по которой идентифицируется в строке функция
+        /// </summary>
+        public string FunctionString { get; private set; }
+
+        /// <summary>
+        /// Строкове представление функции
+        /// </summary>
         public override string ToString()
         {
             return FunctionString;
         }
 
+        /// <summary>
+        /// Создает новый экземпляр класса <see cref="Function"/>
+        /// </summary>
+        /// <param name="functionString">Действие, которое будет выполнять функция с операндом</param>
+        /// <param name="unaryFunction">Имя, по которой идентифицируется в строке функция</param>
         public Function(string functionString, Func<long, long> unaryFunction)
         {
             UnaryFunc = unaryFunction;
