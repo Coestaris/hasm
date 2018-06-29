@@ -40,6 +40,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public Operator UnaryOperator { get; internal set; }
 
         /// <summary>
+        /// Унарная функция данного токена
+        /// </summary>
+        public Function UnaryFunction { get; internal set; }
+
+        /// <summary>
         /// Числовое значение данного токена
         /// </summary>
         public long Value { get; private set; }
@@ -57,12 +62,32 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Указывает на простоту данного токена. Если токен не простой, для него необходимо вызвать <see cref="Expression.CreateTokenTree(string, Token)"/>
         /// </summary>
-        public bool IsSimple => !RawValue.Contains('(') && RawValue.Intersect(Expression.BinaryOperatorCharaters).Count() == 0;
+        public bool IsSimple
+        {
+            get
+            {
+                bool result = !RawValue.Contains('(') && RawValue.Intersect(Expression.OperatorCharaters).Count() == 0;
+                if (Subtokens != null) result = result && Subtokens.All(p => p.RawValue.Intersect(Expression.UnaryOperatorCharaters).Count() == 0);
+
+                return result;
+            }
+        }
 
         /// <summary>
         /// Возможно ли расчитать числовое значение данного токена. Если да, то <see cref="Calculate"/> вернет данное значение
         /// </summary>
-        public bool CanBeCalculated => _valueSet || Subtokens == null || Subtokens.All(p => p._valueSet) || Subtokens.All(p => p.IsSimple);
+        public bool CanBeCalculated
+        {
+            get
+            {
+                bool result = _valueSet || Subtokens == null;
+                if (Subtokens != null)
+                    result = result || ((Subtokens.All(p => p._valueSet) || Subtokens.All(p => p.IsSimple)) &&
+                         (Subtokens.All(p => p.UnaryFunction == null) && Subtokens.All(p => p.UnaryOperator == null) ));
+
+                return result;
+            }
+        }
 
         /// <summary>
         /// Строковое представление данного оператора
@@ -102,7 +127,16 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 SetValue(Parse());
 
                 if (UnaryOperator != null)
+                {
                     Value = UnaryOperator.UnaryFunc(Value);
+                    UnaryOperator = null;
+                }
+
+                if (UnaryFunction != null)
+                {
+                    Value = UnaryFunction.UnaryFunc(Value);
+                    UnaryFunction = null;
+                }
 
                 return Value;
             }
@@ -148,15 +182,31 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     throw new Exception("Token must be primitive");*/
 
                 //Получаем числовые значение
-                //Учитываем, что операнды могут иметь свои унарные операции. 
+                //Учитываем, что операнды могут иметь свои унарные операции и функции. 
                 //Их приоритет всегда выше бинарных, потому сразу выполняем их
-                var leftValue = subTokens[maxLeftIndex].UnaryOperator == null
-                    ? subTokens[maxLeftIndex].Parse()
-                    : subTokens[maxLeftIndex].UnaryOperator.UnaryFunc(subTokens[maxLeftIndex].Parse());
-
-                var rightValue = subTokens[maxRightIndex].UnaryOperator == null
-                    ? subTokens[maxRightIndex].Parse()
-                    : subTokens[maxRightIndex].UnaryOperator.UnaryFunc(subTokens[maxRightIndex].Parse());
+                var leftValue = subTokens[maxLeftIndex].Parse();
+                if (subTokens[maxLeftIndex].UnaryOperator != null)
+                {
+                    leftValue = subTokens[maxLeftIndex].UnaryOperator.UnaryFunc(leftValue);
+                    subTokens[maxLeftIndex].UnaryOperator = null;
+                }
+                if (subTokens[maxLeftIndex].UnaryFunction != null)
+                {
+                    leftValue = subTokens[maxLeftIndex].UnaryFunction.UnaryFunc(leftValue);
+                    subTokens[maxLeftIndex].UnaryFunction = null;
+                }
+                
+                var rightValue = subTokens[maxRightIndex].Parse();
+                if (subTokens[maxRightIndex].UnaryOperator != null)
+                {
+                    rightValue = subTokens[maxRightIndex].UnaryOperator.UnaryFunc(rightValue);
+                    subTokens[maxRightIndex].UnaryOperator = null;
+                }
+                if (subTokens[maxRightIndex].UnaryFunction != null)
+                {
+                    rightValue = subTokens[maxRightIndex].UnaryFunction.UnaryFunc(rightValue);
+                    subTokens[maxRightIndex].UnaryFunction = null;
+                }
 
                 var value = op.BinaryFunc(leftValue, rightValue);
 
@@ -194,8 +244,17 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             _valueSet = true;
             Value = subTokens[0].Value;
 
-            if(UnaryOperator != null)
+            if (UnaryOperator != null)
+            {
                 Value = UnaryOperator.UnaryFunc(Value);
+                UnaryOperator = null;
+            }
+
+            if (UnaryFunction != null)
+            {
+                Value = UnaryFunction.UnaryFunc(Value);
+                UnaryFunction = null;
+            }
 
             return Value;
         }
@@ -242,6 +301,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 RightSideToken = RightSideToken,
                 Subtokens = Subtokens,
                 UnaryOperator = UnaryOperator,
+                UnaryFunction = UnaryFunction,
                 Value = Value,
                  _valueSet = _valueSet
             };

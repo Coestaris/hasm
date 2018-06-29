@@ -49,6 +49,13 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             }
         }
 
+        public static readonly List<Function> Functions = new List<Function>()
+        {
+            new Function("low", (a) => 0xFF & a),
+            new Function("high", (a) => 0xFF & a >> 8),
+            new Function("double", (a) => 2 * a),
+        };
+
         /// <summary>
         /// Список всех поддерживаемых операторов.
         /// Добавление своих не приветсвуется (они взяты со спецификации ANSI C), но это возможно
@@ -113,10 +120,16 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             string currentOperator = "";
             //Унарный оператор, который будет добавлен к следующему токену
             Operator unaryOperatorToAdd = null;
+            //Унарная функция, которая будет добавлена к следующему токену
+            Function unaryFunctionToAdd = null;
+
             //Указатель на то, что предыдущий символ был токеном
             bool lastCharWasOperator = false;
             //Указатель на то, что текущий накопительный оператор - унарный
             bool operatorIsUnary = false;
+
+            //Первая открытая скобка на текущем уровне. Неожиданно!?
+            bool firstOpenedBracketInCurrentLevel = true;
 
             //Список "сырых" накопительныйх токенов
             List<Token> tokens = new List<Token>();
@@ -150,6 +163,23 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                         //Сбрасываем указатель того, что мы читали оператор
                         lastCharWasOperator = false;
                     }
+                    //Если прошлый символ был не оператором, значит что-то там таки было
+                    //Возмонжно функция
+                    else if(bracketCount == 0 && currentToken != "" && firstOpenedBracketInCurrentLevel)
+                    {
+                        firstOpenedBracketInCurrentLevel = false;
+
+                        if (Functions.Exists(p => p.FunctionString == currentToken))
+                        {
+                            //Если это таки функция
+                            //Запоминаем ее, чтобы добавить позже
+                            unaryFunctionToAdd = Functions.Find(p => p.FunctionString == currentToken);
+
+
+                        }
+                        //Иначе тупо ошибка синтаксиса
+                        else throw new Exception("Unknown function!");
+                    }
 
                     //Запрещаем парсинг
                     bracketCount++;
@@ -166,18 +196,28 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     //то можно продолжить парс
                     if (bracketCount == 0)
                     {
+                        firstOpenedBracketInCurrentLevel = true;
+
                         //На всякий случай проверим, а то шото пустые откуда-то
                         //берет токены
                         if (currentToken != "")
                         {
+                            //Если задана функция, удаляем ее с начала строки, и удалем скобки
+                            if (unaryFunctionToAdd != null)
+                                currentToken = AccurateBracketTrim(currentToken.Remove(0, unaryFunctionToAdd.FunctionString.Length));
+
+
                             //Добавляем наш новый токен (скобку) в список
                             tokens.Add(new Token(AccurateBracketTrim(currentToken + ")"))
                             {
                                 //Добавляем унарный всегда, он либо нул либо нет,
                                 //какая разница?
-                                UnaryOperator = unaryOperatorToAdd
+                                UnaryOperator = unaryOperatorToAdd,
+                                UnaryFunction = unaryFunctionToAdd
                             });
                             unaryOperatorToAdd = null;
+                            unaryFunctionToAdd = null;
+
                             currentToken = "";
                         }
 
@@ -212,12 +252,18 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                         //переходит на "+". 
                         if (!lastCharWasOperator && currentToken != "")
                         {
+                            //Если задана функция, удаляем ее с начала строки, и удалем скобки
+                            if (unaryFunctionToAdd != null)
+                                currentToken = AccurateBracketTrim(currentToken.Remove(0, unaryFunctionToAdd.FunctionString.Length));
+
                             //Запоминаем токен
                             tokens.Add(new Token(AccurateBracketTrim(currentToken))
                             {
-                                UnaryOperator = unaryOperatorToAdd
+                                UnaryOperator = unaryOperatorToAdd,
+                                UnaryFunction = unaryFunctionToAdd
                             });
                             unaryOperatorToAdd = null;
+                            unaryFunctionToAdd = null;
                             currentToken = "";
                         }
 
@@ -257,10 +303,17 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             //  обычный символ - операторый символ 
             if (currentToken != "")
             {
+                //Если задана функция, удаляем ее с начала строки, и удалем скобки
+                if (unaryFunctionToAdd != null)
+                    currentToken = AccurateBracketTrim(currentToken.Remove(0, unaryFunctionToAdd.FunctionString.Length));
+
                 tokens.Add(new Token(currentToken)
                 {
-                     UnaryOperator = unaryOperatorToAdd
+                     UnaryOperator = unaryOperatorToAdd,
+                     UnaryFunction = unaryFunctionToAdd
                 });
+                unaryOperatorToAdd = null;
+                unaryFunctionToAdd = null;
             }
 
             //Для каждого найденого токена, если он содержит какую-то дрянь, типо
@@ -419,7 +472,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             //Для выражений, например "4", "!5", состоящих из одной цифры,
             //Берем его единственный сабтокен и кладем его в корневой
             //Клонируем, бикоз не хочу тянуть лишние ссылки
-            if (TokenTree.Subtokens.Count == 1 && TokenTree.Subtokens[0].Subtokens == null)
+            if (TokenTree.Subtokens.Count == 1)
                 TokenTree = (Token)TokenTree.Subtokens[0].Clone();
         }
     }
