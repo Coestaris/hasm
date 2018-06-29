@@ -30,7 +30,7 @@ namespace ConsoleTester
 
         public static string ToPrettyFormat(TimeSpan span)
         {
-            if (span == TimeSpan.Zero) return "0 minutes";
+            if (span == TimeSpan.Zero) return "< 0 ms";
 
             var sb = new StringBuilder();
             if (span.Days > 0)
@@ -48,17 +48,28 @@ namespace ConsoleTester
 
         static void Main(string[] args)
         {
+            new ExpressionTest(new Expression(@"2"), 2);
+
+            
+
             List<ExpressionTest> expressions = new List<ExpressionTest>()
             {
+                new ExpressionTest(new Expression(@"~2"), -3),
+                new ExpressionTest(new Expression(@"!(3 && 1)"), 1),
+                new ExpressionTest(new Expression(@"!(1 && (1 || 0 || 0 || 1))"), 0),
+                new ExpressionTest(new Expression(@"5 + ~2"), 2),
+
+
                 new ExpressionTest(new Expression(@"2"), 2),
                 new ExpressionTest(new Expression(@"3 << 1"), 6),
                 new ExpressionTest(new Expression(@"3 || 1"), 1),
                 new ExpressionTest(new Expression(@"3 || 6"), 0),
                 new ExpressionTest(new Expression(@"1 && (1 || 0 || 0 || 1)"), 1),
-                new ExpressionTest(new Expression(@"0 && (1 || 0 || 0 || 1)"), 1),
+                new ExpressionTest(new Expression(@"0 && (1 || 0 || 0 || 1)"), 0),
                 new ExpressionTest(new Expression(@"2 * (2 + 2)"), 8),
                 new ExpressionTest(new Expression(@"4 - 2 + 2 / 2 * 4 - 1- 2 - 4 - 5"), -6),
                 new ExpressionTest(new Expression(@"2 + (3 - 3 * ( 3 + 4 ) / 3)"), -2),
+                new ExpressionTest(new Expression(@"4 & 2 ^ 4 - 2 + 1"), 3),
             };
 
             foreach (var item in expressions)
@@ -67,8 +78,25 @@ namespace ConsoleTester
                 var result = item.expression.Calculate();
                 var calculated = TimeSpan.FromMilliseconds((DateTime.Now - now).TotalMilliseconds);
 
-                Console.WriteLine("Test: {0}. Expected: {1}. Result: {2}. Parsed: {3}. Calculated: {4}", 
-                    item.expression.Value, item.Result, result, ToPrettyFormat(item.Parsed), ToPrettyFormat(calculated));
+                if(result == item.Result)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("PASSED");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+
+                    Console.WriteLine(" :: Test: \"{0}\". Result: {1}. Parsed: {2}. Calculated: {3}",
+                        item.expression.Value, result, ToPrettyFormat(item.Parsed), ToPrettyFormat(calculated));
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("FAILED");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+
+                    Console.WriteLine(" :: Test: \"{0}\". Expected: {1}. Result: {2}. Parsed: {3}. Calculated: {4}", 
+                        item.expression.Value, item.Result, result, ToPrettyFormat(item.Parsed), ToPrettyFormat(calculated));
+                }
+
             }
 
             Console.ReadKey();

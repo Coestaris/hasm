@@ -1,59 +1,71 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions
 {
+    /// <summary>
+    /// Предсавляет оператор, для применения к токенам
+    /// </summary>
     public class Operator
     {
-        public int Priority;
-        public string OperatorString;
-        public bool IsUnary;
-        public bool IsBracketsRequider;
+        /// <summary>
+        /// Числовой приоритет выполнения оператора
+        /// </summary>
+        public int Priority { get; private set; }
 
-        public Func<Operand, Operand, long> BinaryFunc;
-        public Func<Operand, long> UnaryFunc;
+        /// <summary>
+        /// Строка, используемая для поиска оператора в строках
+        /// </summary>
+        public string OperatorString { get; private set; }
 
-        public Regex FindRegex;
+        /// <summary>
+        /// Унарный ли оператор
+        /// </summary>
+        public bool IsUnary { get; private set; }
 
+        /// <summary>
+        /// Функция выполнения для бинарных операторов. Иными словами, действие оператора
+        /// </summary>
+        public Func<long, long, long> BinaryFunc { get; private set; }
+
+        /// <summary>
+        /// Функция выполнения для унарных операторов. Иными словами, действие оператора
+        /// </summary>
+        public Func<long, long> UnaryFunc { get; private set; }
+
+        /// <summary>
+        /// Строковое представление <see cref="Operator"/>
+        /// </summary>
         public override string ToString()
         {
             return OperatorString;
         }
 
-        public Operator(int priority, string operatorString, bool isBracketsRequider, Func<Operand, long> function)
+        /// <summary>
+        /// Создает новый экземпляр класса <see cref="Operator"/>. Создаст унарный оператор
+        /// </summary>
+        /// <param name="operatorString">Строковое представление оператора</param>
+        /// <param name="function">Функция этого оператора</param>
+        public Operator(string operatorString, Func<long, long> function)
         {
-            Priority = priority;
+            //Унарные операторы, будем считать, всегда одинаково самые приоритетные
+            Priority = int.MaxValue;
             OperatorString = operatorString;
             IsUnary = true;
-            IsBracketsRequider = isBracketsRequider;
-
-            //Экранируем любой символ для регулярок
-            string regexString = "";
-            foreach (char c in operatorString)
-                regexString += "\\" + c; 
-
-            FindRegex = new Regex(regexString, RegexOptions.IgnoreCase);
-
+          
             UnaryFunc = function;
         }
 
-        public Operator(int priority, string operatorString, Func<Operand, Operand, long> function)
+        /// <summary>
+        /// Создает новый экземпляр класса <see cref="Operator"/>. Создаст бинарный оператор
+        /// </summary>
+        /// <param name="priority">Приоритет данного бинарного оператора</param>
+        /// <param name="operatorString">Строковое представление оператора</param>
+        /// <param name="function">Функция этого оператора</param>
+        public Operator(int priority, string operatorString, Func<long, long, long> function)
         {
             Priority = priority;
             OperatorString = operatorString;
             IsUnary = false;
-            IsBracketsRequider = false;
-
-            //Экранируем любой символ для регулярок
-            string regexString = "";
-            foreach (char c in operatorString)
-                regexString += "\\" + c;
-
-            FindRegex = new Regex(regexString, RegexOptions.IgnoreCase);
 
             BinaryFunc = function;
         }

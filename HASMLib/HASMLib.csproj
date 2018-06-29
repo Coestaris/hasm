@@ -59,7 +59,7 @@
     <Compile Include="Parser\Parser\ReferenceType.cs" />
     <Compile Include="Parser\Parser\Variable.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Expression.cs" />
-    <Compile Include="Parser\SyntaxTokens\Expressions\Operand.cs" />
+    <Compile Include="Parser\SyntaxTokens\Expressions\Extention.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Operator.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Token.cs" />
     <Compile Include="Parser\SyntaxTokens\InstructionParameter.cs" />

@@ -1,63 +1,116 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions
 {
-    public class Token : ICloneable
+    /// <summary>
+    /// Представляет основную расчетную еденицу выражений - токен
+    /// </summary>
+    internal class Token : ICloneable
     {
-        public string RawValue;
+        /// <summary>
+        /// "Сырое", строковое представление данного токена
+        /// </summary>
+        public string RawValue { get; internal set; }
 
-        public Token LeftSideToken;
-        public Token RightSideToken;
+        /// <summary>
+        /// Токен, находящийся слева от данного. Если это самый левый токен, то null
+        /// </summary>
+        public Token LeftSideToken { get; internal set; }
 
-        public Operator LeftSideOperator;
-        public Operator RightSideOperator;
+        /// <summary>
+        /// Токен, находящийся справа от данного. Если это самый правый токен, то null
+        /// </summary>
+        public Token RightSideToken { get; internal set; }
 
-        public Operator UnaryOperator;
+        /// <summary>
+        /// Оператор, находящийся между данным токеном и токеном справа. Если это самый правый токен, то null
+        /// </summary>
+        public Operator LeftSideOperator { get; internal set; }
 
-        public bool IsSimple => !RawValue.Contains('(') && RawValue.Intersect(Expression.OperatorCharaters).Count() == 0;
+        /// <summary>
+        /// Оператор, находящийся между данным токеном и токеном слева. Если это самый левый токен, то null
+        /// </summary>
+        public Operator RightSideOperator { get; internal set; }
 
+        /// <summary>
+        /// Унарный оператор данного токена
+        /// </summary>
+        public Operator UnaryOperator { get; internal set; }
+
+        /// <summary>
+        /// Числовое значение данного токена
+        /// </summary>
+        public long Value { get; private set; }
+
+        /// <summary>
+        /// Дочерние токены данного
+        /// </summary>
+        public List<Token> Subtokens { get; internal set; }
+
+        /// <summary>
+        /// Установлено ли числовое значение
+        /// </summary>
+        private bool _valueSet;
+
+        /// <summary>
+        /// Указывает на простоту данного токена. Если токен не простой, для него необходимо вызвать <see cref="Expression.CreateTokenTree(string, Token)"/>
+        /// </summary>
+        public bool IsSimple => !RawValue.Contains('(') && RawValue.Intersect(Expression.BinaryOperatorCharaters).Count() == 0;
+
+        /// <summary>
+        /// Возможно ли расчитать числовое значение данного токена. Если да, то <see cref="Calculate"/> вернет данное значение
+        /// </summary>
+        public bool CanBeCalculated => _valueSet || Subtokens == null || Subtokens.All(p => p._valueSet) || Subtokens.All(p => p.IsSimple);
+
+        /// <summary>
+        /// Строковое представление данного оператора
+        /// </summary>
         public override string ToString()
         {
             if (_valueSet) return $"Value: {Value}";
-            else return $"Raw Value: {RawValue}";
+            else
+            {
+                if(UnaryOperator == null)
+                    return $"Raw Value: {RawValue}";
+                else 
+                    return $"Raw Value: {UnaryOperator.OperatorString}({RawValue})";
+            }
         }
 
+        /// <summary>
+        /// Создает новый экземпляр класса <see cref="Token"/>
+        /// </summary>
+        /// <param name="rawValue">Строковое представление токена</param>
         public Token(string rawValue)
         {
             RawValue = rawValue;
         }
 
-        private bool _valueSet;
-
-        public bool CanBeCalculated => _valueSet || Subtokens == null || Subtokens.All(p =>p._valueSet) || Subtokens.All(p => p.IsSimple);
-
-        public List<Token> Subtokens;
-
-        public int Max(int a, int b)
-        {
-            return a > b ? a : b;
-        }
-
+        /// <summary>
+        /// Расчитывает числовое значение данного токена. Возможно только в случае если <see cref="CanBeCalculated"/> <see cref="true"/>
+        /// </summary>
+        /// <returns></returns>
         public long Calculate()
         {
-            Console.WriteLine("Calculating: {0}", RawValue);
             if (_valueSet)
                 return Value;
 
             if (IsSimple)
             {
                 SetValue(Parse());
-                Console.WriteLine("Result is: {0}", Value);
+
+                if (UnaryOperator != null)
+                    Value = UnaryOperator.UnaryFunc(Value);
+
                 return Value;
             }
 
             //1. Найти пару с найбольшим приоритетом
             //2. Удалить ее, заменив ее решением
             //Посторять 1-2 пункты пока не останится последний токен
+            //3. Применить унарный оператор
 
             //Создаем копию саб токенов. Нам не нужно портить изначальный массив.
             var subTokens = Subtokens.Select(p => (Token)p.Clone()).ToList();
@@ -95,9 +148,17 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     throw new Exception("Token must be primitive");*/
 
                 //Получаем числовые значение
-                var leftValue = subTokens[maxLeftIndex].Parse();
-                var rightValue = subTokens[maxRightIndex].Parse();
-                var value = op.BinaryFunc(new Operand(leftValue), new Operand(rightValue));
+                //Учитываем, что операнды могут иметь свои унарные операции. 
+                //Их приоритет всегда выше бинарных, потому сразу выполняем их
+                var leftValue = subTokens[maxLeftIndex].UnaryOperator == null
+                    ? subTokens[maxLeftIndex].Parse()
+                    : subTokens[maxLeftIndex].UnaryOperator.UnaryFunc(subTokens[maxLeftIndex].Parse());
+
+                var rightValue = subTokens[maxRightIndex].UnaryOperator == null
+                    ? subTokens[maxRightIndex].Parse()
+                    : subTokens[maxRightIndex].UnaryOperator.UnaryFunc(subTokens[maxRightIndex].Parse());
+
+                var value = op.BinaryFunc(leftValue, rightValue);
 
                 //Дебага ради создаем новое строковое значение
                 var newRawValue = value.ToString();
@@ -133,29 +194,44 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             _valueSet = true;
             Value = subTokens[0].Value;
 
-            Console.WriteLine("Result is: {0}", Value);
+            if(UnaryOperator != null)
+                Value = UnaryOperator.UnaryFunc(Value);
+
             return Value;
         }
 
-        public void SetValue(long value)
+        /// <summary>
+        /// Задает числовое значение данного токена, устанавливая <see cref="_valueSet"/> как true
+        /// </summary>
+        /// <param name="value"></param>
+        internal void SetValue(long value)
         {
             _valueSet = true;
             Value = value;
         }
 
-        public long Parse()
+        /// <summary>
+        /// Получает числовое значение данного токена, если он является примитивным или значение уже подсчитано
+        /// </summary>
+        private long Parse()
         {
             if (_valueSet)
                 return Value;
 
             return long.Parse(RawValue);
         }
-
+        
+        /// <summary>
+        /// Создает новый экземпляр класса <see cref="Token"/>
+        /// </summary>
         public Token()
         {
 
         }
 
+        /// <summary>
+        /// Клонирует данный экземпляр класса, создавая новый
+        /// </summary>
         public object Clone()
         {
             return new Token(RawValue)
@@ -170,7 +246,5 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                  _valueSet = _valueSet
             };
         }
-
-        public long Value;
     }
 }
