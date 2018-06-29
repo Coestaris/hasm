@@ -174,8 +174,6 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                             //Если это таки функция
                             //Запоминаем ее, чтобы добавить позже
                             unaryFunctionToAdd = Functions.Find(p => p.FunctionString == currentToken);
-
-
                         }
                         //Иначе тупо ошибка синтаксиса
                         else throw new Exception("Unknown function!");
@@ -213,7 +211,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                                 //Добавляем унарный всегда, он либо нул либо нет,
                                 //какая разница?
                                 UnaryOperator = unaryOperatorToAdd,
-                                UnaryFunction = unaryFunctionToAdd
+                                UnaryFunction = unaryFunctionToAdd,
                             });
                             unaryOperatorToAdd = null;
                             unaryFunctionToAdd = null;
@@ -260,7 +258,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                             tokens.Add(new Token(AccurateBracketTrim(currentToken))
                             {
                                 UnaryOperator = unaryOperatorToAdd,
-                                UnaryFunction = unaryFunctionToAdd
+                                UnaryFunction = unaryFunctionToAdd,
+
                             });
                             unaryOperatorToAdd = null;
                             unaryFunctionToAdd = null;
@@ -310,7 +309,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 tokens.Add(new Token(currentToken)
                 {
                      UnaryOperator = unaryOperatorToAdd,
-                     UnaryFunction = unaryFunctionToAdd
+                     UnaryFunction = unaryFunctionToAdd,
+
                 });
                 unaryOperatorToAdd = null;
                 unaryFunctionToAdd = null;

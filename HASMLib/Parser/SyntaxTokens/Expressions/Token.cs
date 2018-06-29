@@ -66,6 +66,13 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         {
             get
             {
+                //Требует дальнейше обработки токен если:
+                //  1. Содержит скобки
+                // или
+                //  2. Содержит операторные символ
+                // или 
+                //  3. Дочерние токены имеют унырные операторные символы
+
                 bool result = !RawValue.Contains('(') && RawValue.Intersect(Expression.OperatorCharaters).Count() == 0;
                 if (Subtokens != null) result = result && Subtokens.All(p => p.RawValue.Intersect(Expression.UnaryOperatorCharaters).Count() == 0);
 
@@ -80,10 +87,22 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         {
             get
             {
+                //Можно посчиатать если:
+                //  1. Значение уже подсчитано
+                // или
+                //  2. Нету дочерных токенов
+                //  Если дочерные токены есть, то можно если:
+                //  3. Все значениея дочерных уже подсчиатыны
+                // или  
+                //  4. Все дочерные значения примитивные, и их можно подсчитать
+                // 
+                // Но подсчитать нельзя если:
+                //   Некоторые дочерние токены имеют унарные функции или операторы
+
                 bool result = _valueSet || Subtokens == null;
                 if (Subtokens != null)
                     result = result || ((Subtokens.All(p => p._valueSet) || Subtokens.All(p => p.IsSimple)) &&
-                         (Subtokens.All(p => p.UnaryFunction == null) && Subtokens.All(p => p.UnaryOperator == null) ));
+                         (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null) ));
 
                 return result;
             }
@@ -114,6 +133,28 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         }
 
         /// <summary>
+        /// Устанавливает значение функции, применяя унарный оператор и функцию, сохраняя приоритет выполнения
+        /// </summary>
+        private static void CalculateValue(long value, Token token)
+        {
+            token._valueSet = true;
+            token.Value = value;
+
+            if (token.UnaryFunction != null)
+            {
+                token.Value = token.UnaryFunction.UnaryFunc(token.Value);
+                token.UnaryFunction = null;
+            }
+
+
+            if (token.UnaryOperator != null)
+            {
+                token.Value = token.UnaryOperator.UnaryFunc(token.Value);
+                token.UnaryOperator = null;
+            }
+        }
+
+        /// <summary>
         /// Расчитывает числовое значение данного токена. Возможно только в случае если <see cref="CanBeCalculated"/> <see cref="true"/>
         /// </summary>
         /// <returns></returns>
@@ -124,20 +165,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
             if (IsSimple)
             {
-                SetValue(Parse());
-
-                if (UnaryOperator != null)
-                {
-                    Value = UnaryOperator.UnaryFunc(Value);
-                    UnaryOperator = null;
-                }
-
-                if (UnaryFunction != null)
-                {
-                    Value = UnaryFunction.UnaryFunc(Value);
-                    UnaryFunction = null;
-                }
-
+                CalculateValue(Parse(), this);
+                _valueSet = true;
                 return Value;
             }
 
@@ -184,31 +213,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 //Получаем числовые значение
                 //Учитываем, что операнды могут иметь свои унарные операции и функции. 
                 //Их приоритет всегда выше бинарных, потому сразу выполняем их
-                var leftValue = subTokens[maxLeftIndex].Parse();
-                if (subTokens[maxLeftIndex].UnaryOperator != null)
-                {
-                    leftValue = subTokens[maxLeftIndex].UnaryOperator.UnaryFunc(leftValue);
-                    subTokens[maxLeftIndex].UnaryOperator = null;
-                }
-                if (subTokens[maxLeftIndex].UnaryFunction != null)
-                {
-                    leftValue = subTokens[maxLeftIndex].UnaryFunction.UnaryFunc(leftValue);
-                    subTokens[maxLeftIndex].UnaryFunction = null;
-                }
-                
-                var rightValue = subTokens[maxRightIndex].Parse();
-                if (subTokens[maxRightIndex].UnaryOperator != null)
-                {
-                    rightValue = subTokens[maxRightIndex].UnaryOperator.UnaryFunc(rightValue);
-                    subTokens[maxRightIndex].UnaryOperator = null;
-                }
-                if (subTokens[maxRightIndex].UnaryFunction != null)
-                {
-                    rightValue = subTokens[maxRightIndex].UnaryFunction.UnaryFunc(rightValue);
-                    subTokens[maxRightIndex].UnaryFunction = null;
-                }
+                CalculateValue(subTokens[maxLeftIndex].Parse(), subTokens[maxLeftIndex]);
+                CalculateValue(subTokens[maxRightIndex].Parse(), subTokens[maxRightIndex]);
 
-                var value = op.BinaryFunc(leftValue, rightValue);
+                var value = op.BinaryFunc(subTokens[maxLeftIndex].Value, subTokens[maxRightIndex].Value);
 
                 //Дебага ради создаем новое строковое значение
                 var newRawValue = value.ToString();
@@ -241,21 +249,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 subTokens.Insert(maxLeftIndex, newToken);
             }
 
-            _valueSet = true;
-            Value = subTokens[0].Value;
-
-            if (UnaryOperator != null)
-            {
-                Value = UnaryOperator.UnaryFunc(Value);
-                UnaryOperator = null;
-            }
-
-            if (UnaryFunction != null)
-            {
-                Value = UnaryFunction.UnaryFunc(Value);
-                UnaryFunction = null;
-            }
-
+            CalculateValue(subTokens[0].Value, this);
             return Value;
         }
 

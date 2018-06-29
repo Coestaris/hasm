@@ -52,7 +52,7 @@ namespace ConsoleTester
             {
                 //Primitive
                 new ExpressionTest(new Expression(@"2"), 2),
-                new ExpressionTest(new Expression(@"1234567"), 1234567),
+                new ExpressionTest(new Expression(@"(((1234567)))"), 1234567),
 
                 //Unary operators
                 new ExpressionTest(new Expression(@"~2"), -3),
@@ -77,15 +77,15 @@ namespace ConsoleTester
                 new ExpressionTest(new Expression(@"low(323)"), 67),
                 new ExpressionTest(new Expression(@"double(double(2))"), 8),
                 new ExpressionTest(new Expression(@"double(double(double(2)))"), 16),
-                new ExpressionTest(new Expression(@"double(double(2) + 1)"), 10),
-                new ExpressionTest(new Expression(@"double(double(2 + 1))"), 12),
-                new ExpressionTest(new Expression(@"double(4) + double(5 * 2) - 1"), 27),
-
+                
                 //Mixed
                 new ExpressionTest(new Expression(@"~double(2)"), ~4),
                 new ExpressionTest(new Expression(@"double(~2)"), (~2) * 2),
-
-
+                new ExpressionTest(new Expression(@"double(double(2) + 1)"), 10),
+                new ExpressionTest(new Expression(@"double(double(2 + 1))"), 12),
+                new ExpressionTest(new Expression(@"double(4) + double(5 * 2) - 1"), 27),
+                new ExpressionTest(new Expression(@"double(2+double(2+double(2+double(2+double(2)))))"), 124),
+                new ExpressionTest(new Expression(@"(~2- ~2 + ~2 - ~2) || 1"), 1),
             };
 
             foreach (var item in expressions)
