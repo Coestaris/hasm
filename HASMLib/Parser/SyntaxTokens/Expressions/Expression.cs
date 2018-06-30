@@ -35,6 +35,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             BinaryOperatorCharaters = new List<char>();
             foreach (Operator op in Operators)
             {
+                if (op.Ignore) continue;
+
                 foreach (char c in op.OperatorString)
                 {
                     if (!OperatorCharaters.Contains(c))
@@ -65,7 +67,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             //Unary 
             new Operator("!", (a) => a == 1 ? 0 : 1),
             new Operator("~", (a) => ~ a),
-            //new Operator(14, "-", false, (a) => - a.Value), Шо делать с унарным минусом пока хз
+            new Operator("-", (a) => - a, true),
 
             //Binnary
             new Operator(13, "*", (a, b) => a * b),
@@ -164,10 +166,19 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                         //а сохраним, подождав пока будет токен, куда его можно запихнуть
                         if (operatorIsUnary)
                         {
-                            unaryOperatorToAdd = FindOperator(currentOperator);
+                            unaryOperatorToAdd = FindUnaryOperator(currentOperator, false);
                             operatorIsUnary = false;
                         }
-                        else operators.Add(currentOperator);
+                        else
+                        {
+                            //Если это первый токен в списке, то логично, что оператор - унарный
+                            if (tokens.Count == 0 && currentOperator == "-")
+                            {
+                                unaryOperatorToAdd = FindUnaryOperator(currentOperator, true);
+                                operatorIsUnary = false;
+                            }
+                            operators.Add(currentOperator);
+                        }
 
                         //Сбрасываем накопительную переменную
                         currentOperator = "";
@@ -288,10 +299,19 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                         {
                             if (operatorIsUnary)
                             {
-                                unaryOperatorToAdd = FindOperator(currentOperator);
+                                unaryOperatorToAdd = FindUnaryOperator(currentOperator, false);
                                 operatorIsUnary = false;
                             }
-                            else operators.Add(currentOperator);
+                            else
+                            {
+                                //Если это первый токен в списке, то логично, что оператор - унарный
+                                if (tokens.Count == 0 && currentOperator == "-")
+                                {
+                                    unaryOperatorToAdd = FindUnaryOperator(currentOperator, true);
+                                    operatorIsUnary = false;
+                                }
+                                else operators.Add(currentOperator);
+                            }
                             currentOperator = "";
                         }
 
@@ -348,13 +368,13 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 {
                     tokens[i].LeftSideOperator = null;
                     tokens[i].LeftSideToken = null;
-                    tokens[i].RightSideOperator = FindOperator(operators[i]);
+                    tokens[i].RightSideOperator = FindOperator(operators[i], false);
                     tokens[i].RightSideToken = tokens[i + 1];
                 }
                 //Самый правый токен
                 else if(i != 0 && i == tokens.Count - 1 && tokens.Count != 1)
                 {
-                    tokens[i].LeftSideOperator = FindOperator(operators[i - 1]);
+                    tokens[i].LeftSideOperator = FindOperator(operators[i - 1], false);
                     tokens[i].LeftSideToken = tokens[i - 1];
                     tokens[i].RightSideOperator = null;
                     tokens[i].RightSideToken = null;
@@ -362,9 +382,9 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 //Токен не скраю
                 else if(i != 0 && tokens.Count != 1)
                 {
-                    tokens[i].LeftSideOperator = FindOperator(operators[i - 1]);
+                    tokens[i].LeftSideOperator = FindOperator(operators[i - 1], false);
                     tokens[i].LeftSideToken = tokens[i - 1];
-                    tokens[i].RightSideOperator = FindOperator(operators[i]);
+                    tokens[i].RightSideOperator = FindOperator(operators[i], false);
                     tokens[i].RightSideToken = tokens[i + 1];
                 }
                 //Единстенный токен в списке
@@ -391,13 +411,25 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         }
 
         /// <summary>
+        /// Ищет унарный оператор в списке, в случае ошибки выкидывает исключение
+        /// </summary>
+        /// <param name="name">Имя оператора</param>
+        /// <param name="ignoreIngoring">Указывает, стоит ли при поиске игнорировать ингнорирование</param>
+        /// <returns>Найденный оператор</returns>
+        private Operator FindUnaryOperator(string name, bool ignoreIngoring)
+        {
+            var a = Operators.Find(p => p.IsUnary && (ignoreIngoring || !p.Ignore) && p.OperatorString == name);
+            return a ?? throw new Exception("Unknown operator");
+        }
+
+        /// <summary>
         /// Ищет оператор в списке, в случае ошибки выкидывает исключение
         /// </summary>
         /// <param name="name">Имя оператора</param>
         /// <returns>Найденный оператор</returns>
-        private Operator FindOperator(string name)
+        private Operator FindOperator(string name, bool ignoreIngoring)
         {
-            var a = Operators.Find(p => p.OperatorString == name);
+            var a = Operators.Find(p => (ignoreIngoring || !p.Ignore) && p.OperatorString == name);
             return a ?? throw new Exception("Unknown operator");
         }
 

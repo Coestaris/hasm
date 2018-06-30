@@ -28,6 +28,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public string OperatorString { get; private set; }
 
         /// <summary>
+        /// Игнорировать любую обработку оператора. Нужно для унарного минуса
+        /// </summary>
+        internal bool Ignore { get; private set; }
+
+        /// <summary>
         /// Унарный ли оператор
         /// </summary>
         public bool IsUnary { get; private set; }
@@ -48,6 +53,23 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public override string ToString()
         {
             return OperatorString;
+        }
+
+        /// <summary>
+        /// Создает новый экземпляр класса <see cref="Operator"/>. Создаст унарный оператор
+        /// </summary>
+        /// <param name="operatorString">Строковое представление оператора</param>
+        /// <param name="function">Функция этого оператора</param>
+        /// <param name="ignore">Указывает, следует ли игнорировать обработку данного оператора</param>
+        public Operator(string operatorString, Func<long, long> function, bool ignore)
+        {
+            //Унарные операторы, будем считать, всегда одинаково самые приоритетные
+            Priority = int.MaxValue;
+            OperatorString = operatorString;
+            IsUnary = true;
+            Ignore = ignore;
+
+            UnaryFunc = function;
         }
 
         /// <summary>

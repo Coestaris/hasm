@@ -53,6 +53,8 @@ namespace ConsoleTester
                 new ExpressionTest(new Expression(@"(((1234567)))"), 1234567),
 
                 //Unary operators
+                new ExpressionTest(new Expression(@"-2"), -2),
+                new ExpressionTest(new Expression(@"2 + (-2)"), 0),
                 new ExpressionTest(new Expression(@"~2"), -3),
                 new ExpressionTest(new Expression(@"!(3 && 1)"), 1),
                 new ExpressionTest(new Expression(@"!(1 && (1 || 0 || 0 || 1))"), 0),
