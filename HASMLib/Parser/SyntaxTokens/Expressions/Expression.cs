@@ -71,26 +71,37 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             new Operator(13, "*", (a, b) => a * b),
             new Operator(13, "/", (a, b) => a / b),
 
-            new Operator(12, "+", (a, b) => a + b),
-            new Operator(12, "-", (a, b) => a - b),
+            new Operator(12, "%", (a, b) => a % b),
 
-            new Operator(11, "<<", (a, b) => a << (int)b),
-            new Operator(11, ">>", (a, b) => a >> (int)b),
+            new Operator(11, "+", (a, b) => a + b),
+            new Operator(11, "-", (a, b) => a - b),
 
-            new Operator(10, "<", (a, b) => a < b ? 1 : 0),
-            new Operator(10, "<=", (a, b) => a <= b ? 1 : 0),
-            new Operator(10, ">", (a, b) => a > b ? 1 : 0),
-            new Operator(10, ">=", (a, b) => a >= b ? 1 : 0),
+            new Operator(10, "<<", (a, b) => a << (int)b),
+            new Operator(10, ">>", (a, b) => a >> (int)b),
 
-            new Operator(9, "!=", (a, b) => a != b ? 1 : 0),
-            new Operator(9, "==", (a, b) => a == b ? 1 : 0),
+            new Operator(9, "<", (a, b) => a < b ? 1 : 0),
+            new Operator(9, "<=", (a, b) => a <= b ? 1 : 0),
+            new Operator(9, ">", (a, b) => a > b ? 1 : 0),
+            new Operator(9, ">=", (a, b) => a >= b ? 1 : 0),
 
-            new Operator(8, "&", (a, b) => a & b),
-            new Operator(7, "^", (a, b) => a ^ b),
-            new Operator(6, "|", (a, b) => a | b),
-            new Operator(5, "&&", (a, b) => a.AsBool() && b.AsBool() ? 1 : 0),
-            new Operator(4, "||", (a, b) => a.AsBool() || b.AsBool() ? 1 : 0)
+            new Operator(8, "!=", (a, b) => a != b ? 1 : 0),
+            new Operator(8, "==", (a, b) => a == b ? 1 : 0),
+
+            new Operator(7, "&", (a, b) => a & b),
+            new Operator(6, "^", (a, b) => a ^ b),
+            new Operator(5, "|", (a, b) => a | b),
+            new Operator(4, "&&", (a, b) => a.AsBool() && b.AsBool() ? 1 : 0),
+            new Operator(3, "||", (a, b) => a.AsBool() || b.AsBool() ? 1 : 0),
+
+            new Operator(2, "?", (a, b) => 
+            {
+                Operator.ConditionalOperatorResult = a.AsBool();
+                Operator.ConditionalSecondOperand = b;
+                return a;
+            }),
+            new Operator(1, ":", (a, b) => Operator.ConditionalOperatorResult ? Operator.ConditionalSecondOperand : b),
         };
+
 
         /// <summary>
         /// Строковое представление выражения

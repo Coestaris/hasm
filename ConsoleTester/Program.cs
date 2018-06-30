@@ -71,6 +71,12 @@ namespace ConsoleTester
                 new ExpressionTest(new Expression(@"2 + (3 - 3 * ( 3 + 4 ) / 3)"), -2),
                 new ExpressionTest(new Expression(@"4 & 2 ^ 4 - 2 + 1"), 3),
                 
+                //Conditional
+                new ExpressionTest(new Expression(@"1 ? 2 : 3"), 2),
+                new ExpressionTest(new Expression(@"0 ? 2 : 3"), 3),
+                new ExpressionTest(new Expression(@"0 ? 2 + 4 : 3 - 1"), 2),
+                new ExpressionTest(new Expression(@"4 % 2 == 0 ? 2 + 4 : 3 - 1"), 6),
+                
                 //Functions
                 new ExpressionTest(new Expression(@"low(323)"), 67),
                 new ExpressionTest(new Expression(@"double(double(2))"), 8),
@@ -84,6 +90,8 @@ namespace ConsoleTester
                 new ExpressionTest(new Expression(@"double(4) + double(5 * 2) - 1"), 27),
                 new ExpressionTest(new Expression(@"double(2+double(2+double(2+double(2+double(2)))))"), 124),
                 new ExpressionTest(new Expression(@"(~2- ~2 + ~2 - ~2) || 1"), 1),
+                new ExpressionTest(new Expression(@"1 && (1 || 0 || 0 || 1) ? double(3) : ~3 << 1"), 6),
+                new ExpressionTest(new Expression(@"0 && (1 || 0 || 0 || 1) ? double(3) : ~3 << 1"), ~3 << 1),
             };
 
             foreach (var item in expressions)

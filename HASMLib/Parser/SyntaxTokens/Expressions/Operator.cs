@@ -8,6 +8,16 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
     public class Operator
     {
         /// <summary>
+        /// Результат прошлого условного оператора
+        /// </summary>
+        internal static bool ConditionalOperatorResult;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal static long ConditionalSecondOperand;
+
+        /// <summary>
         /// Числовой приоритет выполнения оператора
         /// </summary>
         public int Priority { get; private set; }
