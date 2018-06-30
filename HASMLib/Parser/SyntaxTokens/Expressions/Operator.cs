@@ -15,7 +15,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// 
         /// </summary>
-        internal static long ConditionalSecondOperand;
+        internal static Constant ConditionalSecondOperand;
 
         /// <summary>
         /// Числовой приоритет выполнения оператора
@@ -40,12 +40,12 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Функция выполнения для бинарных операторов. Иными словами, действие оператора
         /// </summary>
-        public Func<long, long, long> BinaryFunc { get; private set; }
+        public Func<Constant, Constant, Constant> BinaryFunc { get; private set; }
 
         /// <summary>
         /// Функция выполнения для унарных операторов. Иными словами, действие оператора
         /// </summary>
-        public Func<long, long> UnaryFunc { get; private set; }
+        public Func<Constant, Constant> UnaryFunc { get; private set; }
 
         /// <summary>
         /// Строковое представление <see cref="Operator"/>
@@ -61,7 +61,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <param name="operatorString">Строковое представление оператора</param>
         /// <param name="function">Функция этого оператора</param>
         /// <param name="ignore">Указывает, следует ли игнорировать обработку данного оператора</param>
-        public Operator(string operatorString, Func<long, long> function, bool ignore)
+        public Operator(string operatorString, Func<Constant, Constant> function, bool ignore)
         {
             //Унарные операторы, будем считать, всегда одинаково самые приоритетные
             Priority = int.MaxValue;
@@ -77,7 +77,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         /// <param name="operatorString">Строковое представление оператора</param>
         /// <param name="function">Функция этого оператора</param>
-        public Operator(string operatorString, Func<long, long> function)
+        public Operator(string operatorString, Func<Constant, Constant> function)
         {
             //Унарные операторы, будем считать, всегда одинаково самые приоритетные
             Priority = int.MaxValue;
@@ -93,7 +93,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <param name="priority">Приоритет данного бинарного оператора</param>
         /// <param name="operatorString">Строковое представление оператора</param>
         /// <param name="function">Функция этого оператора</param>
-        public Operator(int priority, string operatorString, Func<long, long, long> function)
+        public Operator(int priority, string operatorString, Func<Constant, Constant, Constant> function)
         {
             Priority = priority;
             OperatorString = operatorString;

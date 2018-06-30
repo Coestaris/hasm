@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Действие, которое будет выполнять функция с операндом
         /// </summary>
-        public Func<long, long> UnaryFunc { get; private set; }
+        public Func<Constant, Constant> UnaryFunc { get; private set; }
 
         /// <summary>
         /// Имя, по которой идентифицируется в строке функция
@@ -30,7 +30,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         /// <param name="functionString">Действие, которое будет выполнять функция с операндом</param>
         /// <param name="unaryFunction">Имя, по которой идентифицируется в строке функция</param>
-        public Function(string functionString, Func<long, long> unaryFunction)
+        public Function(string functionString, Func<Constant, Constant> unaryFunction)
         {
             UnaryFunc = unaryFunction;
             FunctionString = functionString;

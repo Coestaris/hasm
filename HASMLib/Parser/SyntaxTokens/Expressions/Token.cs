@@ -47,7 +47,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Числовое значение данного токена
         /// </summary>
-        public long Value { get; private set; }
+        public Constant Value { get; private set; }
 
         /// <summary>
         /// Дочерние токены данного
@@ -135,7 +135,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Устанавливает значение функции, применяя унарный оператор и функцию, сохраняя приоритет выполнения
         /// </summary>
-        private static void CalculateValue(long value, Token token)
+        private static void CalculateValue(Constant value, Token token)
         {
             token._valueSet = true;
             token.Value = value;
@@ -158,7 +158,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Расчитывает числовое значение данного токена. Возможно только в случае если <see cref="CanBeCalculated"/> <see cref="true"/>
         /// </summary>
         /// <returns></returns>
-        public long Calculate()
+        public Constant Calculate()
         {
             if (_valueSet)
                 return Value;
@@ -254,10 +254,19 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         }
 
         /// <summary>
+        /// Очищает числовое значение данного токена, устанавливая <see cref="_valueSet"/> как false
+        /// </summary>
+        internal void ClearValue()
+        {
+            _valueSet = false;
+            Value = null;
+        }
+
+        /// <summary>
         /// Задает числовое значение данного токена, устанавливая <see cref="_valueSet"/> как true
         /// </summary>
         /// <param name="value"></param>
-        internal void SetValue(long value)
+        internal void SetValue(Constant value)
         {
             _valueSet = true;
             Value = value;
@@ -266,12 +275,28 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Получает числовое значение данного токена, если он является примитивным или значение уже подсчитано
         /// </summary>
-        private long Parse()
+        private Constant Parse()
         {
             if (_valueSet)
                 return Value;
 
-            return long.Parse(RawValue);
+            var error = Constant.Parse(RawValue, out Constant constant);
+
+            if (error != null)
+            {
+                if (error.Type == ParseErrorType.Constant_TooLong || error.Type == ParseErrorType.Constant_BaseOverflow)
+                    throw new Exception("Wrong coasd");
+
+                //Named constant
+
+                //Variable
+
+                return new Constant();
+            }
+            else
+            {
+                return constant;
+            }
         }
         
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using HASMLib.Parser.SyntaxTokens.Expressions;
+﻿using HASMLib.Parser;
+using HASMLib.Parser.SyntaxTokens.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,12 +9,27 @@ namespace ConsoleTester
     class Program
     {
 
-        public struct ExpressionTest
+        public class ExpressionTest
         {
             public TimeSpan Parsed;
 
             public Expression expression;
             public long Result;
+
+            public string ExpressionString;
+
+            public ParseError Parse()
+            {
+                return Expression.Parse(ExpressionString, out expression);
+            }
+
+            public ExpressionTest(string expression)
+            {
+                Result = 0;
+                Parsed = TimeSpan.Zero;
+
+                ExpressionString = expression;
+            }
 
             public ExpressionTest(Expression expression, long result)
             {
@@ -46,11 +62,12 @@ namespace ConsoleTester
 
         static void Main(string[] args)
         {
+            /*
             List<ExpressionTest> expressions = new List<ExpressionTest>()
             {
                 //Primitive
                 new ExpressionTest(new Expression(@"2"), 2),
-                new ExpressionTest(new Expression(@"(((1234567)))"), 1234567),
+                new ExpressionTest(new Expression(@"(((1234567_q)))"), 1234567),
 
                 //Unary operators
                 new ExpressionTest(new Expression(@"-2"), -2),
@@ -95,14 +112,13 @@ namespace ConsoleTester
                 new ExpressionTest(new Expression(@"1 && (1 || 0 || 0 || 1) ? double(3) : ~3 << 1"), 6),
                 new ExpressionTest(new Expression(@"0 && (1 || 0 || 0 || 1) ? double(3) : ~3 << 1"), ~3 << 1),
             };
-
             foreach (var item in expressions)
             {
                 DateTime now = DateTime.Now;
                 var result = item.expression.Calculate();
                 var calculated = TimeSpan.FromMilliseconds((DateTime.Now - now).TotalMilliseconds);
 
-                if(result == item.Result)
+                if(result.Value == item.Result)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write("PASSED");
@@ -120,6 +136,16 @@ namespace ConsoleTester
                     Console.WriteLine(" :: Test: \"{0}\". Expected: {1}. Result: {2}. Parsed: {3}. Calculated: {4}", 
                         item.expression.Value, item.Result, result, ToPrettyFormat(item.Parsed), ToPrettyFormat(calculated));
                 }
+
+            }*/
+
+            Expression.InitGlobals();
+            var a = Expression.Parse("2 + 2 + 10", out Expression expression);
+            if(a == null)
+            {
+                Console.WriteLine(expression.Calculate(true));
+                Console.WriteLine(expression.Calculate(false));
+                Console.WriteLine(expression.Calculate(true));
 
             }
 

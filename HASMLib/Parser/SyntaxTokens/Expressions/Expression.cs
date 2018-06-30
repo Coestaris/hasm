@@ -1,8 +1,35 @@
-﻿using System;
+﻿using HASMLib.Core;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions
 {
+    internal class UnknownFunctionException : Exception
+    {
+        public string FuncName {get; private set;}
+
+        public UnknownFunctionException(string funcName)
+        {
+            FuncName = funcName;
+        }
+    }
+
+    internal class UnknownOperatorException : Exception
+    {
+        public string OperatorName { get; private set; }
+
+        public UnknownOperatorException(string operatorName)
+        {
+            OperatorName = OperatorName;
+        }
+    }
+
+    internal class WrongOperatorCountException : Exception
+    {
+      
+    }
+
     /// <summary>
     /// Основной класс для подсчета числовых значений текстовых выражений
     /// </summary>
@@ -53,9 +80,21 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
         public static readonly List<Function> Functions = new List<Function>()
         {
-            new Function("low", (a) => 0xFF & a),
-            new Function("high", (a) => 0xFF & a >> 8),
-            new Function("double", (a) => 2 * a),
+            new Function("double", (a) => new Constant(a.Value * 2, a.Length)),
+
+
+            new Function("low", (a) => new Constant((UInt12)a.Value, LengthQualifier.Single)),
+            new Function("high", (a) => new Constant((UInt12)(a.Value >> 12), LengthQualifier.Single)),
+            new Function("tbn2", (a) => new Constant((UInt12)(a.Value >> 12), LengthQualifier.Single)),
+            new Function("tbn3", (a) => new Constant((UInt12)(a.Value >> 24), LengthQualifier.Single)),
+            new Function("tbn4", (a) => new Constant((UInt12)(a.Value >> 36), LengthQualifier.Single)),
+            new Function("lwrd", (a) => new Constant((UInt24)(a.Value), LengthQualifier.Double)),
+            new Function("hwrd", (a) => new Constant((UInt24)(a.Value >> 24), LengthQualifier.Double)),
+            new Function("exp2", (a) => new Constant(a.Value * a.Value, a.Length)),
+            new Function("log2", (a) => new Constant((long)Math.Log(a.Value, 2), a.Length)),
+            new Function("abs", (a) => new Constant(Math.Abs(a.Value), a.Length)),
+            new Function("defined", (a) => new Constant()), //TODO!
+            new Function("strlen", (a) => new Constant()),
         };
 
         /// <summary>
@@ -65,43 +104,43 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public static readonly List<Operator> Operators = new List<Operator>()
         {
             //Unary 
-            new Operator("!", (a) => a == 1 ? 0 : 1),
-            new Operator("~", (a) => ~ a),
-            new Operator("-", (a) => - a, true),
+            new Operator("!", (a) => new Constant(a.AsBool() ? 1 : 0, a.Length)),
+            new Operator("~", (a) => new Constant(~ a.Value, a.Length)),
+            new Operator("-", (a) => new Constant(- a.Value, a.Length), true),
 
             //Binnary
-            new Operator(13, "*", (a, b) => a * b),
-            new Operator(13, "/", (a, b) => a / b),
+            new Operator(13, "*",  (a, b) => new Constant(a.Value * b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(13, "/",  (a, b) => new Constant(a.Value / b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(12, "%", (a, b) => a % b),
+            new Operator(12, "%",  (a, b) => new Constant(a.Value % b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(11, "+", (a, b) => a + b),
-            new Operator(11, "-", (a, b) => a - b),
+            new Operator(11, "+",  (a, b) => new Constant(a.Value + b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(11, "-",  (a, b) => new Constant(a.Value - b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(10, "<<", (a, b) => a << (int)b),
-            new Operator(10, ">>", (a, b) => a >> (int)b),
+            new Operator(10, "<<", (a, b) => new Constant(a.Value << (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(10, ">>", (a, b) => new Constant(a.Value >> (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(9, "<", (a, b) => a < b ? 1 : 0),
-            new Operator(9, "<=", (a, b) => a <= b ? 1 : 0),
-            new Operator(9, ">", (a, b) => a > b ? 1 : 0),
-            new Operator(9, ">=", (a, b) => a >= b ? 1 : 0),
+            new Operator(9, "<",   (a, b) => new Constant(a.Value < b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(9, "<=",  (a, b) => new Constant(a.Value <= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(9, ">",   (a, b) => new Constant(a.Value > b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(9, ">=",  (a, b) => new Constant(a.Value >= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(8, "!=", (a, b) => a != b ? 1 : 0),
-            new Operator(8, "==", (a, b) => a == b ? 1 : 0),
+            new Operator(8, "!=",  (a, b) => new Constant(a.Value != b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(8, "==",  (a, b) => new Constant(a.Value == b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(7, "&", (a, b) => a & b),
-            new Operator(6, "^", (a, b) => a ^ b),
-            new Operator(5, "|", (a, b) => a | b),
-            new Operator(4, "&&", (a, b) => a.AsBool() && b.AsBool() ? 1 : 0),
-            new Operator(3, "||", (a, b) => a.AsBool() || b.AsBool() ? 1 : 0),
+            new Operator(7, "&",  (a, b) => new Constant(a.Value & b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(6, "^",  (a, b) => new Constant(a.Value ^ b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(5, "|",  (a, b) => new Constant(a.Value | b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(4, "&&", (a, b) => new Constant(a.AsBool() && b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(3, "||", (a, b) => new Constant(a.AsBool() || b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(2, "?", (a, b) => 
+            new Operator(2, "?",  (a, b) => 
             {
                 Operator.ConditionalOperatorResult = a.AsBool();
                 Operator.ConditionalSecondOperand = b;
                 return a;
             }),
-            new Operator(1, ":", (a, b) => Operator.ConditionalOperatorResult ? Operator.ConditionalSecondOperand : b),
+            new Operator(1, ":",  (a, b) => Operator.ConditionalOperatorResult ? Operator.ConditionalSecondOperand : b),
         };
 
 
@@ -198,7 +237,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                             unaryFunctionToAdd = Functions.Find(p => p.FunctionString == currentToken);
                         }
                         //Иначе тупо ошибка синтаксиса
-                        else throw new Exception("Unknown function!");
+                        else throw new UnknownFunctionException(currentToken);
                     }
 
                     //Запрещаем парсинг
@@ -347,6 +386,9 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 unaryFunctionToAdd = null;
             }
 
+            if (tokens.Count != operators.Count + 1 || currentOperator != "")
+                throw new WrongOperatorCountException();
+
             //Для каждого найденого токена, если он содержит какую-то дрянь, типо
             //скобок, вызывает этот-же метод рекурсивно
             foreach (var item in tokens)
@@ -419,7 +461,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         private Operator FindUnaryOperator(string name, bool ignoreIngoring)
         {
             var a = Operators.Find(p => p.IsUnary && (ignoreIngoring || !p.Ignore) && p.OperatorString == name);
-            return a ?? throw new Exception("Unknown operator");
+            return a ?? throw new UnknownOperatorException(name);
         }
 
         /// <summary>
@@ -430,7 +472,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         private Operator FindOperator(string name, bool ignoreIngoring)
         {
             var a = Operators.Find(p => (ignoreIngoring || !p.Ignore) && p.OperatorString == name);
-            return a ?? throw new Exception("Unknown operator");
+            return a ?? throw new UnknownOperatorException(name);
         }
 
         /// <summary>
@@ -479,10 +521,47 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         }
 
         /// <summary>
+        /// Очистка расчитаных значений тех токенов, которые зависят от переменных.
+        /// Это означает что в следующий раз токены, независящие от Х не будут считаться
+        /// </summary>
+        /// <param name="token"></param>
+        private void ClearCache(Token token)
+        {
+            //if (token.RawValue.Contains("x")) //TODO:!
+            {
+                token.ClearValue();
+                if (token.Subtokens != null) foreach (Token subToken in token.Subtokens)
+                    {
+                        ClearCache(subToken);
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Расчитывает числовое значение данного выражения
+        /// </summary>
+        /// <param name="clearCache">Стоит ли чистить числовыые значения токенов независящих от переменных</param>
+        /// <returns>Числовое значение выражения</returns>
+        public Constant Calculate(bool clearCache)
+        {
+            //Пытаемся посчиать его рекурсивно.
+            //Там все ссылочно кладется в токены, так что не нужно ничего возвращать
+            Calculate(TokenTree);
+
+            var value = TokenTree.Value;
+            
+            //Чистим расчитаные значения для тех токенов, которые зависят от переменных.
+            if(clearCache) ClearCache(TokenTree);
+
+            return value;
+        }
+
+
+        /// <summary>
         /// Расчитывает числовое значение данного выражения
         /// </summary>
         /// <returns>Числовое значение выражения</returns>
-        public long Calculate()
+        public Constant Calculate()
         {
             //Пытаемся посчиать его рекурсивно.
             //Там все ссылочно кладется в токены, так что не нужно ничего возвращать
@@ -495,19 +574,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Создает новый экземпляр класса <see cref="Expression"/>
         /// </summary>
         /// <param name="input">Строковое представление выражения</param>
-        public Expression(string input)
+        private Expression(string input)
         {
-            //Если не были просчитаны массивы операторов, делаем это
-            if (OperatorCharaters == null)
-                InitGlobals();
-
             //Сохраняем входную строку
             Value = input;
-
-            //Удаляем лишние пробелы, табы и пр.
-            input = input.Replace(" ", "");
-            input = input.Replace("\t", "");
-            input = input.Replace("\r", "");
 
             //Строим граф (дерево) нашего выражения
             TokenTree = ParseToken(input);
@@ -517,6 +587,56 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             //Клонируем, бикоз не хочу тянуть лишние ссылки
             if (TokenTree.Subtokens.Count == 1)
                 TokenTree = (Token)TokenTree.Subtokens[0].Clone();
+        }
+
+        public static ParseError Parse(string input, out Expression result)
+        {
+            string rawInput = input;
+
+            result = null;
+
+            if (input.Count(p => p == '(') != input.Count(p => p == ')'))
+                return new ParseError(ParseErrorType.Expression_Parse_UnclosedBracket);
+
+            //Если не были просчитаны массивы операторов, делаем это
+            if (OperatorCharaters == null)
+                InitGlobals();
+
+            //Удаляем лишние пробелы, табы и пр.
+            input = input.Replace(" ", "");
+            input = input.Replace("\t", "");
+            input = input.Replace("\r", "");
+
+            try
+            {
+                result = new Expression(input);
+            }
+            catch (UnknownFunctionException e)
+            {
+                if (e.FuncName != null)
+                    return new ParseError(
+                        ParseErrorType.Expression_Parse_UnknownFunction,
+                        rawInput.IndexOf(e.FuncName));
+                else return new ParseError(ParseErrorType.Expression_Parse_UnknownFunction);
+            }
+            catch(UnknownOperatorException e)
+            {
+                if (e.OperatorName != null)
+                    return new ParseError(
+                        ParseErrorType.Expression_Parse_UnknownOperator,
+                        rawInput.IndexOf(e.OperatorName));
+                else return new ParseError(ParseErrorType.Expression_Parse_UnknownOperator);
+            }
+            catch (WrongOperatorCountException)
+            {
+                return new ParseError(ParseErrorType.Expression_Parse_WrongOperatorCount);
+            }
+            catch(StackOverflowException)
+            {
+                return new ParseError(ParseErrorType.Expression_Parse_CantParse);
+            }
+
+            return null;
         }
     }
 }

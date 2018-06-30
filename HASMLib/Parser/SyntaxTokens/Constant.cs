@@ -12,15 +12,40 @@ namespace HASMLib.Parser.SyntaxTokens
         public Int64 Value;
         public LengthQualifier Length;
 
+        public static long TrimValue(long value, LengthQualifier lengthQualifier)
+        {
+            switch (lengthQualifier)
+            {
+                case LengthQualifier.Single:
+                    return (UInt12)value;
+                case LengthQualifier.Double:
+                    return (UInt24)value;
+                case LengthQualifier.Quad:
+                    return (UInt24)value;
+            }
+
+            return 0;
+        }
+
+        public bool AsBool()
+        {
+            return Value == 1;
+        }
+
         internal Constant()
         {
 
         }
 
+        public static LengthQualifier GetQualifier(LengthQualifier a, LengthQualifier b)
+        {
+            return (LengthQualifier)Math.Max((int)a, (int)b);
+        }
+
         internal Constant(Int64 value, LengthQualifier lq)
         {
             Length = lq;
-            Value = value;
+            Value = TrimValue(value, lq);
         }
 
         private static List<ConstantFormat> _formats = new List<ConstantFormat>()
