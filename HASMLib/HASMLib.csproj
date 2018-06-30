@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantDummy.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementExpression.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
     <Compile Include="Core\MemZone\MemZoneVariable.cs" />

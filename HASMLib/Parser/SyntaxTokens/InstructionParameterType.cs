@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens
 {
+    [Flags]
     public enum InstructionParameterType
     {
-        Register,
-        Constant,
-        ConstantOrRegister
+        Register = 1,
+        Constant = 2,
+        Expression = 4,
     }
 }

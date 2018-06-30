@@ -5,7 +5,9 @@
         public enum ReferenceType
         {
             Constant,
-            Variable
+            Variable,
+
+            Expression
         }
 	}
 }

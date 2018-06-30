@@ -1,5 +1,4 @@
 ﻿using HASMLib.Core;
-using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -19,7 +18,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             ParameterTypes  = new List<InstructionParameterType>()
             {
                 InstructionParameterType.Register,
-                InstructionParameterType.ConstantOrRegister
+                InstructionParameterType.Register | InstructionParameterType.Constant | InstructionParameterType.Expression
             };
         }
 

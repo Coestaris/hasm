@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions
 {
@@ -587,6 +588,18 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             //Клонируем, бикоз не хочу тянуть лишние ссылки
             if (TokenTree.Subtokens.Count == 1)
                 TokenTree = (Token)TokenTree.Subtokens[0].Clone();
+        }
+
+        /// <summary>
+        /// Рекурсивно проходит по каждому токену, встречая незнакомое имя,
+        /// вызывает заданную функцию, запрашивая ссылку на объект. Расчитывает все токены, которые
+        /// не зависят от переменных и констант.
+        /// </summary>
+        /// <param name="ResolveNameFunc">Фукция, которая будет вызываться для каждой неизвестной константы или переменной, встреченной в выражении</param>
+        /// <param name="RegisterNewConstant">Необязательная функция, которая будет вызываться, при встече чисел, и в случае ее заданности будет заменять числа на ссылки</param>
+        public void Precompile(Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ReferenceType> RegisterNewConstant = null)
+        {
+
         }
 
         public static ParseError Parse(string input, out Expression result)

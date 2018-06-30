@@ -5,6 +5,7 @@
         Variable,
         Instruction,
 		Constant,
+        Expression,
         Undefined
     }
 }

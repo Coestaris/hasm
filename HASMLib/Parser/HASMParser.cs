@@ -1,6 +1,7 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Parser.SyntaxTokens.Instructions;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System.Collections.Generic;
@@ -233,13 +234,18 @@ namespace HASMLib.Parser
                 //Попытка пропарсить константу
                 var constError = Constant.Parse(argument, out Constant constant);
 
+                //Попытка пропарсить выражение
+                var expressionError = Expression.Parse(argument, out Expression expression);
+
                 //Грубое определние типа нашего аргумента
                 var isConst = constant != null;
                 var isVar = Variables.Select(p => p.Name).Contains(argument);
-
+                
 
                 //Если допустимо и константа и переменная, то выходит неоднозначность
-                if (isVar && isConst && line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister)
+                if (isVar && isConst && 
+                    line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register) &&
+                    line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                 {
                     error = NewParseError(ParseErrorType.Syntax_AmbiguityBetweenVarAndConst, line, argIndex);
                     return null;
@@ -250,7 +256,7 @@ namespace HASMLib.Parser
                 if (isVar && isConst)
                 {
                     //Если необходима коснтанта
-                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
+                    if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                     {
                         //Запоминаем индекс константы
                         usedIndexes.Add(new ObjectReference((UInt24)(++_constIndex), ReferenceType.Constant));
@@ -259,7 +265,7 @@ namespace HASMLib.Parser
                     };
 
                     //Если необходима переменная
-                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Register)
+                    if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
                     {
                         //Получаем индекс переменной со списка переменных
                         int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(argument);
@@ -272,7 +278,7 @@ namespace HASMLib.Parser
                 if (isConst)
                 {
                     //А ожидалась константа, то ошибка
-                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Register)
+                    if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
                     {
                         error = NewParseError(ParseErrorType.Syntax_ExpectedVar, line, argIndex);
                         return null;
@@ -289,7 +295,7 @@ namespace HASMLib.Parser
                     if (isVar)
                     {
                         //А ожидалась константа, то ошибка
-                        if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
+                        if (!line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
                         {
                             error = NewParseError(ParseErrorType.Syntax_ExpectedСonst, line, argIndex);
                             return null;
@@ -302,8 +308,7 @@ namespace HASMLib.Parser
                     }
                     else //Если это не переменная, а просили константу
                     
-                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.ConstantOrRegister ||
-                        line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.Constant)
+                    if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                     {
                         //То, возможно, это именная константа...
                         if (_namedConsts.Select(p => p.Name).Contains(argument))
