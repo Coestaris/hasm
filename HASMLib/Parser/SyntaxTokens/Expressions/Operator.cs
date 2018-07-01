@@ -28,6 +28,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public string OperatorString { get; private set; }
 
         /// <summary>
+        /// Условное количество шагов, необходимое для выполнения оператора
+        /// </summary>
+        public int OperatorSteps { get; private set; }
+
+        /// <summary>
         /// Игнорировать любую обработку оператора. Нужно для унарного минуса
         /// </summary>
         internal bool Ignore { get; private set; }
@@ -61,8 +66,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <param name="operatorString">Строковое представление оператора</param>
         /// <param name="function">Функция этого оператора</param>
         /// <param name="ignore">Указывает, следует ли игнорировать обработку данного оператора</param>
-        public Operator(string operatorString, Func<Constant, Constant> function, bool ignore)
+        public Operator(int steps, string operatorString, Func<Constant, Constant> function, bool ignore)
         {
+            OperatorSteps = steps;
+
             //Унарные операторы, будем считать, всегда одинаково самые приоритетные
             Priority = int.MaxValue;
             OperatorString = operatorString;
@@ -77,8 +84,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         /// <param name="operatorString">Строковое представление оператора</param>
         /// <param name="function">Функция этого оператора</param>
-        public Operator(string operatorString, Func<Constant, Constant> function)
+        public Operator(int steps, string operatorString, Func<Constant, Constant> function)
         {
+            OperatorSteps = steps;
+
             //Унарные операторы, будем считать, всегда одинаково самые приоритетные
             Priority = int.MaxValue;
             OperatorString = operatorString;
@@ -93,8 +102,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <param name="priority">Приоритет данного бинарного оператора</param>
         /// <param name="operatorString">Строковое представление оператора</param>
         /// <param name="function">Функция этого оператора</param>
-        public Operator(int priority, string operatorString, Func<Constant, Constant, Constant> function)
+        public Operator(int steps, int priority, string operatorString, Func<Constant, Constant, Constant> function)
         {
+            OperatorSteps = steps;
+
             Priority = priority;
             OperatorString = operatorString;
             IsUnary = false;

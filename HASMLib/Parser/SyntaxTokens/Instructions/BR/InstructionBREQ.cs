@@ -28,7 +28,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
             if(result.HasFlag(ComapreResult.Equal))
             {
-                UInt24 position = (UInt24)GetNumericValue(0, memZone, constants, expressions, parameters).Value;
+                UInt24 position = (UInt24)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
 
                 RuntimeMachineJump(position, runtimeMachine);
             }

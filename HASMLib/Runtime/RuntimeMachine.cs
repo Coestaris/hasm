@@ -17,7 +17,7 @@ namespace HASMLib.Runtime
 
         public TimeSpan TimeOfRunning { get; private set; }
 
-        public int Ticks { get; private set; }
+        public int Ticks { get; internal set; }
 
         private HASMMachine _machine;
 

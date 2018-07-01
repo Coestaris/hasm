@@ -81,24 +81,30 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             }
         }
 
+        /// <summary>
+        /// Функции, которые допустимо использовать в выражениях
+        /// </summary>
         public static readonly List<Function> Functions = new List<Function>()
         {
-            new Function("double", (a) => new Constant(a.Value * 2, a.Length)),
-
-
-            new Function("low", (a) => new Constant((UInt12)a.Value, LengthQualifier.Single)),
-            new Function("high", (a) => new Constant((UInt12)(a.Value >> 12), LengthQualifier.Single)),
-            new Function("tbn2", (a) => new Constant((UInt12)(a.Value >> 12), LengthQualifier.Single)),
-            new Function("tbn3", (a) => new Constant((UInt12)(a.Value >> 24), LengthQualifier.Single)),
-            new Function("tbn4", (a) => new Constant((UInt12)(a.Value >> 36), LengthQualifier.Single)),
-            new Function("lwrd", (a) => new Constant((UInt24)(a.Value), LengthQualifier.Double)),
-            new Function("hwrd", (a) => new Constant((UInt24)(a.Value >> 24), LengthQualifier.Double)),
-            new Function("exp2", (a) => new Constant(a.Value * a.Value, a.Length)),
-            new Function("log2", (a) => new Constant((long)Math.Log(a.Value, 2), a.Length)),
-            new Function("abs", (a) => new Constant(Math.Abs(a.Value), a.Length)),
-            new Function("defined", (a) => new Constant()), //TODO!
-            new Function("strlen", (a) => new Constant()),
+            new Function(1, "double", (a) => new Constant(a.Value * 2, a.Length)),
+            new Function(1, "low", (a) => new Constant((UInt12)a.Value, LengthQualifier.Single)),
+            new Function(2, "high", (a) => new Constant((UInt12)(a.Value >> 12), LengthQualifier.Single)),
+            new Function(2, "tbn2", (a) => new Constant((UInt12)(a.Value >> 12), LengthQualifier.Single)),
+            new Function(2, "tbn3", (a) => new Constant((UInt12)(a.Value >> 24), LengthQualifier.Single)),
+            new Function(2, "tbn4", (a) => new Constant((UInt12)(a.Value >> 36), LengthQualifier.Single)),
+            new Function(1, "lwrd", (a) => new Constant((UInt24)(a.Value), LengthQualifier.Double)),
+            new Function(2, "hwrd", (a) => new Constant((UInt24)(a.Value >> 24), LengthQualifier.Double)),
+            new Function(2, "exp2", (a) => new Constant(a.Value * a.Value, a.Length)),
+            new Function(8, "log2", (a) => new Constant((long)Math.Log(a.Value, 2), a.Length)),
+            new Function(2, "abs", (a) => new Constant(Math.Abs(a.Value), a.Length)),
+            new Function(1, "defined", (a) => new Constant()), //TODO!
+            new Function(1, "strlen", (a) => new Constant()),
         };
+
+        /// <summary>
+        /// Количество условных шагов, за которое было выполнено вычисление результата
+        /// </summary>
+        public int Steps { get; set; }
 
         /// <summary>
         /// Список всех поддерживаемых операторов.
@@ -107,43 +113,43 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public static readonly List<Operator> Operators = new List<Operator>()
         {
             //Unary 
-            new Operator("!", (a) => new Constant(a.AsBool() ? 1 : 0, a.Length)),
-            new Operator("~", (a) => new Constant(~ a.Value, a.Length)),
-            new Operator("-", (a) => new Constant(- a.Value, a.Length), true),
+            new Operator(1, "!", (a) => new Constant(a.AsBool() ? 1 : 0, a.Length)),
+            new Operator(1, "~", (a) => new Constant(~ a.Value, a.Length)),
+            new Operator(1, "-", (a) => new Constant(- a.Value, a.Length), true),
 
             //Binnary
-            new Operator(13, "*",  (a, b) => new Constant(a.Value * b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(13, "/",  (a, b) => new Constant(a.Value / b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 13, "*",  (a, b) => new Constant(a.Value * b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 13, "/",  (a, b) => new Constant(a.Value / b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(12, "%",  (a, b) => new Constant(a.Value % b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 12, "%",  (a, b) => new Constant(a.Value % b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(11, "+",  (a, b) => new Constant(a.Value + b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(11, "-",  (a, b) => new Constant(a.Value - b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 11, "+",  (a, b) => new Constant(a.Value + b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 11, "-",  (a, b) => new Constant(a.Value - b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(10, "<<", (a, b) => new Constant(a.Value << (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(10, ">>", (a, b) => new Constant(a.Value >> (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 10, "<<", (a, b) => new Constant(a.Value << (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 10, ">>", (a, b) => new Constant(a.Value >> (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(9, "<",   (a, b) => new Constant(a.Value < b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(9, "<=",  (a, b) => new Constant(a.Value <= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(9, ">",   (a, b) => new Constant(a.Value > b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(9, ">=",  (a, b) => new Constant(a.Value >= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 9, "<",   (a, b) => new Constant(a.Value < b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 9, "<=",  (a, b) => new Constant(a.Value <= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 9, ">",   (a, b) => new Constant(a.Value > b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 9, ">=",  (a, b) => new Constant(a.Value >= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(8, "!=",  (a, b) => new Constant(a.Value != b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(8, "==",  (a, b) => new Constant(a.Value == b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 8, "!=",  (a, b) => new Constant(a.Value != b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 8, "==",  (a, b) => new Constant(a.Value == b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(7, "&",  (a, b) => new Constant(a.Value & b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(6, "^",  (a, b) => new Constant(a.Value ^ b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(5, "|",  (a, b) => new Constant(a.Value | b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(4, "&&", (a, b) => new Constant(a.AsBool() && b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(3, "||", (a, b) => new Constant(a.AsBool() || b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 7, "&",  (a, b) => new Constant(a.Value & b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 6, "^",  (a, b) => new Constant(a.Value ^ b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 5, "|",  (a, b) => new Constant(a.Value | b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 4, "&&", (a, b) => new Constant(a.AsBool() && b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 3, "||", (a, b) => new Constant(a.AsBool() || b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
 
-            new Operator(2, "?",  (a, b) => 
+            new Operator(1, 2, "?",  (a, b) => 
             {
                 Operator.ConditionalOperatorResult = a.AsBool();
                 Operator.ConditionalSecondOperand = b;
                 return a;
             }),
-            new Operator(1, ":",  (a, b) => Operator.ConditionalOperatorResult ? Operator.ConditionalSecondOperand : b),
+            new Operator(0, 1, ":",  (a, b) => Operator.ConditionalOperatorResult ? Operator.ConditionalSecondOperand : b),
         };
 
 
@@ -501,6 +507,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             if (token.CanBeCalculated)
             {
                 token.Calculate(zone);
+                Steps += token.Steps;
                 return;
             }
 
@@ -509,12 +516,14 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             foreach (Token subToken in token.Subtokens)
             {
                 Calculate(zone, subToken);
+                Steps += subToken.Steps;
             }
 
             //Если после пересчета возможно посчитать, то считаем
             if (token.CanBeCalculated)
             {
                 token.Calculate(zone);
+                Steps += token.Steps;
                 return;
             }
 
@@ -546,6 +555,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <returns>Числовое значение выражения</returns>
         public Constant Calculate(MemZone zone = null, bool clearCache = false)
         {
+            Steps = 0;
+
             //Пытаемся посчиать его рекурсивно.
             //Там все ссылочно кладется в токены, так что не нужно ничего возвращать
             Calculate(zone, TokenTree);

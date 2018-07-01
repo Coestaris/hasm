@@ -23,7 +23,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
         public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions,  List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            var value = GetNumericValue(0, memZone, constants, expressions, parameters);
+            var value = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine);
             runtimeMachine.OutBytes(value.ToUInt12());
             return RuntimeOutputCode.OK;
         }

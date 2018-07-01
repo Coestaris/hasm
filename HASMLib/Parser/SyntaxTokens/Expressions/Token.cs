@@ -11,6 +11,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
     /// </summary>
     public class Token : ICloneable
     {
+        ///<summary>
+        /// Количество шагов, потраченное на выполненеие оператора
+        ///</summary>
+        public int Steps { get; internal set; }
+
         /// <summary>
         /// "Сырое", строковое представление данного токена
         /// </summary>
@@ -159,6 +164,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
             if (token.UnaryFunction != null)
             {
+                token.Steps += token.UnaryFunction.FunctionSteps;
                 token.Value = token.UnaryFunction.UnaryFunc(token.Value);
                 token.UnaryFunction = null;
             }
@@ -166,6 +172,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
             if (token.UnaryOperator != null)
             {
+                token.Steps += token.UnaryOperator.OperatorSteps;
                 token.Value = token.UnaryOperator.UnaryFunc(token.Value);
                 token.UnaryOperator = null;
             }
@@ -186,6 +193,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <returns></returns>
         public Constant Calculate(MemZone zone)
         {
+            Steps = 0;
+
             if (_valueSet)
                 return Value;
 
@@ -243,6 +252,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 CalculateValue(subTokens[maxRightIndex].Parse(zone), subTokens[maxRightIndex]);
 
                 var value = op.BinaryFunc(subTokens[maxLeftIndex].Value, subTokens[maxRightIndex].Value);
+                Steps += op.OperatorSteps;
 
                 //Дебага ради создаем новое строковое значение
                 var newRawValue = value.ToString();

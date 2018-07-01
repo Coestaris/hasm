@@ -35,8 +35,8 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
         public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            long a = GetNumericValue(0, memZone, constants, expressions, parameters).Value;
-            long b = GetNumericValue(1, memZone, constants, expressions, parameters).Value;
+            long a = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+            long b = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine).Value;
 
             ComapreResult result = 0;
 

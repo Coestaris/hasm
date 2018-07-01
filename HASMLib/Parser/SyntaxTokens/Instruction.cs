@@ -1,5 +1,6 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
+using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Runtime;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -32,7 +33,7 @@ namespace HASMLib.Parser.SyntaxTokens
             runtimeMachine.CurrentPosition = (UInt24)(globalIndex - 1);
         }
 
-        public Constant GetNumericValue(int index, MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters)
+        public Constant GetNumericValue(int index, MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
             switch (parameters[index].Type)
             {
@@ -41,7 +42,13 @@ namespace HASMLib.Parser.SyntaxTokens
                 case (ReferenceType.Variable):
                     return new Constant(GetVar(memZone, parameters[index].Index));
                 case (ReferenceType.Expression):
-                    return expressions.Find(p => p.Index == parameters[index].Index).Expression.Calculate(memZone, true);
+                    {
+                        Expression expression = expressions.Find(p => p.Index == parameters[index].Index).Expression;
+                        Constant constnant = expression.Calculate(memZone, true);
+
+                        runtimeMachine.Ticks += expression.Steps;
+                        return constnant;
+                    }
             }
 
             return null;
