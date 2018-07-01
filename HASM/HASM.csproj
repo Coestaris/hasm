@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Classes\CompileConfig.cs" />
     <Compile Include="Classes\Define.cs" />
+    <Compile Include="Classes\RegisterIcon.cs" />
     <Compile Include="CompileOptions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +118,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="hasm.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ideDirIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

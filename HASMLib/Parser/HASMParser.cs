@@ -255,7 +255,9 @@ namespace HASMLib.Parser
                 var isVar = Variables.Select(p => p.Name).Contains(argument);
 
                 //Если допустимо выражение и если это не просто выражение
-                if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Expression) && expressionError == null && !expression.TokenTree.IsSimple)
+                if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Expression) &&
+                    expressionError == null  && 
+                    (!expression.TokenTree.IsSimple || expression.TokenTree.UnaryFunction != null || expression.TokenTree.UnaryOperator != null))
                 {
                     Expression.Precompile(expression.TokenTree,
                         (tokenName) =>

@@ -14,9 +14,9 @@ namespace HASM
         private Regex RegisterRegex = new Regex(@"R\d{0,2}", RegexOptions.Multiline);
 
 
-        private Regex BinRegex = new Regex(@"\W0[bB][0-1]{1,100}(_[sdq]){0,1}");
-        private Regex DecRegex = new Regex(@"\W\d{1,30}(_[sdq]){0,1}");
-        private Regex HexRegex = new Regex(@"\W0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
+        private Regex BinRegex = new Regex(@"0[bB][0-1]{1,100}(_[sdq]){0,1}");
+        private Regex DecRegex = new Regex(@"\d{1,30}(_[sdq]){0,1}");
+        private Regex HexRegex = new Regex(@"0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
 
         public bool Close()
         {
@@ -82,9 +82,14 @@ namespace HASM
                 TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, DecRegex);
                 TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, HexRegex);
 
+                foreach(var item in HASMLib.Parser.SyntaxTokens.Expressions.Expression.Functions)
+                {
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueBoldStyle, item.FunctionString);
+                }
+
                 foreach (var item in HASMLib.Parser.SyntaxTokens.SourceLines.SourceLineInstruction.Instructions)
                 {
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, item.NameString);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, @"\s" + item.NameString + @"\s");
                 }
 
             };

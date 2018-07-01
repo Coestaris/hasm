@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HASM.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ namespace HASM
         [STAThread]
         static void Main()
         {
+            RegisterIcon.RegisterHASMIcon();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Editor());

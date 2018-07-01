@@ -218,8 +218,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                             {
                                 unaryOperatorToAdd = FindUnaryOperator(currentOperator, true);
                                 operatorIsUnary = false;
-                            }
-                            operators.Add(currentOperator);
+                            } else operators.Add(currentOperator);
                         }
 
                         //Сбрасываем накопительную переменную

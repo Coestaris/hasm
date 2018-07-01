@@ -117,7 +117,7 @@ namespace ConsoleTester
                 foreach (var item in expressions)
                 {
                     DateTime now = DateTime.Now;
-                    var result = item.expression.Calculate();
+                    var result = item.expression.Calculate(null);
                     var calculated = TimeSpan.FromMilliseconds((DateTime.Now - now).TotalMilliseconds);
 
                     if (result.Value == item.Result)
