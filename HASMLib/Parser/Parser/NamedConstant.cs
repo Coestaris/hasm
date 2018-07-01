@@ -1,25 +1,25 @@
 ﻿
 using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
 
 namespace HASMLib.Parser
 {
-    public partial class HASMParser
-	{
-        public class NamedConstant
-        {
-            public string Name;
-            public UInt24 Index;
-            public Constant Constant;
+    public class NamedConstant
+    {
+        public MemZoneFlashElementConstant constant;
 
-            public NamedConstant(string name, UInt24 index, Constant value)
-            {
-                Name = name;
-                Index = index;
-                Constant = value;
-            }
+        public string Name;
+        public UInt24 Index;
+        public Constant Constant;
+
+        public NamedConstant(string name, UInt24 index, Constant value)
+        {
+            Name = name;
+            Index = index;
+            Constant = value;
         }
-	}
+    }
 }
 
 

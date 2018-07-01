@@ -4,7 +4,8 @@ using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static HASMLib.Parser.HASMParser;
+using HASMLib.Parser;
+using System.Linq.Expressions;
 
 namespace HASMLib.Runtime
 {
@@ -94,8 +95,13 @@ namespace HASMLib.Runtime
                     constant.ToConstant());
             }).ToList();
 
+            List<MemZoneFlashElementExpression> expressions = data.FindAll(p => p.Type == MemZoneFlashElementType.Expression).Select(p => (MemZoneFlashElementExpression)p).ToList();
+
             //Удаляем их из коллекции
             data.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
+
+            //Удаляем их из коллекции
+            data.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
 
             UInt24 globalIndex = 0;
 
@@ -146,12 +152,18 @@ namespace HASMLib.Runtime
                             if (!_machine.MemZone.RAM.Exists(p => p.Index == parameter.Index))
                                 return RuntimeOutputCode.UnknownConstantReference;
                             break;
+
+                        case ReferenceType.Expression:
+                            if(!expressions.Exists(p => p.Index == parameter.Index))
+                                return RuntimeOutputCode.UnknownConstantReference;
+                            break;
+
                     }
                 }
 
                 //Если все ОК, то запускаем нашу инструкцию
                 RuntimeOutputCode output = SourceLineInstruction.Instructions[instruction.InstructionNumber].Apply(
-                    _machine.MemZone, constants, instruction.Parameters, this);
+                    _machine.MemZone, constants, expressions, instruction.Parameters, this);
 
                 if (output != RuntimeOutputCode.OK)
                     return output;

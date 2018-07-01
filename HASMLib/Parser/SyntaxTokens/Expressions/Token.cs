@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +9,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
     /// <summary>
     /// Представляет основную расчетную еденицу выражений - токен
     /// </summary>
-    internal class Token : ICloneable
+    public class Token : ICloneable
     {
         /// <summary>
         /// "Сырое", строковое представление данного токена
@@ -45,6 +47,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public Function UnaryFunction { get; internal set; }
 
         /// <summary>
+        /// Ссылка на объект, с которого можно получить значение
+        /// </summary>
+        public ObjectReference Reference { get; internal set; }
+
+        /// <summary>
         /// Числовое значение данного токена
         /// </summary>
         public Constant Value { get; private set; }
@@ -58,6 +65,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Установлено ли числовое значение
         /// </summary>
         private bool _valueSet;
+
+        /// <summary>
+        /// Установлена ли ссылка на токен
+        /// </summary>
+        private bool _referenceSet => Reference != null;
 
         /// <summary>
         /// Указывает на простоту данного токена. Если токен не простой, для него необходимо вызвать <see cref="Expression.CreateTokenTree(string, Token)"/>
@@ -93,15 +105,17 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 //  2. Нету дочерных токенов
                 //  Если дочерные токены есть, то можно если:
                 //  3. Все значениея дочерных уже подсчиатыны
+                // или
+                //  4. Если ссылки на дочерные установлены
                 // или  
-                //  4. Все дочерные значения примитивные, и их можно подсчитать
+                //  5. Все дочерные значения примитивные, и их можно подсчитать
                 // 
                 // Но подсчитать нельзя если:
                 //   Некоторые дочерние токены имеют унарные функции или операторы
 
                 bool result = _valueSet || Subtokens == null;
                 if (Subtokens != null)
-                    result = result || ((Subtokens.All(p => p._valueSet) || Subtokens.All(p => p.IsSimple)) &&
+                    result = result || ((Subtokens.All(p => p._valueSet) || Subtokens.All(p => p._referenceSet) || Subtokens.All(p => p.IsSimple)) &&
                          (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null) ));
 
                 return result;
@@ -113,6 +127,9 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         public override string ToString()
         {
+            if (Reference != null)
+                return $"Ref to: {Reference}";
+
             if (_valueSet) return $"Value: {Value}";
             else
             {
@@ -160,12 +177,21 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <returns></returns>
         public Constant Calculate()
         {
+            return Calculate(null);
+        }
+
+        /// <summary>
+        /// Расчитывает числовое значение данного токена. Возможно только в случае если <see cref="CanBeCalculated"/> <see cref="true"/>
+        /// </summary>
+        /// <returns></returns>
+        public Constant Calculate(MemZone zone)
+        {
             if (_valueSet)
                 return Value;
 
             if (IsSimple)
             {
-                CalculateValue(Parse(), this);
+                CalculateValue(Parse(zone), this);
                 _valueSet = true;
                 return Value;
             }
@@ -213,8 +239,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 //Получаем числовые значение
                 //Учитываем, что операнды могут иметь свои унарные операции и функции. 
                 //Их приоритет всегда выше бинарных, потому сразу выполняем их
-                CalculateValue(subTokens[maxLeftIndex].Parse(), subTokens[maxLeftIndex]);
-                CalculateValue(subTokens[maxRightIndex].Parse(), subTokens[maxRightIndex]);
+                CalculateValue(subTokens[maxLeftIndex].Parse(zone), subTokens[maxLeftIndex]);
+                CalculateValue(subTokens[maxRightIndex].Parse(zone), subTokens[maxRightIndex]);
 
                 var value = op.BinaryFunc(subTokens[maxLeftIndex].Value, subTokens[maxRightIndex].Value);
 
@@ -272,31 +298,78 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             Value = value;
         }
 
-        /// <summary>
-        /// Получает числовое значение данного токена, если он является примитивным или значение уже подсчитано
-        /// </summary>
-        private Constant Parse()
+        internal void ResolveName(Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant)
         {
             if (_valueSet)
-                return Value;
+                return;
 
             var error = Constant.Parse(RawValue, out Constant constant);
-
             if (error != null)
             {
                 if (error.Type == ParseErrorType.Constant_TooLong || error.Type == ParseErrorType.Constant_BaseOverflow)
                     throw new Exception("Wrong coasd");
 
-                //Named constant
-
                 //Variable
+                if (ResolveNameFunc == null)
+                    throw new Exception("Cant resolve name =c");
 
-                return new Constant();
+
+                Reference = ResolveNameFunc(RawValue);
+
+                return;
             }
             else
             {
-                return constant;
+                if (RegisterNewConstant != null)
+                {
+                    Reference = RegisterNewConstant(constant);
+                    return;
+                }
+                _valueSet = true;
             }
+        }
+
+        /// <summary>
+        /// Получает числовое значение данного токена, если он является примитивным или значение уже подсчитано
+        /// </summary>
+        private Constant Parse(MemZone zone)
+        {
+            if (_valueSet)
+                return Value;
+
+            if(_referenceSet && zone != null)
+            {
+                switch (Reference.Object.Type)
+                {
+                    case MemZoneFlashElementType.Variable:
+                        return new Constant(zone.RAM.Find(p => p.Index == (Reference.Object as MemZoneFlashElementVariable).Index));
+                    case MemZoneFlashElementType.Constant:
+                        return (Reference.Object as MemZoneFlashElementConstant).ToConstant();
+                    case MemZoneFlashElementType.Instruction:
+                    case MemZoneFlashElementType.Expression:
+                    case MemZoneFlashElementType.Undefined:
+                    default:
+                        throw new Exception("Wrong reference object!");
+                }
+
+            }
+            else
+            {
+                var error = Constant.Parse(RawValue, out Constant constant);
+
+                if (error != null)
+                {
+                    if (error.Type == ParseErrorType.Constant_TooLong || error.Type == ParseErrorType.Constant_BaseOverflow)
+                        throw new Exception("Wrong const format");
+
+                    throw new Exception("wrong token =/");
+                }
+                else
+                {
+                    return constant;
+                }
+            }
+
         }
         
         /// <summary>
@@ -322,6 +395,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 UnaryOperator = UnaryOperator,
                 UnaryFunction = UnaryFunction,
                 Value = Value,
+                Reference = Reference,
                  _valueSet = _valueSet
             };
         }

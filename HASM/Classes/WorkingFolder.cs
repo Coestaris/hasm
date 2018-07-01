@@ -17,7 +17,7 @@ namespace HASM
 
         public List<string> OpenedTabs;
 
-        public string ConfigPath;
+        public string CompileConfigPath;
 
         public string Path;
 

@@ -65,7 +65,16 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         private string[] GetStringParts(string input)
         {
-            return input.Split(GetStringPartsSplitChar);
+            var parts = input.Split(GetStringPartsSplitChar);
+            if (parts.Length == 1) return parts;
+            else
+            {
+                return new string[2]
+                {
+                    parts[0],
+                    string.Join("", parts.Skip(1))
+                };
+            }
         }
 
         private void SplitLineIntoArguments(string[] stringParts, out string instruction, out string[] argumentList)

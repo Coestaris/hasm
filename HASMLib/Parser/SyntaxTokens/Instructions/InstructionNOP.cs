@@ -1,9 +1,8 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens.Instructions
 {
@@ -14,12 +13,12 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             Index = (UInt24)index;
 
             NameString = "nop";
-            Name = new Regex("^[Nn][Oo][Pp]");
+            Name = new Regex("^nop", RegexOptions.IgnoreCase);
             ParameterCount = 0;
             ParameterTypes = new List<InstructionParameterType>() { };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
             return RuntimeOutputCode.OK;
         }

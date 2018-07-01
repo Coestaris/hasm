@@ -32,6 +32,21 @@ namespace HASMLib.Parser.SyntaxTokens
             runtimeMachine.CurrentPosition = (UInt24)(globalIndex - 1);
         }
 
-        public abstract RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine);
+        public Constant GetNumericValue(int index, MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters)
+        {
+            switch (parameters[index].Type)
+            {
+                case (ReferenceType.Constant):
+                    return GetConst(constants, parameters[index].Index).Constant;
+                case (ReferenceType.Variable):
+                    return new Constant(GetVar(memZone, parameters[index].Index));
+                case (ReferenceType.Expression):
+                    return expressions.Find(p => p.Index == parameters[index].Index).Expression.Calculate(memZone, true);
+            }
+
+            return null;
+        }
+
+        public abstract RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine);
     }
 }

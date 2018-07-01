@@ -1,11 +1,11 @@
-﻿using HASMLib.Parser.SyntaxTokens.Expressions;
+﻿using HASMLib.Parser;
+using HASMLib.Parser.SyntaxTokens.Expressions;
 using System;
 using System.Collections.Generic;
-using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Core.MemoryZone
 {
-    class MemZoneFlashElementExpression : MemZoneFlashElement
+    public class MemZoneFlashElementExpression : MemZoneFlashElement
     {
         public override int FixedSize => 0; //TODO:
 
@@ -14,6 +14,14 @@ namespace HASMLib.Core.MemoryZone
         public List<ObjectReference> Dependencies;
 
         public Expression Expression; 
+
+        public UInt24 Index;
+
+        public MemZoneFlashElementExpression(Expression expression, UInt24 index)
+        {
+            Index = index;
+            Expression = expression;
+        }
 
         public override byte[] ToBytes()
         {

@@ -1,8 +1,8 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens.Instructions
 {
@@ -13,7 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             Index = (UInt24)index;
 
             NameString = "add";
-            Name = new Regex("^[Aa][Dd][Dd]");
+            Name = new Regex("^add", RegexOptions.IgnoreCase);
             ParameterCount = 2;
             ParameterTypes  = new List<InstructionParameterType>()
             {
@@ -22,20 +22,12 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
             var dest = GetVar(memZone, parameters[0].Index);
+            var source = GetNumericValue(1, memZone, constants, expressions, parameters);
 
-            if (parameters[1].Type == ReferenceType.Variable)
-            {
-                var source = GetVar(memZone, parameters[1].Index);
-                dest.AddValue(source);
-            }
-            else
-            {
-                var source = GetConst(constants, parameters[1].Index);
-                dest.AddValue(source.Constant.Value);
-            }
+            dest.AddValue(source.Value);
 
             return RuntimeOutputCode.OK;
         }

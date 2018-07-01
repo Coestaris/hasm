@@ -42,6 +42,12 @@ namespace HASMLib.Parser.SyntaxTokens
             return (LengthQualifier)Math.Max((int)a, (int)b);
         }
 
+        internal Constant(MemZoneVariable variable)
+        {
+            Length = variable.Length;
+            Value = variable.GetNumericValue();
+        }
+
         internal Constant(Int64 value, LengthQualifier lq)
         {
             Length = lq;

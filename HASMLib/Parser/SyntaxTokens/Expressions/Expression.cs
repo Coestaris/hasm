@@ -58,6 +58,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         public static void InitGlobals()
         {
+            if (OperatorCharaters != null) return;
+
             OperatorCharaters = new List<char>();
             UnaryOperatorCharaters = new List<char>();
             BinaryOperatorCharaters = new List<char>();
@@ -153,7 +155,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Построенный (кешированный) граф выражений
         /// </summary>
-        private Token TokenTree;
+        internal Token TokenTree;
 
         /// <summary>
         /// Основной метод разбиение строки на узлы графа. Рекурсивно самовызывается для скобок.
@@ -494,12 +496,12 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Рекурсивный метод расчета значения токенов
         /// </summary>
         /// <param name="token">Токен, который будет расчитываться</param>
-        private void Calculate(Token token)
+        private void Calculate(MemZone zone, Token token)
         {
             //Если токен можно посчитать сходу то делаем это
             if (token.CanBeCalculated)
             {
-                token.Calculate();
+                token.Calculate(zone);
                 return;
             }
 
@@ -507,13 +509,13 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             //Которые обязаны считаться!
             foreach (Token subToken in token.Subtokens)
             {
-                Calculate(subToken);
+                Calculate(zone, subToken);
             }
 
             //Если после пересчета возможно посчитать, то считаем
             if (token.CanBeCalculated)
             {
-                token.Calculate();
+                token.Calculate(zone);
                 return;
             }
 
@@ -543,11 +545,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         /// <param name="clearCache">Стоит ли чистить числовыые значения токенов независящих от переменных</param>
         /// <returns>Числовое значение выражения</returns>
-        public Constant Calculate(bool clearCache)
+        public Constant Calculate(MemZone zone = null, bool clearCache = false)
         {
             //Пытаемся посчиать его рекурсивно.
             //Там все ссылочно кладется в токены, так что не нужно ничего возвращать
-            Calculate(TokenTree);
+            Calculate(zone, TokenTree);
 
             var value = TokenTree.Value;
             
@@ -562,11 +564,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Расчитывает числовое значение данного выражения
         /// </summary>
         /// <returns>Числовое значение выражения</returns>
-        public Constant Calculate()
+        public Constant Calculate(MemZone zone = null)
         {
             //Пытаемся посчиать его рекурсивно.
             //Там все ссылочно кладется в токены, так что не нужно ничего возвращать
-            Calculate(TokenTree);
+            Calculate(zone, TokenTree);
 
             return TokenTree.Value;
         }
@@ -575,7 +577,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Создает новый экземпляр класса <see cref="Expression"/>
         /// </summary>
         /// <param name="input">Строковое представление выражения</param>
-        private Expression(string input)
+        internal Expression(string input)
         {
             //Сохраняем входную строку
             Value = input;
@@ -591,17 +593,53 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         }
 
         /// <summary>
+        /// Строковое представление данного выражения
+        /// </summary>
+        public override string ToString()
+        {
+            return $"Expression: [{TokenTree.ToString()}]";
+        }
+
+        /// <summary>
         /// Рекурсивно проходит по каждому токену, встречая незнакомое имя,
         /// вызывает заданную функцию, запрашивая ссылку на объект. Расчитывает все токены, которые
         /// не зависят от переменных и констант.
         /// </summary>
         /// <param name="ResolveNameFunc">Фукция, которая будет вызываться для каждой неизвестной константы или переменной, встреченной в выражении</param>
         /// <param name="RegisterNewConstant">Необязательная функция, которая будет вызываться, при встече чисел, и в случае ее заданности будет заменять числа на ссылки</param>
-        public void Precompile(Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ReferenceType> RegisterNewConstant = null)
+        public static void Precompile(Token token, Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant = null)
         {
-
+            if(token.IsSimple) token.ResolveName(ResolveNameFunc, RegisterNewConstant);
+            if (token.Subtokens != null) foreach (Token subToken in token.Subtokens)
+                {
+                    Precompile(subToken, ResolveNameFunc, RegisterNewConstant);
+                }
         }
 
+        /// <summary>
+        /// Парсит строку, применяя к результату <see cref="Precompile"/>
+        /// </summary>
+        /// <param name="input">Входящее строковое представление выражения</param>
+        /// <param name="result">Результат разбора строки</param>
+        /// <param name="ResolveNameFunc">Фукция, которая будет вызываться для каждой неизвестной константы или переменной, встреченной в выражении</param>
+        /// <param name="RegisterNewConstant">Необязательная функция, которая будет вызываться, при встече чисел, и в случае ее заданности будет заменять числа на ссылки</param>
+        /// <returns></returns>
+        public static ParseError Parse(string input, out Expression result, Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant = null)
+        {
+            var error = Parse(input, out result);
+            if (error == null)
+            {
+                Precompile(result.TokenTree, ResolveNameFunc, RegisterNewConstant);
+                return null;
+            }
+            else return error;
+        }
+
+        /// <summary>
+        /// Преобразовует строку в выражение
+        /// </summary>
+        /// <param name="input">Входящее строковое представление выражения</param>
+        /// <param name="result">Результат разбора строки</param>
         public static ParseError Parse(string input, out Expression result)
         {
             string rawInput = input;

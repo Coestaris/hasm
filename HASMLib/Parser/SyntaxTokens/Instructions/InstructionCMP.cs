@@ -1,9 +1,9 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens.Instructions
 {
@@ -24,7 +24,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
             NameString = "cmp";
             //CP or CMP
-            Name = new Regex("^[Cc]([Mm])?[Pp]");
+            Name = new Regex("^cm?p", RegexOptions.IgnoreCase);
             ParameterCount = 2;
             ParameterTypes = new List<InstructionParameterType>()
             {
@@ -33,18 +33,10 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            long a = 0;
-            long b = 0;
-
-            if (parameters[0].Type == ReferenceType.Constant)
-                a = GetConst(constants, parameters[0].Index).Constant.Value;
-            else a = GetVar(memZone, parameters[0].Index).GetNumericValue();
-
-            if (parameters[1].Type == ReferenceType.Constant)
-                b = GetConst(constants, parameters[1].Index).Constant.Value;
-            else b = GetVar(memZone, parameters[1].Index).GetNumericValue();
+            long a = GetNumericValue(0, memZone, constants, expressions, parameters).Value;
+            long b = GetNumericValue(1, memZone, constants, expressions, parameters).Value;
 
             ComapreResult result = 0;
 

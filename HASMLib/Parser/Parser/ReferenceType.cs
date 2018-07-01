@@ -1,15 +1,12 @@
 ﻿namespace HASMLib.Parser
 {
-    public partial class HASMParser
-	{
-        public enum ReferenceType
-        {
-            Constant,
-            Variable,
+    public enum ReferenceType
+    {
+        Constant,
+        Variable,
 
-            Expression
-        }
-	}
+        Expression
+    }
 }
 
 

@@ -24,8 +24,52 @@ namespace HASM
         {
             Form1_SizeChanged(null, null);
 
-            string configName = "C:/Users/Notebook/Desktop/hasmProject/_ide/.cfg";
-            workingFolder = WorkingFolder.FromFile(configName);
+            string configName = "";
+
+            if(File.Exists("directory.txt"))
+                configName = File.ReadAllText("directory.txt");
+
+            if (!Directory.Exists(configName))
+            {
+                if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    configName = folderBrowserDialog1.SelectedPath + "/_ide/.cfg";
+                    string compileConfigFileName = folderBrowserDialog1.SelectedPath + "/_ide/compile.cfg";
+
+                    Directory.CreateDirectory(folderBrowserDialog1.SelectedPath + "/_ide");
+
+                    workingFolder = new WorkingFolder()
+                    {
+                        CompileConfigPath = compileConfigFileName,
+                        Path = folderBrowserDialog1.SelectedPath,
+                    };
+
+                    WorkingFolder.ToFile(configName, workingFolder);
+                    File.WriteAllText("directory.txt", folderBrowserDialog1.SelectedPath);
+                }
+                else
+                {
+                    Close();
+                    return;
+                }
+            }
+            else
+            {
+                configName += "/_ide/.cfg";
+                if (File.Exists(configName))
+                {
+                    workingFolder = WorkingFolder.FromFile(configName);
+                } else
+                {
+                    workingFolder = new WorkingFolder()
+                    {
+                        CompileConfigPath = new FileInfo(configName).DirectoryName + "/compile.cfg",
+                        Path = new FileInfo(configName).Directory.Parent.FullName,
+                    };
+
+                    WorkingFolder.ToFile(configName, workingFolder);
+                }
+            }
 
             if(workingFolder.OpenedTabs != null)
             {
@@ -35,17 +79,18 @@ namespace HASM
                 }
             }
 
-            if (File.Exists(workingFolder.ConfigPath))
+            if (File.Exists(workingFolder.CompileConfigPath))
             {
-                compileConfig = CompileConfig.FromFile(workingFolder.ConfigPath);
-                compileConfig.FileName = workingFolder.ConfigPath;
+                compileConfig = CompileConfig.FromFile(workingFolder.CompileConfigPath);
+                compileConfig.FileName = workingFolder.CompileConfigPath;
             }
             else
             {
                 compileConfig = new CompileConfig()
                 {
-                    FileName = workingFolder.ConfigPath
+                    FileName = workingFolder.CompileConfigPath
                 };
+                CompileConfig.ToFile(workingFolder.CompileConfigPath, compileConfig);
             }
 
             workingFolder.SetTreeView(treeView1);

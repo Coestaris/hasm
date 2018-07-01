@@ -1,8 +1,8 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static HASMLib.Parser.HASMParser;
 using static HASMLib.Parser.SyntaxTokens.Instructions.InstructionCMP;
 
 namespace HASMLib.Parser.SyntaxTokens.Instructions
@@ -14,7 +14,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             Index = (UInt24)index;
 
             NameString = "breq";
-            Name = new Regex("^[Bb][Rr][Ee][Qq]");
+            Name = new Regex("^breq", RegexOptions.IgnoreCase);
             ParameterCount = 1;
             ParameterTypes = new List<InstructionParameterType>()
             {
@@ -22,17 +22,13 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
             ComapreResult result = (ComapreResult)(int)memZone.Stack.Pop();
 
             if(result.HasFlag(ComapreResult.Equal))
             {
-                UInt24 position = 0;
-
-                if (parameters[0].Type == ReferenceType.Constant)
-                    position = (UInt24)GetConst(constants, parameters[0].Index).Constant.Value;
-                else position = (UInt24)GetVar(memZone, parameters[0].Index).GetNumericValue();
+                UInt24 position = (UInt24)GetNumericValue(0, memZone, constants, expressions, parameters).Value;
 
                 RuntimeMachineJump(position, runtimeMachine);
             }

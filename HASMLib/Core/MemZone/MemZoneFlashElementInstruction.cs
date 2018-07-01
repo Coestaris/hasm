@@ -9,7 +9,7 @@ namespace HASMLib.Core.MemoryZone
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
         public UInt24 InstructionNumber;
-        public List<HASMParser.ObjectReference> Parameters;
+        public List<ObjectReference> Parameters;
         public UInt24 ProgramIndex;
 
         public UInt24 RuntimeAbsoluteIndex;
@@ -47,14 +47,14 @@ namespace HASMLib.Core.MemoryZone
 
             foreach (var item in Parameters)
             {
-                bytes.Add(item.Type == HASMParser.ReferenceType.Constant ? Parameter_Const : Parameter_Var);    //Const or variable
+                bytes.Add(item.Type == ReferenceType.Constant ? Parameter_Const : Parameter_Var);    //Const or variable
                 bytes.AddRange(item.Index.ToBytes());                       //Index of argument
             }
 
             return bytes.ToArray();
         }
 
-        public MemZoneFlashElementInstruction(Instruction instruction, List<HASMParser.ObjectReference> arguments, UInt24 index)
+        public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, UInt24 index)
         {
             InstructionNumber = instruction.Index;
             Parameters = arguments;
