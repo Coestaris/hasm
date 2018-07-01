@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
@@ -9,16 +11,16 @@ using System.Xml.Serialization;
 namespace HASM
 {
     [Serializable]
-    public class WorkingFolder
+    public class WorkingFolder : ICloneable
     {
         [XmlIgnore]
         public List<SourceFile> SourceFiles;
         
-
         public List<string> OpenedTabs;
 
         public string CompileConfigPath;
 
+        [XmlIgnore]
         public string Path;
 
         public SourceFile PreferedToCompile;
@@ -28,21 +30,52 @@ namespace HASM
             ToFile(Path + "/_ide/.cfg", this);
         }
 
+        public static string MakeRelative(string filePath, string referencePath)
+        {
+            var fileUri = new Uri(filePath);
+            var referenceUri = new Uri(referencePath);
+            return referenceUri.MakeRelativeUri(fileUri).ToString();
+        }
+
+        public object Clone()
+        {
+            return new WorkingFolder()
+            {
+                CompileConfigPath = CompileConfigPath,
+                OpenedTabs = OpenedTabs.Select(p => new string(p.ToCharArray())).ToList(),
+                Path = Path,
+                PreferedToCompile = (SourceFile)PreferedToCompile.Clone(),
+                SelectedTab = SelectedTab
+            };
+        }
+
         public static void ToFile(string filename, WorkingFolder cfg)
         {
             XmlSerializer ser = new XmlSerializer(typeof(WorkingFolder));
 
-            FileStream fs = new FileStream(filename, FileMode.Create);
-            XmlWriter writer = XmlWriter.Create(fs);
+            WorkingFolder config = (WorkingFolder)cfg.Clone();
 
-            ser.Serialize(writer, cfg);
+            for (int i = 0; i < config.OpenedTabs.Count; i++)
+                config.OpenedTabs[i] = MakeRelative(config.OpenedTabs[i], config.Path + "\\");
+
+            config.PreferedToCompile.Path = MakeRelative(config.PreferedToCompile.Path, config.Path + "\\");
+            config.CompileConfigPath = MakeRelative(config.CompileConfigPath, config.Path + "\\");
+
+
+            FileStream fs = new FileStream(filename, FileMode.Create);
+            XmlTextWriter writer = new XmlTextWriter(fs, Encoding.UTF8)
+            {
+                Formatting = Formatting.Indented,
+                Indentation = 4
+            };
+
+            ser.Serialize(writer, config);
 
             fs.Close();
         }
+        
 
-
-
-        public static WorkingFolder FromFile(string filename)
+        public static WorkingFolder FromFile(string filename, string directory)
         {
             XmlSerializer ser = new XmlSerializer(typeof(WorkingFolder));
 
@@ -50,6 +83,19 @@ namespace HASM
             XmlReader reader = XmlReader.Create(fs);
 
             WorkingFolder cfg = (WorkingFolder)ser.Deserialize(reader);
+            cfg.Path = new DirectoryInfo(directory).Parent.Parent.FullName;
+
+
+            if(cfg.OpenedTabs != null) 
+                for (int i = 0; i < cfg.OpenedTabs.Count; i++)
+                {
+                    cfg.OpenedTabs[i] = System.IO.Path.Combine(cfg.Path, cfg.OpenedTabs[i]);
+                }
+
+            cfg.PreferedToCompile.Path = System.IO.Path.Combine(cfg.Path, cfg.PreferedToCompile.Path);
+            cfg.CompileConfigPath = System.IO.Path.Combine(cfg.Path, cfg.CompileConfigPath);
+
+
             fs.Close();
             return cfg;
         }

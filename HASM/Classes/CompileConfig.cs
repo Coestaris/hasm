@@ -10,7 +10,7 @@ namespace HASM
     [XmlRoot("CompileConfig", Namespace = "http://CompileConfig", IsNullable = false)]
     public class CompileConfig
     {
-        [NonSerialized]
+        [XmlIgnore]
         public string FileName;
 
         public int RAM;

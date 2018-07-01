@@ -28,7 +28,7 @@ namespace HASM
 
             if(File.Exists("directory.txt"))
                 configName = File.ReadAllText("directory.txt");
-
+            
             if (!Directory.Exists(configName))
             {
                 if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
@@ -58,7 +58,7 @@ namespace HASM
                 configName += "/_ide/.cfg";
                 if (File.Exists(configName))
                 {
-                    workingFolder = WorkingFolder.FromFile(configName);
+                    workingFolder = WorkingFolder.FromFile(configName, configName);
                 } else
                 {
                     workingFolder = new WorkingFolder()
@@ -82,7 +82,7 @@ namespace HASM
             if (File.Exists(workingFolder.CompileConfigPath))
             {
                 compileConfig = CompileConfig.FromFile(workingFolder.CompileConfigPath);
-                compileConfig.FileName = workingFolder.CompileConfigPath;
+                compileConfig.FileName =  workingFolder.CompileConfigPath;
             }
             else
             {
