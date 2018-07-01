@@ -106,6 +106,11 @@ namespace HASM
                     Save();
                 if (args.Control && args.KeyCode == Keys.W)
                     Close();
+                if (args.KeyCode == Keys.F5)
+                {
+                    Save();
+                    Editor.Self.Run(Path);
+                }
             };
 
             TextBox.HighlightingRangeType = HighlightingRangeType.ChangedRange;

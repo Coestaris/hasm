@@ -5,6 +5,7 @@
         UnknownConstantReference,
         UnknownVariableReference,
 
-        OK
+        OK,
+        StackOverFlow
     }
 }

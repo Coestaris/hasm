@@ -15,6 +15,9 @@ namespace HASM.Classes
         {
             try
             {
+                if (Registry.ClassesRoot.GetSubKeyNames().Contains(".hasm"))
+                    return;
+
                 var key = Registry.ClassesRoot.CreateSubKey(".hasm");
                 var icon = key.CreateSubKey("defaultIcon");
 

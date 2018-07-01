@@ -161,6 +161,9 @@ namespace HASMLib.Runtime
                     }
                 }
 
+                if (Ticks == int.MaxValue)
+                    return RuntimeOutputCode.StackOverFlow;
+
                 //Если все ОК, то запускаем нашу инструкцию
                 RuntimeOutputCode output = SourceLineInstruction.Instructions[instruction.InstructionNumber].Apply(
                     _machine.MemZone, constants, expressions, instruction.Parameters, this);

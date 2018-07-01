@@ -24,6 +24,15 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         public bool IsEmpty => Instruction == null;
 
+        public override string ToString()
+        {
+            if(Instruction != null)
+            {
+                return $"{Instruction.NameString} {string.Join(" ", Parameters)}";
+            }
+            return $"No instruction line.{(string.IsNullOrEmpty(Label) ? "" : " [has label]")} {(Comment == null ? "" : " [has comment]")}";
+        }
+
         public static List<Instruction> Instructions
         {
             get

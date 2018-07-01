@@ -425,8 +425,7 @@ namespace HASMLib.Parser
                         } else 
                         
                         //Если это не переменная, а просили константу, не переменную
-                        if ( line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant) &&
-                            !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
+                        if ( line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                         {
                             //То, возможно, это именная константа...
                             if (_namedConsts.Select(p => p.Name).Contains(argument))

@@ -25,6 +25,8 @@ namespace HASM
 
         public SourceFile PreferedToCompile;
 
+        public Editor.OutputType OutputType;
+
         public void Save()
         {
             ToFile(Path + "/_ide/.cfg", this);
@@ -45,7 +47,8 @@ namespace HASM
                 OpenedTabs = OpenedTabs.Select(p => new string(p.ToCharArray())).ToList(),
                 Path = Path,
                 PreferedToCompile = (SourceFile)PreferedToCompile.Clone(),
-                SelectedTab = SelectedTab
+                SelectedTab = SelectedTab,
+                OutputType = OutputType
             };
         }
 

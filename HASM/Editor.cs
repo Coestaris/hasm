@@ -1,4 +1,5 @@
 ﻿using HASMLib;
+using HASMLib.Core;
 using HASMLib.Parser;
 using HASMLib.Runtime;
 
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace HASM
@@ -18,12 +20,15 @@ namespace HASM
             InitializeComponent();
         }
 
+        public static Editor Self;
+
         private WorkingFolder workingFolder;
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Form1_SizeChanged(null, null);
+            Self = this;
 
+            tabControl1_SizeChanged(null, null);
             string configName = "";
 
             if(File.Exists("directory.txt"))
@@ -103,6 +108,22 @@ namespace HASM
 
             tabControl1.SelectedIndex = workingFolder.SelectedTab;
 
+            switch (workingFolder.OutputType)
+            {
+                case OutputType.Hex:
+                    hexOutputToolStripMenuItem.Checked = true;
+                    break;
+                case OutputType.Dec:
+                    decOutputToolStripMenuItem.Checked = true;
+                    break;
+                case OutputType.Char:
+                    charOutputToolStripMenuItem.Checked = true;
+                    break;
+                default:
+                    break;
+            }
+            outputType = workingFolder.OutputType;
+
             Text = $"HASM Editor { (tabControl1.SelectedTab == null ? "" : " - " + (tabControl1.SelectedTab as TextEditor).Path)}";
         }
 
@@ -163,16 +184,6 @@ namespace HASM
                     UpdateOpenedTabs();
                 }
             }
-        }
-
-        private void Form1_SizeChanged(object sender, EventArgs e)
-        {
-            treeView1.Height = Height - 94;
-            tabControl1.Width = Width - 219;
-            tabControl1.Height = Height - 194;
-
-            panel1.Width = Width - 219;
-            panel1.Top = Height - 161;
         }
 
         private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -327,7 +338,7 @@ namespace HASM
                 toolStripComboBox1.SelectedItem = lastSelected;
         }
 
-        private void Run(string FileName)
+        public void Run(string FileName)
         {
             HASMMachine machine = new HASMMachine((uint)compileConfig.RAM, (uint)compileConfig.EEPROM, (uint)compileConfig.Flash)
             {
@@ -335,33 +346,105 @@ namespace HASM
             };
 
             machine.SetRegisters(compileConfig.RegisterNameFormat, (uint)compileConfig.RegisterCount);
-
-
             HASMParser parser = new HASMParser();
 
             FileStream fs = File.OpenRead(FileName);
             HASMSource source = new HASMSource(machine, fs);
             fs.Close();
 
+            loadingCircle1.Visible = true;
+            splitContainer_editor.Enabled = false;
+            stopToolStripMenuItem.Enabled = true;
+
             ParseError error = source.Parse();
 
             if(error != null)
             {
                 error.Line++;
-                MessageBox.Show(error.ToString());
+                MessageBox.Show(error.ToString(), "Parsing error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                loadingCircle1.Visible = false;
+                stopToolStripMenuItem.Enabled = false;
+                splitContainer_editor.Enabled = true;
                 return;
             }
 
             IOStream iostream = new IOStream();
             var runtime = machine.CreateRuntimeMachine(source, iostream);
 
-            runtime.Run();
+            runThread = new Thread(p =>
+            {
+                var result = runtime.Run();
+                if (result != RuntimeOutputCode.OK)
+                    MessageBox.Show($"Runtime error: {result}", "Runtime error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            var output = iostream.ReadAll();
-            richTextBox1.Text = string.Join(", ", output.Select(p => p.ToString("X")));
+                RunEnd(iostream, runtime, source);
+            });
 
-            toolStripLabel1.Text = $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}. Run in: {Formatter.ToPrettyFormat(runtime.TimeOfRunning)} or {runtime.Ticks} step{(runtime.Ticks == 1 ? "" : "s")}. Result is: {output.Count} TBN{(output.Count == 1 ? "" : "s")}";
+
+            runThread.Start();
         }
+
+        Thread runThread;
+
+        delegate void RunEndDelegate(IOStream iostream, RuntimeMachine runtime, HASMSource source);
+
+        void RunEnd(IOStream iostream, RuntimeMachine runtime, HASMSource source)
+        {
+            if(InvokeRequired)
+            {
+                Invoke(new RunEndDelegate(RunEnd), iostream, runtime, source);
+            }
+            else
+            {
+                if (runtime == null || source == null)
+                {
+                    toolStripLabel1.Text = "Run aborted";
+                    Output = null;
+                }
+                else
+                {
+                    Output = iostream.ReadAll();
+                    int size = source.ParseResult.Sum(p => p.FixedSize);
+                    toolStripLabel1.Text =
+                        $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}. " +
+                        $"Parsed size: {size}TBN{(size == 1 ? "" : "s")}. " +
+                        $"Run in: {Formatter.ToPrettyFormat(runtime.TimeOfRunning)} or {runtime.Ticks} step{(runtime.Ticks == 1 ? "" : "s")}. " +
+                        $"Result is: {Output.Count} TBN{(Output.Count == 1 ? "" : "s")}";
+                }
+
+
+                OutputToTextBox();
+                loadingCircle1.Visible = false;
+                stopToolStripMenuItem.Enabled = false;
+                splitContainer_editor.Enabled = true;
+
+                (tabControl1.SelectedTab as TextEditor)?.TextBox.Focus();
+            }
+        }
+
+        void OutputToTextBox()
+        {
+            if(Output != null) switch (outputType)
+            {
+                case OutputType.Hex:
+                    richTextBox1.Text = string.Join(", ", Output.Select(p => "0x" + p.ToString("X")));
+                    break;
+
+                case OutputType.Dec:
+                    richTextBox1.Text = string.Join(", ", Output.Select(p => p.ToString()));
+                    break;
+
+                case OutputType.Char:
+                    richTextBox1.Text = string.Join("", Output.Select(p => (char)p));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        List<UInt12> Output;
 
         private void runToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -523,6 +606,60 @@ namespace HASM
                 workingFolder.SetTreeView(treeView1);
                 treeView1.ExpandAll();
             }
+        }
+
+        public enum OutputType
+        {
+            Hex,
+            Dec,
+            Char
+        }
+
+        private OutputType outputType;
+
+        private void hexOutputToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            outputType = OutputType.Hex;
+            decOutputToolStripMenuItem.Checked = false;
+            charOutputToolStripMenuItem.Checked = false;
+
+            OutputToTextBox();
+            workingFolder.OutputType = outputType;
+            workingFolder.Save();
+        }
+
+        private void decOutputToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            outputType = OutputType.Dec;
+            hexOutputToolStripMenuItem.Checked = false;
+            charOutputToolStripMenuItem.Checked = false;
+
+            OutputToTextBox();
+            workingFolder.OutputType = outputType;
+            workingFolder.Save();
+        }
+
+        private void charOutputToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            outputType = OutputType.Char;
+            decOutputToolStripMenuItem.Checked = false;
+            hexOutputToolStripMenuItem.Checked = false;
+
+            OutputToTextBox();
+            workingFolder.OutputType = outputType;
+            workingFolder.Save();
+        }
+
+        private void stopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            runThread.Abort();
+            RunEnd(null, null, null);
+        }
+
+        private void tabControl1_SizeChanged(object sender, EventArgs e)
+        {
+            loadingCircle1.Top =  Height / 2 - loadingCircle1.Height / 2;
+            loadingCircle1.Left = Width / 2 - loadingCircle1.Width / 2;
         }
     }
 }

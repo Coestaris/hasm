@@ -29,11 +29,9 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
 
         public ParseError Parse(string str, out Constant constant)
         {
-            if (char.IsDigit(str.Last()))
+            if (str.Last() == 's' || str.Last() == 'q' || (str.Last() == 'd' && str[str.Length - 2] == '_'))
             {
-                return Parse(str, LengthQualifier.Single, out constant);
-            } else
-            {
+
                 char c = str.Last();
                 str = str.Remove(str.Length - 2, 2);
 
@@ -49,6 +47,10 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
                         constant = null;
                         return new ParseError(ParseErrorType.Constant_UnknownConstantLengthQualifier);
                 }
+            }
+            else
+            {
+                return Parse(str, LengthQualifier.Single, out constant);
             }
         }
 

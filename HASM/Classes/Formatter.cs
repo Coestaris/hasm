@@ -7,7 +7,7 @@ namespace HASM
     {
         public static string ToPrettyFormat(TimeSpan span)
         {
-            if (span == TimeSpan.Zero) return "0 minutes";
+            if (span == TimeSpan.Zero) return "<0 ms";
 
             var sb = new StringBuilder();
             if (span.Days > 0)
