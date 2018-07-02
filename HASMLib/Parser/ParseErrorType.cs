@@ -21,5 +21,10 @@
 		Syntax_ExpectedVar,
 		Syntax_ExpectedСonst,
 		Syntax_UnExpectedToken,
+        Preprocessor_UnexpectedPreprocessorLine,
+        Preprocessor_WrongPreprocessorFormat,
+        IO_UnabletoFindSpecifiedFile,
+        IO_UnabletoFindSpecifiedWorkingDirectory,
+        Preprocessor_UnknownDirective,
     }
 }

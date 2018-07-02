@@ -43,9 +43,7 @@ namespace HASM
             machine.SetRegisters(workingFolder.CompileConfig.RegisterNameFormat, (uint)workingFolder.CompileConfig.RegisterCount);
             HASMParser parser = new HASMParser();
 
-            FileStream fs = File.OpenRead(FileName);
-            HASMSource source = new HASMSource(machine, fs);
-            fs.Close();
+            HASMSource source = new HASMSource(machine, FileName, null);
 
             loadingCircle1.Visible = true;
             splitContainer_editor.Enabled = false;

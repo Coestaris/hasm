@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.SourceLines
 {
@@ -16,6 +14,8 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
         private const string LabelReplaceChar = "";
         private const char LabelTrimChar = ':';
         private Regex LabelRegex = new Regex(@"^\w{1,100}:");
+
+        private string input;
 
         private const int ArgumentInstructionIndex = 0;
         private const int ArgumentArgumentsIndex = 1;
@@ -52,6 +52,11 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
                 return _instructions;
             }
 
+        }
+
+        public SourceLineInstruction(string input)
+        {
+            this.input = input;
         }
 
         private static List<Instruction> _instructions;
@@ -92,7 +97,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
             argumentList = stringParts[ArgumentArgumentsIndex].Split(ArgumentSplitChar);
         }
 
-        public override ParseError Parse(string input)
+        public ParseError Parse()
         {
             FindAndDeleteComment(ref input);
             FindAndDeleteLabel(ref input);

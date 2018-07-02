@@ -33,7 +33,5 @@ namespace HASMLib.Parser.SyntaxTokens
         public bool Enabled;
 
         public string Comment;
-
-        public abstract ParseError Parse(string input);
     }
 }

@@ -19,7 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTester", "ConsoleTes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{9DFE41A4-A214-4158-9475-FE486F5FF36C}"
 	ProjectSection(SolutionItems) = preProject
+		Examples\breq.hasm = Examples\breq.hasm
 		Examples\expressions.hasm = Examples\expressions.hasm
+		Examples\preprocessor.hasm = Examples\preprocessor.hasm
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ide", "_ide", "{CA31BBE0-8838-4687-AFB6-7589B4F18E05}"

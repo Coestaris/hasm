@@ -7,6 +7,7 @@ using HASMLib.Parser.SyntaxTokens.Instructions;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -56,42 +57,31 @@ namespace HASMLib.Parser
       
         private const string PrepareSourceSpaceReplace = " ";
         private const string PrepareSourceMultiCommaReplace = ",";
-        
-     
+
+
         #endregion
 
 
         #region Text Processing Methods
-        private List<SourceLine> PrepareSource(string input, string fileName, out ParseError error)
+
+        private List<string> BasePrepareLines(string absoluteFileName)
         {
+            string input = File.ReadAllText(absoluteFileName);
+
             input = multipleSpaceRegex.Replace(input, PrepareSourceSpaceReplace);
             input = commaSpaceRegex.Replace(input, PrepareSourceMultiCommaReplace);
 
-            var actualLines = input.Split('\n').ToList();
-            var lines = new List<SourceLine>();
-            int index = 0;
+            return input.Split('\n').ToList();
+        }
 
-            foreach (string line in actualLines)
+        private List<SourceLine> InstructionPhase(List<SourceLine> lines, out ParseError error)
+        {
+            foreach (SourceLine line in lines)
             {
-                //TODO: чето блять нормальное
-                if(line.StartsWith("#"))
+                if(line.GetType() == typeof(SourceLineInstruction))
                 {
-                    lines.Add(new SourceLinePreprocessor());
-                }
-                else
-                {
-                    var a = new SourceLineInstruction()
-                    {
-                        LineIndex = index++,
-                        FileName = fileName
-                    };
-
-                    error = a.Parse(line);
-
-                    if (error != null)
-                        return null;
-
-                    lines.Add(a);
+                    error = (line as SourceLineInstruction).Parse();
+                    if (error != null) return null;
                 }
             }
 
@@ -412,7 +402,7 @@ namespace HASMLib.Parser
                         }
 
                         //Если константу он то пропарсил, но было переполение
-                        if(constError != null && constError.Type == ParseErrorType.Syntax_Constant_BaseOverflow || constError.Type == ParseErrorType.Syntax_Constant_TooLong)
+                        if(constError != null && (constError.Type == ParseErrorType.Syntax_Constant_BaseOverflow || constError.Type == ParseErrorType.Syntax_Constant_TooLong))
                         {
                             error = NewParseError(constError.Type, line, argIndex);
                             return null;
@@ -534,38 +524,69 @@ namespace HASMLib.Parser
 
         internal List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError, string Source)
         {
-            // OPT        REQ       OPT            OPT
-            //label: instruction a1, a2, a3 ... ; comment
+            var filename = Path.GetTempFileName();
+            File.WriteAllText(filename, Source);
 
-            //Examples
-            //       instruction a1, a2, a3 ... ; comment
-            //label: instruction                ; comment
-            //etc
+            return Parse(machine, out parseError, filename, new FileInfo(filename).DirectoryName);
 
+        }
+        
+        // OPT        REQ       OPT            OPT
+        //label: instruction a1, a2, a3 ... ; comment
+
+        //Examples
+        //       instruction a1, a2, a3 ... ; comment
+        //label: instruction                ; comment
+        //etc
+        internal List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError, string filename, string workingDirectory)
+        {
             //Задаем глобальные переменные выражений
             Expression.InitGlobals();
 
-            //Обнуляем глобальные переменые
+            //Обнуляем глобальные переменные
             ResetGLobals();
+
+            //Проверка валидности указанного имени файла
+            if(!File.Exists(filename))
+            {
+                parseError = new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile);
+                return null;
+            }
+
+            //Проверка валидности указанного имени рабочей директории
+            if (workingDirectory == null)
+            {
+                workingDirectory = new FileInfo(filename).DirectoryName;
+            }
+            else
+            {
+                if(!Directory.Exists(workingDirectory))
+                {
+                    parseError = new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedWorkingDirectory);
+                    return null;
+                }
+            }
 
             List<MemZoneFlashElement> result = new List<MemZoneFlashElement>();
 
             //Заносим регистры в список переменных
             result.AddRange(SetupRegisters(machine));
 
-            //Очистка строк от лишних пробелов, табов
-            List<SourceLine> lines = PrepareSource(Source, "onlyFile.hasm", out parseError);
+            //Запускаем рекурсивный метод обработки препроцессором
+            List<SourceLine> lines = PreprocessorDirective.RecursiveParse(filename, workingDirectory, out parseError, BasePrepareLines);
+            if (parseError != null) return null;
 
-            if (parseError != null)
-                return null;
+            //Обрабатываем данные о инструкциях
+            lines = InstructionPhase(lines, out parseError);
+            if (parseError != null) return null;
 
+            //Разбираем логику типов и пр.
             foreach (SourceLineInstruction line in lines)
-            {
-                if (line.IsEmpty)
-                    continue;
+            { 
+                if (line.IsEmpty) continue;
 
                 var res = ProceedInstruction(line, out parseError);
-                if(parseError != null)
+                if (parseError != null)
                 {
                     return null;
                 }
@@ -577,7 +598,7 @@ namespace HASMLib.Parser
             //Если среди них есть пустые, то бьем тревогу!
             foreach (var item in UnknownLabelNameErrorList)
             {
-                if(item.memZoneFlashElementConstant.isEmpty)
+                if (item.memZoneFlashElementConstant.isEmpty)
                 {
                     parseError = item.ParseError;
                     return null;
@@ -603,7 +624,7 @@ namespace HASMLib.Parser
 
             parseError = null;
             return result;
-           
+
         }
     }
 }

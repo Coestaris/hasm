@@ -13,7 +13,17 @@ namespace HASMLib
 
         public string Source { get; set; }
 
-		public HASMSource(HASMMachine machine, FileStream fs)
+        public string BaseFilename { get; set; }
+
+        public string WorkingDirectory { get; set; }
+
+        public HASMSource(HASMMachine machine, string fileName, string workingDirectory = null)
+        {
+            BaseFilename = fileName;
+            Machine = machine;
+        }
+
+        public HASMSource(HASMMachine machine, Stream fs)
         {
 			byte[] bytes = new byte[fs.Length];
 			fs.Read (bytes, 0, (int)fs.Length);
@@ -55,12 +65,11 @@ namespace HASMLib
 
 		public ParseError Parse()
 		{
-            DateTime startTime = DateTime.Now; 
+            DateTime startTime = DateTime.Now;
 
-			ParseError err;
-			ParseResult = new HASMParser().Parse(Machine, out err, Source);
+            ParseResult = new HASMParser().Parse(Machine, out ParseError err, BaseFilename, WorkingDirectory);
 
-			if (err != null)
+            if (err != null)
 				return err;
 
 			if (ParseResult == null)

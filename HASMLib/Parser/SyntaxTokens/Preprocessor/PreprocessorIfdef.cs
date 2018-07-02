@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
+{
+    internal class PreprocessorIfdef : PreprocessorDirective
+    {
+        public PreprocessorIfdef()
+        {
+            Name = "ifdef";
+            CanAddNewLines = false;
+        }
+
+        protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)
+        {
+            throw new NotImplementedException();
+        }
+
+        //Для include
+        protected override List<SourceLine> Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
