@@ -59,11 +59,15 @@
     <Compile Include="Parser\Parser\ObjectReference.cs" />
     <Compile Include="Parser\Parser\ReferenceType.cs" />
     <Compile Include="Parser\Parser\Variable.cs" />
+    <Compile Include="Parser\SyntaxTokens\Expressions\Exceptions\ConstantOverflowException.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Expression.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Extention.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Function.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Operator.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Token.cs" />
+    <Compile Include="Parser\SyntaxTokens\Expressions\Exceptions\UnknownFunctionException.cs" />
+    <Compile Include="Parser\SyntaxTokens\Expressions\Exceptions\UnknownOperatorException.cs" />
+    <Compile Include="Parser\SyntaxTokens\Expressions\Exceptions\WrongOperatorCountException.cs" />
     <Compile Include="Parser\SyntaxTokens\InstructionParameter.cs" />
     <Compile Include="Parser\SyntaxTokens\InstructionParameterType.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\BR\InstructionBREQ.cs" />

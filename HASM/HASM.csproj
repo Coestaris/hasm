@@ -53,6 +53,7 @@
     <Compile Include="Classes\CompileConfig.cs" />
     <Compile Include="Classes\Define.cs" />
     <Compile Include="Classes\RegisterIcon.cs" />
+    <Compile Include="Classes\UserConfig.cs" />
     <Compile Include="CompileOptions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,6 +65,9 @@
     </Compile>
     <Compile Include="Editor.Designer.cs">
       <DependentUpon>Editor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editor.OutputType.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="EnterNameDialog.cs">
       <SubType>Form</SubType>

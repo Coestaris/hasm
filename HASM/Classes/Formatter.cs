@@ -3,7 +3,7 @@ using System.Text;
 
 namespace HASM
 {
-    public class Formatter
+    public static class Formatter
     {
         public static string ToPrettyFormat(TimeSpan span)
         {
@@ -21,6 +21,13 @@ namespace HASM
             if (span.Milliseconds > 0)
                 sb.AppendFormat("{0} ms", span.Milliseconds);
             return sb.ToString();
+        }
+
+        public static string MakeRelative(string filePath, string referencePath)
+        {
+            var fileUri = new Uri(filePath);
+            var referenceUri = new Uri(referencePath);
+            return referenceUri.MakeRelativeUri(fileUri).ToString();
         }
     }
 }

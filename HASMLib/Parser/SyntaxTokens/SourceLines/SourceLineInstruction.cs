@@ -134,7 +134,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
             //Если не было найдено то ошибка
             return new ParseError(
-                ParseErrorType.Instruction_UnknownInstruction,
+                ParseErrorType.Syntax_Instruction_UnknownInstruction,
                 LineIndex,
                 Label.Length + 2,
                 FileName);

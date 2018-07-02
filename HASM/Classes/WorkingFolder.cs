@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HASM.Classes;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -13,30 +14,35 @@ namespace HASM
     [Serializable]
     public class WorkingFolder : ICloneable
     {
+        public readonly static string MainConfigPostfix = "/_ide/.cfg";
+        public readonly static string CompileConfigPostfix = "/_ide/compile.cfg";
+        public readonly static string UserConfigPostfix = "/_ide/user.cfg";
+
         [XmlIgnore]
         public List<SourceFile> SourceFiles;
-        
-        public List<string> OpenedTabs;
-
         public string CompileConfigPath;
 
         [XmlIgnore]
         public string Path;
 
+        [XmlIgnore]
+        public UserConfig UserConfig;
+
+        [XmlIgnore]
+        public CompileConfig CompileConfig;
+
+        public string UserConfigPath;
+
         public SourceFile PreferedToCompile;
-
-        public Editor.OutputType OutputType;
-
+        
         public void Save()
         {
-            ToFile(Path + "/_ide/.cfg", this);
+            ToFile(Path + MainConfigPostfix, this);
         }
 
-        public static string MakeRelative(string filePath, string referencePath)
+        public void SaveUser()
         {
-            var fileUri = new Uri(filePath);
-            var referenceUri = new Uri(referencePath);
-            return referenceUri.MakeRelativeUri(fileUri).ToString();
+            UserConfig.ToFile(UserConfigPath, UserConfig);
         }
 
         public object Clone()
@@ -44,11 +50,9 @@ namespace HASM
             return new WorkingFolder()
             {
                 CompileConfigPath = CompileConfigPath,
-                OpenedTabs = OpenedTabs.Select(p => new string(p.ToCharArray())).ToList(),
+                UserConfigPath = UserConfigPath,
                 Path = Path,
                 PreferedToCompile = (SourceFile)PreferedToCompile.Clone(),
-                SelectedTab = SelectedTab,
-                OutputType = OutputType
             };
         }
 
@@ -58,11 +62,9 @@ namespace HASM
 
             WorkingFolder config = (WorkingFolder)cfg.Clone();
 
-            for (int i = 0; i < config.OpenedTabs.Count; i++)
-                config.OpenedTabs[i] = MakeRelative(config.OpenedTabs[i], config.Path + "\\");
-
-            config.PreferedToCompile.Path = MakeRelative(config.PreferedToCompile.Path, config.Path + "\\");
-            config.CompileConfigPath = MakeRelative(config.CompileConfigPath, config.Path + "\\");
+            config.PreferedToCompile.Path = Formatter.MakeRelative(config.PreferedToCompile.Path, config.Path + "\\");
+            config.CompileConfigPath = Formatter.MakeRelative(config.CompileConfigPath, config.Path + "\\");
+            config.UserConfigPath = Formatter.MakeRelative(config.UserConfigPath, config.Path + "\\");
 
 
             FileStream fs = new FileStream(filename, FileMode.Create);
@@ -89,14 +91,9 @@ namespace HASM
             cfg.Path = new DirectoryInfo(directory).Parent.Parent.FullName;
 
 
-            if(cfg.OpenedTabs != null) 
-                for (int i = 0; i < cfg.OpenedTabs.Count; i++)
-                {
-                    cfg.OpenedTabs[i] = System.IO.Path.Combine(cfg.Path, cfg.OpenedTabs[i]);
-                }
-
             cfg.PreferedToCompile.Path = System.IO.Path.Combine(cfg.Path, cfg.PreferedToCompile.Path);
             cfg.CompileConfigPath = System.IO.Path.Combine(cfg.Path, cfg.CompileConfigPath);
+            cfg.UserConfigPath = System.IO.Path.Combine(cfg.Path, cfg.UserConfigPath);
 
 
             fs.Close();
@@ -109,8 +106,6 @@ namespace HASM
 
         [XmlIgnore]
         private int _imgIndex = 0;
-
-        public int SelectedTab;
 
         public void SetTreeView(TreeView tv)
         {

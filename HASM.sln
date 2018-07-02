@@ -9,6 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HASMLib", "HASMLib\HASMLib.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D458B6B6-D73B-4ECE-9C77-77D10153DD8E}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -23,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ide", "_ide", "{CA31BBE0-8
 	ProjectSection(SolutionItems) = preProject
 		Examples\_ide\.cfg = Examples\_ide\.cfg
 		Examples\_ide\compile.cfg = Examples\_ide\compile.cfg
+		Examples\_ide\user.cfg = Examples\_ide\user.cfg
 	EndProjectSection
 EndProject
 Global

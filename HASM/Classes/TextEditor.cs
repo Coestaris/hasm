@@ -1,4 +1,5 @@
 ﻿using FastColoredTextBoxNS;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -67,32 +68,48 @@ namespace HASM
 
             Text = DisplayName;
 
-            TextBox.VisibleRangeChanged += (obj, args) =>
+            if (DisplayName.Contains(".cfg"))
             {
-                TextBox.VisibleRange.ClearStyle(StyleIndex.All);
-
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GreenStyle, CommentRegex);
-
-
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, LabelRegex);
-
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.MaroonStyle, RegisterRegex);
-                
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, BinRegex);
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, DecRegex);
-                TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, HexRegex);
-
-                foreach(var item in HASMLib.Parser.SyntaxTokens.Expressions.Expression.Functions)
+                TextBox.VisibleRangeChanged += (obj, args) =>
                 {
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueBoldStyle, item.FunctionString);
-                }
+                    TextBox.VisibleRange.ClearStyle(StyleIndex.All);
+                    TextBox.SyntaxHighlighter.XMLSyntaxHighlight(TextBox.VisibleRange);
+                    TextBox.SyntaxHighlighter.XmlTagNameStyle = TextBox.SyntaxHighlighter.BlueStyle;
+                };
+            }
+            else
+            {
+                List<Regex> FunctionRegexes = new List<Regex>();
+                foreach (var item in HASMLib.Parser.SyntaxTokens.Expressions.Expression.Functions)
+                    FunctionRegexes.Add(new Regex($"\\s{item.FunctionString}\\s"));
 
+                List<Regex> InstructionRegexes = new List<Regex>();
                 foreach (var item in HASMLib.Parser.SyntaxTokens.SourceLines.SourceLineInstruction.Instructions)
-                {
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, @"\s" + item.NameString + @"\s");
-                }
+                    InstructionRegexes.Add(new Regex($"\\s{item.NameString}\\s"));
 
-            };
+
+                TextBox.VisibleRangeChanged += (obj, args) =>
+                {
+                    TextBox.VisibleRange.ClearStyle(StyleIndex.All);
+
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GreenStyle, CommentRegex);
+
+
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, LabelRegex);
+
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.MaroonStyle, RegisterRegex);
+
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, BinRegex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, DecRegex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, HexRegex);
+
+                    foreach (var item in FunctionRegexes)
+                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueBoldStyle, item);
+
+                    foreach (var item in InstructionRegexes)
+                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, item);
+                };
+            }
 
             TextBox.TextChanged += (obj, args) =>
             {

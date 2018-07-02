@@ -48,6 +48,7 @@
             this.runDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+            this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.saveCompiledToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadCompiledToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,7 +79,6 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.splitContainer_main = new System.Windows.Forms.SplitContainer();
             this.splitContainer_editor = new System.Windows.Forms.SplitContainer();
-            this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadingCircle1 = new MRG.Controls.UI.LoadingCircle();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -107,7 +107,7 @@
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(191, 453);
+            this.treeView1.Size = new System.Drawing.Size(185, 453);
             this.treeView1.TabIndex = 11;
             this.treeView1.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView1_ItemDrag);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseClick);
@@ -118,10 +118,11 @@
             // tabControl1
             // 
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Enabled = false;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(637, 344);
+            this.tabControl1.Size = new System.Drawing.Size(643, 344);
             this.tabControl1.TabIndex = 13;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             this.tabControl1.SizeChanged += new System.EventHandler(this.tabControl1_SizeChanged);
@@ -234,6 +235,14 @@
             this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
             this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
+            // stopToolStripMenuItem
+            // 
+            this.stopToolStripMenuItem.Enabled = false;
+            this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.stopToolStripMenuItem.Text = "Stop running";
+            this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -343,7 +352,7 @@
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.textBox1.Location = new System.Drawing.Point(0, 85);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(637, 20);
+            this.textBox1.Size = new System.Drawing.Size(643, 20);
             this.textBox1.TabIndex = 1;
             // 
             // richTextBox1
@@ -352,7 +361,7 @@
             this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(637, 105);
+            this.richTextBox1.Size = new System.Drawing.Size(643, 105);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -445,8 +454,9 @@
             // 
             this.splitContainer_main.Panel2.Controls.Add(this.splitContainer_editor);
             this.splitContainer_main.Size = new System.Drawing.Size(832, 453);
-            this.splitContainer_main.SplitterDistance = 191;
+            this.splitContainer_main.SplitterDistance = 185;
             this.splitContainer_main.TabIndex = 17;
+            this.splitContainer_main.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_main_SplitterMoved);
             // 
             // splitContainer_editor
             // 
@@ -463,31 +473,25 @@
             // 
             this.splitContainer_editor.Panel2.Controls.Add(this.textBox1);
             this.splitContainer_editor.Panel2.Controls.Add(this.richTextBox1);
-            this.splitContainer_editor.Size = new System.Drawing.Size(637, 453);
+            this.splitContainer_editor.Size = new System.Drawing.Size(643, 453);
             this.splitContainer_editor.SplitterDistance = 344;
             this.splitContainer_editor.TabIndex = 0;
-            // 
-            // stopToolStripMenuItem
-            // 
-            this.stopToolStripMenuItem.Enabled = false;
-            this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.stopToolStripMenuItem.Text = "Stop running";
-            this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
+            this.splitContainer_editor.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer_editor_SplitterMoved);
             // 
             // loadingCircle1
             // 
             this.loadingCircle1.Active = true;
             this.loadingCircle1.BackColor = System.Drawing.Color.Transparent;
             this.loadingCircle1.Color = System.Drawing.Color.DimGray;
-            this.loadingCircle1.InnerCircleRadius = 25;
+            this.loadingCircle1.InnerCircleRadius = 5;
             this.loadingCircle1.Location = new System.Drawing.Point(115, 406);
             this.loadingCircle1.Name = "loadingCircle1";
-            this.loadingCircle1.NumberSpoke = 50;
-            this.loadingCircle1.OuterCircleRadius = 30;
+            this.loadingCircle1.NumberSpoke = 12;
+            this.loadingCircle1.OuterCircleRadius = 11;
             this.loadingCircle1.RotationSpeed = 45;
             this.loadingCircle1.Size = new System.Drawing.Size(90, 90);
-            this.loadingCircle1.SpokeThickness = 10;
+            this.loadingCircle1.SpokeThickness = 2;
+            this.loadingCircle1.StylePreset = MRG.Controls.UI.LoadingCircle.StylePresets.MacOSX;
             this.loadingCircle1.TabIndex = 18;
             this.loadingCircle1.Text = "loadingCircle1";
             this.loadingCircle1.Visible = false;
@@ -506,6 +510,8 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.ResizeEnd += new System.EventHandler(this.Editor_ResizeEnd);
+            this.LocationChanged += new System.EventHandler(this.Editor_LocationChanged);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.menuStrip1.ResumeLayout(false);

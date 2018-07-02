@@ -1,5 +1,6 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
+using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -316,12 +317,12 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             var error = Constant.Parse(RawValue, out Constant constant);
             if (error != null)
             {
-                if (error.Type == ParseErrorType.Constant_TooLong || error.Type == ParseErrorType.Constant_BaseOverflow)
-                    throw new Exception("Wrong coasd");
+                if (error.Type == ParseErrorType.Syntax_Constant_TooLong || error.Type == ParseErrorType.Syntax_Constant_BaseOverflow)
+                    throw new ConstantOverflowException(RawValue, error.Type);
 
                 //Variable
                 if (ResolveNameFunc == null)
-                    throw new Exception("Cant resolve name =c");
+                    throw new ArgumentNullException("");
 
 
                 Reference = ResolveNameFunc(RawValue);
@@ -369,7 +370,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
                 if (error != null)
                 {
-                    if (error.Type == ParseErrorType.Constant_TooLong || error.Type == ParseErrorType.Constant_BaseOverflow)
+                    if (error.Type == ParseErrorType.Syntax_Constant_TooLong || error.Type == ParseErrorType.Syntax_Constant_BaseOverflow)
                         throw new Exception("Wrong const format");
 
                     throw new Exception("wrong token =/");

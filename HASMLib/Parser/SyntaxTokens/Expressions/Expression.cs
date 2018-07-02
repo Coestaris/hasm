@@ -1,36 +1,11 @@
 ﻿using HASMLib.Core;
+using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions
 {
-    internal class UnknownFunctionException : Exception
-    {
-        public string FuncName {get; private set;}
-
-        public UnknownFunctionException(string funcName)
-        {
-            FuncName = funcName;
-        }
-    }
-
-    internal class UnknownOperatorException : Exception
-    {
-        public string OperatorName { get; private set; }
-
-        public UnknownOperatorException(string operatorName)
-        {
-            OperatorName = OperatorName;
-        }
-    }
-
-    internal class WrongOperatorCountException : Exception
-    {
-      
-    }
-
     /// <summary>
     /// Основной класс для подсчета числовых значений текстовых выражений
     /// </summary>
@@ -619,7 +594,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <param name="RegisterNewConstant">Необязательная функция, которая будет вызываться, при встече чисел, и в случае ее заданности будет заменять числа на ссылки</param>
         public static void Precompile(Token token, Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant = null)
         {
-            if(token.IsSimple) token.ResolveName(ResolveNameFunc, RegisterNewConstant);
+            if (token.IsSimple) token.ResolveName(ResolveNameFunc, RegisterNewConstant);
             if (token.Subtokens != null) foreach (Token subToken in token.Subtokens)
                 {
                     Precompile(subToken, ResolveNameFunc, RegisterNewConstant);
@@ -657,7 +632,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             result = null;
 
             if (input.Count(p => p == '(') != input.Count(p => p == ')'))
-                return new ParseError(ParseErrorType.Expression_Parse_UnclosedBracket);
+                return new ParseError(ParseErrorType.Syntax_Expression_UnclosedBracket);
 
             //Если не были просчитаны массивы операторов, делаем это
             if (OperatorCharaters == null)
@@ -676,25 +651,25 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             {
                 if (e.FuncName != null)
                     return new ParseError(
-                        ParseErrorType.Expression_Parse_UnknownFunction,
+                        ParseErrorType.Syntax_Expression_UnknownFunction,
                         rawInput.IndexOf(e.FuncName));
-                else return new ParseError(ParseErrorType.Expression_Parse_UnknownFunction);
+                else return new ParseError(ParseErrorType.Syntax_Expression_UnknownFunction);
             }
             catch(UnknownOperatorException e)
             {
                 if (e.OperatorName != null)
                     return new ParseError(
-                        ParseErrorType.Expression_Parse_UnknownOperator,
+                        ParseErrorType.Syntax_Expression_UnknownOperator,
                         rawInput.IndexOf(e.OperatorName));
-                else return new ParseError(ParseErrorType.Expression_Parse_UnknownOperator);
+                else return new ParseError(ParseErrorType.Syntax_Expression_UnknownOperator);
             }
             catch (WrongOperatorCountException)
             {
-                return new ParseError(ParseErrorType.Expression_Parse_WrongOperatorCount);
+                return new ParseError(ParseErrorType.Syntax_Expression_WrongOperatorCount);
             }
             catch(StackOverflowException)
             {
-                return new ParseError(ParseErrorType.Expression_Parse_CantParse);
+                return new ParseError(ParseErrorType.Syntax_Expression_CantParse);
             }
 
             return null;

@@ -78,7 +78,7 @@ namespace HASMLib.Parser.SyntaxTokens
             }
 
             constant = null;
-            return new ParseError(ParseErrorType.Constant_WrongFormat, 0);
+            return new ParseError(ParseErrorType.Syntax_Constant_WrongFormat, 0);
         }
 
         public List<UInt12> ToUInt12()
