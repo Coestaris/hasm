@@ -1,10 +1,6 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HASM.Classes
@@ -21,7 +17,7 @@ namespace HASM.Classes
                 var key = Registry.ClassesRoot.CreateSubKey(".hasm");
                 var icon = key.CreateSubKey("defaultIcon");
 
-                icon.SetValue("", new FileInfo("hasm.ico").FullName, RegistryValueKind.String);
+                icon.SetValue("", new FileInfo("Icons\\hasm.ico").FullName, RegistryValueKind.String);
 
                 icon.Close();
                 key.Close();

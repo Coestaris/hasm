@@ -123,13 +123,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="hasm.ico">
+    <Content Include="Icons\hasm.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="ideDirIcon.png">
+    <Content Include="Icons\cfg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\dirIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="dirIcon.png">
+    <Content Include="Icons\ideDirIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="libs\FastColoredTextBox.dll" />

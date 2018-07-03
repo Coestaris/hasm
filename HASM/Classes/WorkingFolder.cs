@@ -116,8 +116,9 @@ namespace HASM
             tv.Nodes.Clear();
 
             il = new ImageList();
-            il.Images.Add("dir", new Bitmap("dirIcon.png"));
-            il.Images.Add("idedir", new Bitmap("ideDirIcon.png"));
+            il.Images.Add("dir", new Bitmap("icons\\dirIcon.png"));
+            il.Images.Add(".cfg", new Bitmap("icons\\cfg.png"));
+            il.Images.Add("idedir", new Bitmap("icons\\ideDirIcon.png"));
 
             _imgIndex = 1;
             TreeNode parent = new FileNode(removeFunc(Path), Path, true)
@@ -125,10 +126,9 @@ namespace HASM
                 isRoot = true
             };
 
-            AddNodes(removeFunc, Path, parent);
-                
-            tv.Nodes.Add(parent);
             tv.ImageList = il;
+            AddNodes(removeFunc, Path, parent);
+            tv.Nodes.Add(parent);
         }
 
         private void AddNodes(Func<string, string> removeFunc, string path, TreeNode parent)
@@ -151,12 +151,13 @@ namespace HASM
                 var ext = System.IO.Path.GetExtension(file);
                 if (!string.IsNullOrEmpty(ext))
                 {
-                    _imgIndex++; 
-                    il.Images.Add(ext, IconManager.FindIconForFilename(file, true));
+                    if(!il.Images.Keys.Contains(ext))
+                        il.Images.Add(ext, IconManager.FindIconForFilename(file, true));
+
                     parent.Nodes.Add(new FileNode(removeFunc(file), file, false)
                     {
-                        ImageIndex = _imgIndex,
-                        SelectedImageIndex = _imgIndex
+                        ImageKey = ext,
+                        SelectedImageKey = ext
                     });
                 } else
                 {
