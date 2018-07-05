@@ -4,7 +4,6 @@ using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Runtime;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static HASMLib.Parser.HASMParser;
 
 namespace HASMLib.Parser.SyntaxTokens
 {

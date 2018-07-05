@@ -76,7 +76,6 @@ namespace HASMLib.Parser.SyntaxTokens
         private static RecursiveParseResult RecursiveParse(string fileName)
         {
             var result = new List<SourceLine>();
-            int index = -1;
 
             if (!File.Exists(fileName))
                 fileName = Path.Combine(workingDirectory, fileName);
@@ -85,16 +84,18 @@ namespace HASMLib.Parser.SyntaxTokens
             {
                 return new RecursiveParseResult(
                     null,
-                    new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile, index, fileName));
+                    new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile, -1, fileName));
             }
 
             List<string> lines = getLinesFunc(fileName);
 
-            foreach (var line in lines)
+            for(int index = 0; index < lines.Count; index++)
             {
+                string line = lines[index];
+
                 if (IsPreprocessorLine(line))
                 {
-                    PreprocessorDirective directive = GetDirective(line, ++index, fileName, out ParseError error);
+                    PreprocessorDirective directive = GetDirective(line, index, fileName, out ParseError error);
                     if (error != null) return new RecursiveParseResult(null, error);
 
                     if(directive.CanAddNewLines)
@@ -111,12 +112,45 @@ namespace HASMLib.Parser.SyntaxTokens
                 }
                 else
                 {
-                    result.Add(new SourceLineInstruction(line)
+                    foreach (Define define in defines)
                     {
-                        LineIndex = index++,
-                        FileName = fileName,
-                        Enabled = enableStack.Contains(false)
-                    });
+                        if(line.Contains(define.Name) && line.IndexOf(define.Name) < line.IndexOf(';'))
+                        {
+                            if(define.IsEmpty)
+                            {
+                                return new RecursiveParseResult(null, new ParseError(ParseErrorType.Preprocessor_ReferenceToEmptyDefine, index, fileName));
+                            }
+
+                            if (define.IsParametric)
+                            {
+                                Match match = ParametricDefine.ParametricUsageRegex.Match(line);
+                                if (match.Success)
+                                {
+                                    var subStr = line.Substring(match.Index, match.Length);
+                                    line = line.Remove(match.Index, match.Length);
+
+                                    var newStr = (define as ParametricDefine).Expand(subStr, out ParseError parseError);
+                                    if(parseError != null) return new RecursiveParseResult(null, new ParseError(parseError.Type, index, fileName));
+
+                                    line = line.Insert(match.Index, newStr);
+                                }
+                                else
+                                {
+                                    return new RecursiveParseResult(null, new ParseError(ParseErrorType.Preprocessor_WrongParametricDefineFormat, index, fileName));
+                                }
+                            }
+                            else line = line.Replace(define.Name, define.Value);
+                        }
+                    }
+
+                    if (!enableStack.Contains(false))
+                    {
+                        result.Add(new SourceLineInstruction(line)
+                        {
+                            LineIndex = index,
+                            FileName = fileName,
+                        });
+                    }
                 }
 
             }

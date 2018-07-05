@@ -10,7 +10,9 @@ namespace HASMLib.Parser.SyntaxTokens
 
         public string Name;
         public string Value;
-        
+
+        public bool IsEmpty => string.IsNullOrEmpty(Value);
+
         public Define(string name, string value)
         {
             Name = name;

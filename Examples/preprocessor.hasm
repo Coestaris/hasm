@@ -13,9 +13,9 @@
 ;   #message
 
 #define someDef
-#define someValue 0x100
+#define someValue 0x110
 #define someAnotherDef 0x200 - 4
-#define someExpression(a,b) a + b
+#define someExpression(a,b) 2 * a + b
 
 ; Если объявлен someDef, вывести 100 иначе 200
 #ifdef someDef
@@ -29,21 +29,21 @@
 
 ; Повторяем процедуру
 #ifdef someDef
-        out 0x100
+        out 0x105
 #else   
-        out 0x200
+        out 0x205
 #endif
 
-        out SomeValue               ; Вывести значение someValue (0x100)
-        out someAnotherDef          ; Вывести значение someAnotherDef (0x200 - 4)
-        out someExpression(2, 2)    ; Вывести значение someExpression 2 + 2
+        out someValue                   ; Вывести значение someValue (0x100)
+        out someAnotherDef              ; Вывести значение someAnotherDef (0x200 - 4)
+        out someExpression(2, 2 + 2)    ; Вывести значение someExpression 2 + 2
 
 #if (defined(someDef) || defined(someValue)) && defined(someAnotherDef)
         out 0x0_q                   ; Если выполняется условие, вывести 4 нуля
 #elif !defined(someDef) && !defined(someValue) && !defined(someAnotherDef) && !defined(someExpression)
 #error This is sample error code! 
+        out 0x1_q                   ; Если выполняется условие, вывести 1 и 3 нуля
 #endif
 
 #warning This is sample warning
 #message This is sample message
-

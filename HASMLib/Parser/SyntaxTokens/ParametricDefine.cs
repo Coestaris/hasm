@@ -3,10 +3,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace HASMLib.Parser.SyntaxTokens
-{//
+{
     public class ParametricDefine : Define
     {
         public static Regex ParametricDefineRegex = new Regex(@"^[A-Za-z](?:(?!\W)\w)*\(([A-Za-z](?:(?!\W\s)\w)*(, *?[A-Za-z](\w)*){0,}){1,}\)");
+        public static Regex ParametricUsageRegex = new Regex(@"[A-Za-z](?:(?!\W)\w)*\(([^(),]+(, *?[^(),]+){0,}){1,}\)");
 
         public ParametricDefine(string name, string value) : base(name.Split('(')[0], value)
         {
@@ -24,9 +25,17 @@ namespace HASMLib.Parser.SyntaxTokens
 
         public List<string> ParameterNames;
 
-        public string Expand(List<string> parameters, out ParseError error)
+        public string Expand(string input, out ParseError error)
         {
-            if(parameters.Count != ParameterNames.Count)
+            var parts = input.Split('(');
+            var part = parts[1].Trim(')');
+            part = part.Replace(" ", "");
+            part = part.Replace("\t", "");
+            part = part.Replace("\r", "");
+
+            var parameters = part.Split(',').ToList();
+
+            if (parameters.Count != ParameterNames.Count)
             {
                 error = new ParseError(ParseErrorType.Preprocessor_WrongParameterCount);
                 return null;

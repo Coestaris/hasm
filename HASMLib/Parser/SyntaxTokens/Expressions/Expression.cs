@@ -89,7 +89,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public static readonly List<Operator> Operators = new List<Operator>()
         {
             //Unary 
-            new Operator(1, "!", (a) => new Constant(a.AsBool() ? 1 : 0, a.Length)),
+            new Operator(1, "!", (a) => new Constant(a.AsBool() ? 0 : 1, a.Length)),
             new Operator(1, "~", (a) => new Constant(~ a.Value, a.Length)),
             new Operator(1, "-", (a) => new Constant(- a.Value, a.Length), true),
 
