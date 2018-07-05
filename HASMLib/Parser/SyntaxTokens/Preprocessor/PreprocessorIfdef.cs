@@ -1,22 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
-namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
+namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     internal class PreprocessorIfdef : PreprocessorDirective
     {
+        internal static Regex ArgumentRegex = new Regex(@"^[A-Za-z]\w*$"); 
+
         public PreprocessorIfdef()
         {
             Name = "ifdef";
             CanAddNewLines = false;
         }
 
-        protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)
+        protected override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
-            throw new NotImplementedException();
+            input = ClearInput(input);
+
+            if(!ArgumentRegex.IsMatch(input))
+            {
+                error = new ParseError(ParseErrorType.Preprocessor_NameExpected);
+                return;
+            }
+
+            enableStack.Push(defines.Exists(p => p.Name == input));
+
+            error = null;
         }
 
         //Для include

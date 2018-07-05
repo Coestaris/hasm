@@ -1,6 +1,7 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
+using HASMLib.Parser.SyntaxTokens.Preprocessor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -348,7 +349,12 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             if (_valueSet)
                 return Value;
 
-            if(_referenceSet && zone != null)
+            if(_referenceSet && Reference.Type == ReferenceType.Define)
+            {
+                return new Constant(PreprocessorIf.defines.Exists(p => p.Name == RawValue));
+            }
+
+            if (_referenceSet && zone != null)
             {
                 switch (Reference.Object.Type)
                 {
@@ -373,7 +379,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     if (error.Type == ParseErrorType.Syntax_Constant_TooLong || error.Type == ParseErrorType.Syntax_Constant_BaseOverflow)
                         throw new Exception("Wrong const format");
 
-                    throw new Exception("wrong token =/");
+                    throw new WrongTokenException();
                 }
                 else
                 {

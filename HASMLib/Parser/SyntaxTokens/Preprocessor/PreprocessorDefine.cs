@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
+namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     internal class PreprocessorDefine: PreprocessorDirective
     {
@@ -40,18 +38,29 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
                     return;
                 }
 
+                var newDef = new ParametricDefine(name, string.Join(" ", parts.Skip(1)));
 
+                if(defines.Exists(p => p.Name == newDef.Name))
+                {
+                    error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
+                    return;
+                }
+
+                defines.Add(newDef);
                 
-                defines.Add(new ParametricDefine(name, string.Join(" ", parts.Skip(1))));
-
-
                 error = null;
                 return;
             }
 
-            if (!Define.GeneralDefineNameRegex.IsMatch(name))
+            if(!Define.GeneralDefineNameRegex.IsMatch(name))
             {
                 error = new ParseError(ParseErrorType.Preprocessor_WrongDefineName);
+                return;
+            }
+
+            if (defines.Exists(p => p.Name == Name))
+            {
+                error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
                 return;
             }
 

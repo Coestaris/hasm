@@ -506,7 +506,7 @@ namespace HASM
         private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             workingFolder.PreferedToCompile = (SourceFile)toolStripComboBox1.SelectedItem;
-            workingFolder.SaveUser();
+            workingFolder.Save();
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)

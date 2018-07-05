@@ -5,7 +5,9 @@
         Constant,
         Variable,
 
-        Expression
+        Expression,
+
+        Define
     }
 }
 

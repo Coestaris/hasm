@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
+namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     internal class PreprocessorElse : PreprocessorDirective
     {
@@ -14,9 +11,18 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
             CanAddNewLines = false;
         }
 
-        protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)
+        protected override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
-            throw new NotImplementedException();
+            if(enableStack.Count == 0)
+            {
+                error = new ParseError(ParseErrorType.Preprocessor_ElseWithoutPreviousConditionals);
+                return;
+            }
+
+            var last = enableStack.Pop();
+            enableStack.Push(!last);
+
+            error = null;
         }
 
         //Для include

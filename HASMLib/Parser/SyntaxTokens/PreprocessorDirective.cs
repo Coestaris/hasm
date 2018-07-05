@@ -76,7 +76,7 @@ namespace HASMLib.Parser.SyntaxTokens
         private static RecursiveParseResult RecursiveParse(string fileName)
         {
             var result = new List<SourceLine>();
-            int index = 0;
+            int index = -1;
 
             if (!File.Exists(fileName))
                 fileName = Path.Combine(workingDirectory, fileName);
@@ -94,19 +94,19 @@ namespace HASMLib.Parser.SyntaxTokens
             {
                 if (IsPreprocessorLine(line))
                 {
-                    PreprocessorDirective directive = GetDirective(line, index++, fileName, out ParseError error);
+                    PreprocessorDirective directive = GetDirective(line, ++index, fileName, out ParseError error);
                     if (error != null) return new RecursiveParseResult(null, error);
 
                     if(directive.CanAddNewLines)
                     {
                         var newLines = directive.Apply(line, enableStack, defines, out ParseError parseError, RecursiveParse);
-                        if (error != null) return new RecursiveParseResult(null, new ParseError(error.Type, index, fileName));
+                        if (parseError != null) return new RecursiveParseResult(null, new ParseError(parseError.Type, index, fileName));
                         result.AddRange(newLines);
                     }
                     else
                     {
                         directive.Apply(line, enableStack, defines, out ParseError parseError);
-                        if (error != null) return new RecursiveParseResult(null, new ParseError(error.Type, index, fileName));
+                        if (parseError != null) return new RecursiveParseResult(null, new ParseError(parseError.Type, index, fileName));
                     }
                 }
                 else

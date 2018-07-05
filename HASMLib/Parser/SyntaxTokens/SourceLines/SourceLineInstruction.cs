@@ -13,7 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         private const string LabelReplaceChar = "";
         private const char LabelTrimChar = ':';
-        private Regex LabelRegex = new Regex(@"^\w{1,100}:");
+        private static Regex LabelRegex = new Regex(@"^\w{1,100}:");
 
         private string input;
 

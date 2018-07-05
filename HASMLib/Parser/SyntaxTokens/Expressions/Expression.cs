@@ -1,5 +1,6 @@
 ﻿using HASMLib.Core;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
+using HASMLib.Parser.SyntaxTokens.Preprocessor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             new Function(2, "exp2", (a) => new Constant(a.Value * a.Value, a.Length)),
             new Function(8, "log2", (a) => new Constant((long)Math.Log(a.Value, 2), a.Length)),
             new Function(2, "abs", (a) => new Constant(Math.Abs(a.Value), a.Length)),
-            new Function(1, "defined", (a) => new Constant()), //TODO!
+            new Function(1, "defined", (a) => a), //TODO!
             new Function(1, "strlen", (a) => new Constant()),
         };
 
@@ -212,6 +213,13 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     else if(bracketCount == 0 && currentToken != "" && firstOpenedBracketInCurrentLevel)
                     {
                         firstOpenedBracketInCurrentLevel = false;
+
+                        //Низя юзать дефайнед, если того не разрешено
+                        if(currentToken == "defined")
+                        {
+                            if (!PreprocessorIf.AllowDefinedFunction)
+                                throw new NotAllowedDefinedFunctionException();
+                        }
 
                         if (Functions.Exists(p => p.FunctionString == currentToken))
                         {
@@ -646,7 +654,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             try
             {
                 result = new Expression(input);
-            }
+            }  
             catch (UnknownFunctionException e)
             {
                 if (e.FuncName != null)
@@ -666,6 +674,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             catch (WrongOperatorCountException)
             {
                 return new ParseError(ParseErrorType.Syntax_Expression_WrongOperatorCount);
+            }
+            catch (NotAllowedDefinedFunctionException)
+            {
+                return new ParseError(ParseErrorType.Syntax_Expression_NotAllowToUseDefinedFunction);
             }
             catch(StackOverflowException)
             {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
+namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     internal class PreprocessorInclude : PreprocessorDirective
     {

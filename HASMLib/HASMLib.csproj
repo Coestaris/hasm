@@ -61,6 +61,8 @@
     <Compile Include="Parser\Parser\Variable.cs" />
     <Compile Include="Parser\SyntaxTokens\Define.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Exceptions\ConstantOverflowException.cs" />
+    <Compile Include="Parser\SyntaxTokens\Expressions\Exceptions\WrongTokenException.cs" />
+    <Compile Include="Parser\SyntaxTokens\Expressions\Exceptions\NotAllowedDefineFunctionException.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Expression.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Extention.cs" />
     <Compile Include="Parser\SyntaxTokens\Expressions\Function.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionLDI.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionCMP.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionOUT.cs" />
+    <Compile Include="Parser\SyntaxTokens\ParametricDefine.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorInclude.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorMessage.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorWarning.cs" />

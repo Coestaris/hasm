@@ -31,5 +31,10 @@
         Preprocessor_WrongParametricDefineFormat,
         Preprocessor_ParametricDefineWithoutExpression,
         Preprocessor_WrongDefineName,
+        Preprocessor_ElseWithoutPreviousConditionals,
+        Preprocessor_EndifWithoutPreviousConditionals,
+        Preprocessor_DefineNameAlreadyExists,
+        Preprocessor_UnknownDefineName,
+        Syntax_Expression_NotAllowToUseDefinedFunction,
     }
 }

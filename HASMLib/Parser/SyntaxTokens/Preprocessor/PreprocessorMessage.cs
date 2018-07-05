@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
+namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     internal class PreprocessorMessage : PreprocessorDirective
     {
@@ -16,7 +16,8 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
 
         protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)
         {
-            throw new NotImplementedException();
+            error = null;
+
         }
 
         //Для include

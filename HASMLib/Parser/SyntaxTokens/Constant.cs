@@ -32,10 +32,9 @@ namespace HASMLib.Parser.SyntaxTokens
             return Value == 1;
         }
 
-        internal Constant()
-        {
+        internal Constant() { }
 
-        }
+        internal Constant(bool value) : this(value ? 1 : 0, LengthQualifier.Single) { }
 
         public static LengthQualifier GetQualifier(LengthQualifier a, LengthQualifier b)
         {
