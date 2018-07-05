@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.SourceLines
 {
-    class SourceLineDirective
+    class SourceLineDirective : SourceLine
     {
     }
 }

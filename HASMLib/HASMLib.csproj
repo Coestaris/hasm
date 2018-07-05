@@ -75,6 +75,16 @@
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionLDI.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionCMP.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionOUT.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorInclude.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorMessage.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorWarning.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorError.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorEndif.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorElse.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorElif.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorIf.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorIfndef.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorUndef.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorDefine.cs" />
     <Compile Include="Parser\SyntaxTokens\SourceLine.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorIfdef.cs" />
@@ -108,5 +118,4 @@
     <Compile Include="Runtime\RuntimeOutputCode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
 </Project>

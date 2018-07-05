@@ -26,5 +26,10 @@
         IO_UnabletoFindSpecifiedFile,
         IO_UnabletoFindSpecifiedWorkingDirectory,
         Preprocessor_UnknownDirective,
+        Preprocessor_WrongParameterCount,
+        Preprocessor_NameExpected,
+        Preprocessor_WrongParametricDefineFormat,
+        Preprocessor_ParametricDefineWithoutExpression,
+        Preprocessor_WrongDefineName,
     }
 }

@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
 {
-    internal class PreprocessorIfdef : PreprocessorDirective
+    internal class PreprocessorInclude : PreprocessorDirective
     {
-        public PreprocessorIfdef()
+        public PreprocessorInclude()
         {
-            Name = "ifdef";
-            CanAddNewLines = false;
+            Name = "include";
+            CanAddNewLines = true;
         }
 
         protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)

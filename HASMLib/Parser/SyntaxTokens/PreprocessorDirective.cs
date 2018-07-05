@@ -38,9 +38,9 @@ namespace HASMLib.Parser.SyntaxTokens
             return line.StartsWith("#");
         }
 
-        public void GeneralParse()
+        public string ClearInput(string input)
         {
-
+            return input.TrimStart('#').Remove(0, Name.Length).Trim();
         }
 
         private static Func<string, List<string>> getLinesFunc;
@@ -53,6 +53,7 @@ namespace HASMLib.Parser.SyntaxTokens
             getLinesFunc = GetLinesFunc ?? throw new ArgumentNullException(nameof(GetLinesFunc));
             workingDirectory = WorkingDirectory;
             enableStack = new Stack<bool>();
+            defines = new List<Define>();
 
             var result = RecursiveParse(fileName);
 
@@ -99,13 +100,13 @@ namespace HASMLib.Parser.SyntaxTokens
                     if(directive.CanAddNewLines)
                     {
                         var newLines = directive.Apply(line, enableStack, defines, out ParseError parseError, RecursiveParse);
-                        if (error != null) return new RecursiveParseResult(null, error);
+                        if (error != null) return new RecursiveParseResult(null, new ParseError(error.Type, index, fileName));
                         result.AddRange(newLines);
                     }
                     else
                     {
                         directive.Apply(line, enableStack, defines, out ParseError parseError);
-                        if (error != null) return new RecursiveParseResult(null, error);
+                        if (error != null) return new RecursiveParseResult(null, new ParseError(error.Type, index, fileName));
                     }
                 }
                 else

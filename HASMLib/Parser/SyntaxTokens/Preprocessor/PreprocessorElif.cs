@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.SourceLines.Preprocessor
 {
-    internal class PreprocessorIfdef : PreprocessorDirective
+    internal class PreprocessorElif : PreprocessorDirective
     {
-        public PreprocessorIfdef()
+        public PreprocessorElif()
         {
-            Name = "ifdef";
+            Name = "elif";
             CanAddNewLines = false;
         }
 
