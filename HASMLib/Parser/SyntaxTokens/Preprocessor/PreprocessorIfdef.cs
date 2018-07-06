@@ -6,7 +6,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     internal class PreprocessorIfdef : PreprocessorDirective
     {
-        internal static Regex ArgumentRegex = new Regex(@"^[A-Za-z]\w*$"); 
+        internal static Regex ArgumentRegex = new Regex(@"^[A-Za-z_]\w*$"); 
 
         public PreprocessorIfdef()
         {

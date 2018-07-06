@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     internal class PreprocessorInclude : PreprocessorDirective
     {
+        private static Regex Name1Regex = new Regex("^\\\".*\\\"");
+        private static Regex Name2Regex = new Regex(@"^<.*>");
+
         public PreprocessorInclude()
         {
             Name = "include";
@@ -22,7 +23,27 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         //Для include
         protected override List<SourceLine> Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
         {
-            throw new NotSupportedException();
+            input = ClearInput(input);
+            
+            if(!Name1Regex.IsMatch(input) && !Name2Regex.IsMatch(input))
+            {
+                error = new ParseError(ParseErrorType.Preprocessor_WrongNameFormat);
+                return null;
+            }
+
+            input = input.Trim('\"', '<', '>');
+
+            var result = recursiveFunc(input);
+            if (result.error != null)
+            {
+                error = result.error;
+                return null;
+            }
+            else
+            {
+                error = null;
+                return result.sourceLines;
+            }
         }
     }
 }

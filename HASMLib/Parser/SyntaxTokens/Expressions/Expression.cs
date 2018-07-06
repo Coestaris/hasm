@@ -600,7 +600,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         /// <param name="ResolveNameFunc">Фукция, которая будет вызываться для каждой неизвестной константы или переменной, встреченной в выражении</param>
         /// <param name="RegisterNewConstant">Необязательная функция, которая будет вызываться, при встече чисел, и в случае ее заданности будет заменять числа на ссылки</param>
-        public static void Precompile(Token token, Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant = null)
+        public static void Precompile(Token token, Func<Token, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant = null)
         {
             if (token.IsSimple) token.ResolveName(ResolveNameFunc, RegisterNewConstant);
             if (token.Subtokens != null) foreach (Token subToken in token.Subtokens)
@@ -617,7 +617,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <param name="ResolveNameFunc">Фукция, которая будет вызываться для каждой неизвестной константы или переменной, встреченной в выражении</param>
         /// <param name="RegisterNewConstant">Необязательная функция, которая будет вызываться, при встече чисел, и в случае ее заданности будет заменять числа на ссылки</param>
         /// <returns></returns>
-        public static ParseError Parse(string input, out Expression result, Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant = null)
+        public static ParseError Parse(string input, out Expression result, Func<Token, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant = null)
         {
             var error = Parse(input, out result);
             if (error == null)

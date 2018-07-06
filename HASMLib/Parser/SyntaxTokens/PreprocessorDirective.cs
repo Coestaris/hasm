@@ -40,7 +40,12 @@ namespace HASMLib.Parser.SyntaxTokens
 
         public string ClearInput(string input)
         {
-            return input.TrimStart('#').Remove(0, Name.Length).Trim();
+            var match = SourceLine.CommentRegex.Match(input);
+
+            if (match.Success)
+                input = input.Remove(match.Index, match.Length);
+
+            return input.TrimStart('#').Remove(0, Name.Length).Trim(' ', '\t', '\r');
         }
 
         private static Func<string, List<string>> getLinesFunc;
@@ -112,36 +117,8 @@ namespace HASMLib.Parser.SyntaxTokens
                 }
                 else
                 {
-                    foreach (Define define in defines)
-                    {
-                        if(line.Contains(define.Name) && line.IndexOf(define.Name) < line.IndexOf(';'))
-                        {
-                            if(define.IsEmpty)
-                            {
-                                return new RecursiveParseResult(null, new ParseError(ParseErrorType.Preprocessor_ReferenceToEmptyDefine, index, fileName));
-                            }
-
-                            if (define.IsParametric)
-                            {
-                                Match match = ParametricDefine.ParametricUsageRegex.Match(line);
-                                if (match.Success)
-                                {
-                                    var subStr = line.Substring(match.Index, match.Length);
-                                    line = line.Remove(match.Index, match.Length);
-
-                                    var newStr = (define as ParametricDefine).Expand(subStr, out ParseError parseError);
-                                    if(parseError != null) return new RecursiveParseResult(null, new ParseError(parseError.Type, index, fileName));
-
-                                    line = line.Insert(match.Index, newStr);
-                                }
-                                else
-                                {
-                                    return new RecursiveParseResult(null, new ParseError(ParseErrorType.Preprocessor_WrongParametricDefineFormat, index, fileName));
-                                }
-                            }
-                            else line = line.Replace(define.Name, define.Value);
-                        }
-                    }
+                    ParseError parseError = Define.ResolveDefines(defines, ref line, index, fileName);
+                    if(parseError != null) return new RecursiveParseResult(null, parseError);
 
                     if (!enableStack.Contains(false))
                     {

@@ -6,7 +6,7 @@ namespace HASMLib.Parser.SyntaxTokens
     {
         private const string CommentReplaceChar = "";
         private const char CommentTrimChar = ':';
-        private Regex CommentRegex = new Regex(@";[\d\W\s\w]{0,}$");
+        internal static Regex CommentRegex = new Regex(@";[\d\W\s\w]{0,}$");
         private readonly char[] StringCleanUpChars = { ' ', '\t', '\r' };
 
         protected void CleanUpLine(ref string input)

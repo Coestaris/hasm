@@ -16,7 +16,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
         protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)
         {
-            error = null;
+            error = new ParseError(ParseErrorType.Preprocessor_UserDefinedError);
         }
 
         //Для include

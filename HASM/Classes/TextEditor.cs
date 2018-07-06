@@ -12,12 +12,15 @@ namespace HASM
     {
         private Regex LabelRegex = new Regex(@"^\w{1,100}:", RegexOptions.Multiline);
         private Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
-        private Regex RegisterRegex = new Regex(@"R\d{0,2}", RegexOptions.Multiline);
-
-
+        private Regex RegisterRegex = new Regex(@"R\d{1,2}", RegexOptions.Multiline);
+        
         private Regex BinRegex = new Regex(@"0[bB][0-1]{1,100}(_[sdq]){0,1}");
         private Regex DecRegex = new Regex(@"\d{1,30}(_[sdq]){0,1}");
         private Regex HexRegex = new Regex(@"0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
+
+        private Regex String1Regex = new Regex("\\\".*\\\"");
+        private Regex String2Regex = new Regex(@"<.*>");
+
 
         public bool Close()
         {
@@ -60,9 +63,17 @@ namespace HASM
                 return;
             }
 
-            TextBox = new FastColoredTextBox();
-            TextBox.Dock = DockStyle.Fill;
-            TextBox.Text = File.ReadAllText(path);
+            TextBox = new FastColoredTextBox
+            {
+                Dock = DockStyle.Fill,
+                Text = File.ReadAllText(path),
+
+                BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy1,
+                AutoCompleteBrackets = true,
+                LeftBracket = '(',
+                RightBracket = ')',
+                
+            };
 
             DisplayName = path.Remove(0, path.Replace('\\', '/').LastIndexOf('/') + 1) + "  [x]";
 
@@ -92,6 +103,12 @@ namespace HASM
                     PreprocessorRegexes.Add(new Regex($"#{item.Name}\\s"));
 
 
+                TextBox.TextChanged += (obj, args) =>
+                {
+                    for (int i = 0; i < TextBox.LinesCount - 1; i++)
+                        TextBox[i].BackgroundBrush = Brushes.White;
+                };
+
                 TextBox.VisibleRangeChanged += (obj, args) =>
                 {
                     TextBox.VisibleRange.ClearStyle(StyleIndex.All);
@@ -99,10 +116,11 @@ namespace HASM
 
                     TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GreenStyle, CommentRegex);
 
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BrownStyle, String1Regex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BrownStyle, String2Regex);
+                    
                     TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, LabelRegex);
-
                     TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.MaroonStyle, RegisterRegex);
-
                     TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, BinRegex);
                     TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, DecRegex);
                     TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, HexRegex);
@@ -115,6 +133,7 @@ namespace HASM
 
                     foreach (var item in FunctionRegexes)
                         TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueBoldStyle, item);
+
                 };
             }
 

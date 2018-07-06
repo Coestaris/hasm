@@ -1,4 +1,5 @@
 ﻿using HASMLib.Parser.SyntaxTokens.Expressions;
+using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +27,23 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
             input = ClearInput(input);
 
-            var expError = Expression.Parse(input, out Expression exp, (p) =>
+            var expError = Expression.Parse(input, out Expression exp, (token) =>
             {
+                if(token.UnaryFunction == null || token.UnaryFunction.FunctionString != "defined")
+                {
+                    var def = defines.Find(p => p.Name == token.RawValue);
+                    if (def == null) throw new WrongTokenException();
+                    token.RawValue = def.Value;
+
+                    if(!token.IsSimple)
+                    {
+                        Expression.Parse(token.RawValue, out Expression expression);
+                        token.Subtokens = expression.TokenTree.Subtokens;
+                    }
+
+                    return null;
+                }
+
                 return new ObjectReference(0, ReferenceType.Define);
             });
 

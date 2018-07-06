@@ -1,0 +1,27 @@
+;
+; Пример работы с директивой препроцессора include
+;
+
+#include "lib/bitw.hasm"
+
+#ifndef _bitwise_h_             ; Если библиотека не была загружена bitw.hasm,
+     
+    out 0_q                     ; Выведем 8 нулей
+    out 0_q                     ;
+
+#else
+
+    ldi R1, 0x0                 ; Устанавливаем R1 как 0
+    ldi R1, bitw_set(R1, 1)     ; Устанавливаем 1й бит как 1
+    ldi R1, bitw_set(R1, 3)     ; Устанавливаем 3й бит как 1
+    ldi R1, bitw_set(R1, 5)     ; Устанавливаем 5й бит как 1
+    
+    ldi R2, 0xFFF               ; Устанавливаем R1 как 0xFFF
+    ldi R2, bitw_clear(R2, 1)   ; Устанавливаем 1й бит как 0
+    ldi R2, bitw_clear(R2, 3)   ; Устанавливаем 3й бит как 0
+    ldi R2, bitw_clear(R2, 5)   ; Устанавливаем 5й бит как 0
+
+    out R1                      ; Выводим R1
+    out R2                      ; Выводим R2
+    
+#endif

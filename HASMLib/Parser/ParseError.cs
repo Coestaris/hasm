@@ -1,4 +1,6 @@
-﻿namespace HASMLib.Parser
+﻿using System.Text;
+
+namespace HASMLib.Parser
 {
 
     public class ParseError
@@ -7,17 +9,15 @@
 
         public override string ToString()
         {
-			if 		(Line != NullValue && Index != NullValue) 
-				return string.Format("Error {0} at line: {1}, index: {2}", Type.ToString(), Line, Index);
-			else if (Line == NullValue && Index != NullValue) 
-				return string.Format("Error {0} at index {1}", Type.ToString(), Index);
-			else if (Line != NullValue && Index == NullValue) 
-				return string.Format("Error {0} at line {1}", Type.ToString(), Line);
-			else 
-				return string.Format("Error {0}", Type.ToString());
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("Error {0}", Type);
+            if (Line != NullValue) sb.AppendFormat(" at line {0}", Line);
+            if (Index != NullValue) sb.AppendFormat(" at index {0}", Index);
+            if (FileName != null) sb.AppendFormat(" at {0}", FileName);
+            return sb.ToString();
         }
 
-		public ParseError(ParseErrorType type)
+        public ParseError(ParseErrorType type)
 		{
 			Type = type;
 		}

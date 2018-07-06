@@ -1,0 +1,24 @@
+; Небольшая либа для бинарный операций с числами
+; Взято с https://github.com/Coestaris/HX8357B-Software/blob/master/headers/bitwise.h
+
+#ifndef _bitwise_h_
+#define _bitwise_h_
+
+#define logicalOne 1
+
+; Установить х-й бит в n как 1
+#define bitw_set(n,x) n | (logicalOne << x)
+
+; Установить х-й бит в n как 0
+#define bitw_clear(n,x) n & (~(logicalOne << x))
+
+; Инвертировать х-й бит в n
+#define bitw_inverse(n,x) n ^ (logicalOne << x)
+
+; Получить х-й бит в n
+#define bitw_bit(n,x) ((n >> x) & logicalOne)
+
+; Установить х-й бит в n как b
+#define bitw_sset(n,x,b) n ^ ((- b ^ n) & (logicalOne << x))
+
+#endif

@@ -1,4 +1,5 @@
-﻿using HASM.Classes;
+﻿using FastColoredTextBoxNS;
+using HASM.Classes;
 using HASMLib;
 using HASMLib.Core;
 using HASMLib.Parser;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -59,6 +61,39 @@ namespace HASM
                 loadingCircle1.Visible = false;
                 stopToolStripMenuItem.Enabled = false;
                 splitContainer_editor.Enabled = true;
+
+                if(error.FileName != null)
+                {
+                    bool found = false;
+                    foreach (TextEditor page in tabControl1.TabPages)
+                        if (page.Path == error.FileName)
+                        {
+                            tabControl1.SelectedTab = page;
+                            found = true;
+                            break;
+                        }
+
+                    if (!found) AddTab(error.FileName);
+                }
+
+                if(error.Line != -1)
+                {
+                    FastColoredTextBox tb = (tabControl1.SelectedTab as TextEditor).TextBox;
+
+                    var minLines = 0;
+                    var maxLines = tb.LinesCount;
+                    var max = tb.VerticalScroll.Maximum;
+                    var min = tb.VerticalScroll.Minimum;
+                    var currentLine = error.Line;
+
+                    int position = (int)((currentLine - minLines) * (max - min) / (float)(maxLines - minLines) + min);
+
+                    tb.VerticalScroll.Value = position;
+                    tb.VerticalScroll.Value = position;
+
+                    (tabControl1.SelectedTab as TextEditor).TextBox[error.Line - 1].BackgroundBrush = Brushes.Pink;
+                }
+
                 return;
             }
 

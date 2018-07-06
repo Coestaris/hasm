@@ -310,7 +310,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             Value = value;
         }
 
-        internal void ResolveName(Func<string, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant)
+        internal void ResolveName(Func<Token, ObjectReference> ResolveNameFunc, Func<Constant, ObjectReference> RegisterNewConstant)
         {
             if (_valueSet)
                 return;
@@ -326,7 +326,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     throw new ArgumentNullException("");
 
 
-                Reference = ResolveNameFunc(RawValue);
+                Reference = ResolveNameFunc(this);
 
                 return;
             }
@@ -337,7 +337,6 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     Reference = RegisterNewConstant(constant);
                     return;
                 }
-                _valueSet = true;
             }
         }
 

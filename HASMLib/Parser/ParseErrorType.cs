@@ -37,5 +37,7 @@
         Preprocessor_UnknownDefineName,
         Syntax_Expression_NotAllowToUseDefinedFunction,
         Preprocessor_ReferenceToEmptyDefine,
+        Preprocessor_WrongNameFormat,
+        Preprocessor_UserDefinedError,
     }
 }

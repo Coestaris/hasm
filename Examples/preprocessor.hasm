@@ -13,9 +13,24 @@
 ;   #message
 
 #define someDef
-#define someValue 0x110
+#define someValue 0x2
 #define someAnotherDef 0x200 - 4
 #define someExpression(a,b) 2 * a + b
+
+#define innerDefine someValue + 1
+#define anotherInnerDefine innerDefine + 2
+
+
+; Использование дефайнов в #if
+#if someValue == 2      
+        out 0x999
+#endif
+
+; Использование вложенных дефайнов в #if
+#if anotherInnerDefine == 5      
+        out 0x777
+#endif
+
 
 ; Если объявлен someDef, вывести 100 иначе 200
 #ifdef someDef
@@ -34,14 +49,15 @@
         out 0x205
 #endif
 
-        out someValue                   ; Вывести значение someValue (0x100)
+        out someValue + 2 * someValue   ; Вывести значение someValue (0x6)
         out someAnotherDef              ; Вывести значение someAnotherDef (0x200 - 4)
         out someExpression(2, 2 + 2)    ; Вывести значение someExpression 2 + 2
-
+        out anotherInnerDefine + 2      ; Вывести значение anotherInnerDefine 0х7 (2 + 1 + 2 + 2)
+        
 #if (defined(someDef) || defined(someValue)) && defined(someAnotherDef)
         out 0x0_q                   ; Если выполняется условие, вывести 4 нуля
 #elif !defined(someDef) && !defined(someValue) && !defined(someAnotherDef) && !defined(someExpression)
-#error This is sample error code! 
+#error This is sample error code!
         out 0x1_q                   ; Если выполняется условие, вывести 1 и 3 нуля
 #endif
 

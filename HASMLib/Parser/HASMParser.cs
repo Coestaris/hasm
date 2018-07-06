@@ -255,14 +255,14 @@ namespace HASMLib.Parser
                     try
                     {
                         Expression.Precompile(expression.TokenTree,
-                            (tokenName) =>
+                            (token) =>
                             {
 
-                                var variable = Variables.Find(p => p.Name == tokenName);
+                                var variable = Variables.Find(p => p.Name == token.RawValue);
                                 if (variable != null)
                                 {
                                 //Получаем индекс переменной со списка переменных
-                                int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(tokenName);
+                                int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(token.RawValue);
                                 //Запоминаем индекс переменной
                                 return new ObjectReference((UInt24)varIndex, ReferenceType.Variable)
                                     {
@@ -271,10 +271,10 @@ namespace HASMLib.Parser
                                 }
 
                             //То, возможно, это именная константа...
-                            if (_namedConsts.Select(p => p.Name).Contains(tokenName))
+                            if (_namedConsts.Select(p => p.Name).Contains(token.RawValue))
                                 {
                                 //Получения индекса константы со списка
-                                int constantIndex = _namedConsts.Select(p => p.Name).ToList().IndexOf(tokenName);
+                                int constantIndex = _namedConsts.Select(p => p.Name).ToList().IndexOf(token.RawValue);
 
                                     return new ObjectReference(_namedConsts[constantIndex].Index, ReferenceType.Constant)
                                     {
@@ -291,13 +291,13 @@ namespace HASMLib.Parser
 
 
                                 //Елси на эту неведомую херню уже ссылались, то сошлемся на нее же
-                                if (UnknownLabelNameErrorList.Exists(p => p.Name == tokenName))
+                                if (UnknownLabelNameErrorList.Exists(p => p.Name == token.RawValue))
                                     {
-                                        var item = UnknownLabelNameErrorList.Find(p => p.Name == tokenName);
+                                        var item = UnknownLabelNameErrorList.Find(p => p.Name == token.RawValue);
                                     //После такой "грязной" хуйни мне хочется сходить с душ!
                                     return new ObjectReference((UInt24)item.ConstIndex, ReferenceType.Constant)
                                         {
-                                            Object = UnknownLabelNameErrorList.Find(p => p.Name == tokenName).memZoneFlashElementConstant
+                                            Object = UnknownLabelNameErrorList.Find(p => p.Name == token.RawValue).memZoneFlashElementConstant
                                         };
                                     }
                                     else
@@ -305,13 +305,13 @@ namespace HASMLib.Parser
 
                                         int constIndex = ++_constIndex;
                                         MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy(constIndex);
-                                        NamedConstant dummyNamedConstant = new NamedConstant(tokenName, (UInt24)constIndex, new Constant())
+                                        NamedConstant dummyNamedConstant = new NamedConstant(token.RawValue, (UInt24)constIndex, new Constant())
                                         {
                                             constant = dummyConstant
                                         };
 
                                         UnknownLabelNameErrorList.Add(new UnknownLabelNameError(
-                                            tokenName,
+                                            token.RawValue,
                                             NewParseError(ParseErrorType.Syntax_UnknownConstName, line, argIndex),
                                             constIndex,
                                             dummyNamedConstant, dummyConstant));

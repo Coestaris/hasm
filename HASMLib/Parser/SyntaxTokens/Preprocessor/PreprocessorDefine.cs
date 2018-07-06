@@ -46,6 +46,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                     return;
                 }
 
+                Define.ResolveDefines(defines, ref newDef.Value, -1, null);
                 defines.Add(newDef);
                 
                 error = null;
@@ -71,7 +72,9 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             }
             else
             {
-                defines.Add(new Define(name, string.Join(" ", parts.Skip(1))));
+                var newDef = new Define(name, string.Join(" ", parts.Skip(1)));
+                Define.ResolveDefines(defines, ref newDef.Value, -1, null);
+                defines.Add(newDef);
             }
 
             error = null;
