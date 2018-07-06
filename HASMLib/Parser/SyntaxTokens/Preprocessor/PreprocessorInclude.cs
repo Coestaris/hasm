@@ -15,14 +15,20 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             CanAddNewLines = true;
         }
 
-        protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)
+        protected override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
             throw new NotImplementedException();
         }
 
         //Для include
-        protected override List<SourceLine> Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
+        protected override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
         {
+            if (!enableStack.Contains(false))
+            {
+                error = null;
+                return null;
+            }
+
             input = ClearInput(input);
             
             if(!Name1Regex.IsMatch(input) && !Name2Regex.IsMatch(input))

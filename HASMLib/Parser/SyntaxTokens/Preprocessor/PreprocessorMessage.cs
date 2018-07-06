@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
@@ -14,14 +11,19 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             CanAddNewLines = false;
         }
 
-        protected override void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error)
+        protected override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
-            error = null;
+            if (!enableStack.Contains(false))
+            {
+                error = null;
+                return;
+            }
 
+            error = null;
         }
 
         //Для include
-        protected override List<SourceLine> Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
+        protected override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
         {
             throw new NotSupportedException();
         }

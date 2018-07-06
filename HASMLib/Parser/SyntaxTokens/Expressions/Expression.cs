@@ -683,6 +683,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             {
                 return new ParseError(ParseErrorType.Syntax_Expression_CantParse);
             }
+            catch(WrongTokenException)
+            {
+                return new ParseError(ParseErrorType.Syntax_Expression_UnknownToken);
+            }
 
             return null;
         }

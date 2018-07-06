@@ -39,5 +39,6 @@
         Preprocessor_ReferenceToEmptyDefine,
         Preprocessor_WrongNameFormat,
         Preprocessor_UserDefinedError,
+        Syntax_Expression_UnknownToken,
     }
 }
