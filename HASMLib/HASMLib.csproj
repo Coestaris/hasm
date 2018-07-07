@@ -74,6 +74,8 @@
     <Compile Include="Parser\SyntaxTokens\InstructionParameter.cs" />
     <Compile Include="Parser\SyntaxTokens\InstructionParameterType.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\BR\InstructionBREQ.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionPOP.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionPUSH.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionLDI.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionCMP.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionOUT.cs" />

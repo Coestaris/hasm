@@ -17,27 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTester", "ConsoleTester\ConsoleTester.csproj", "{EF559849-220B-4C59-9B68-AD110800DDBB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{9DFE41A4-A214-4158-9475-FE486F5FF36C}"
-	ProjectSection(SolutionItems) = preProject
-		Examples\breq.hasm = Examples\breq.hasm
-		Examples\expressions.hasm = Examples\expressions.hasm
-		Examples\include.hasm = Examples\include.hasm
-		Examples\preprocessor.hasm = Examples\preprocessor.hasm
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ide", "_ide", "{CA31BBE0-8838-4687-AFB6-7589B4F18E05}"
-	ProjectSection(SolutionItems) = preProject
-		Examples\_ide\.cfg = Examples\_ide\.cfg
-		Examples\_ide\compile.cfg = Examples\_ide\compile.cfg
-		Examples\_ide\user.cfg = Examples\_ide\user.cfg
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{401F9EB6-DF2C-4DDF-9745-A47F6ADBB82E}"
-	ProjectSection(SolutionItems) = preProject
-		Examples\lib\bitw.hasm = Examples\lib\bitw.hasm
-		Examples\lib\colors.hasm = Examples\lib\colors.hasm
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,11 +38,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{9DFE41A4-A214-4158-9475-FE486F5FF36C} = {D458B6B6-D73B-4ECE-9C77-77D10153DD8E}
-		{CA31BBE0-8838-4687-AFB6-7589B4F18E05} = {9DFE41A4-A214-4158-9475-FE486F5FF36C}
-		{401F9EB6-DF2C-4DDF-9745-A47F6ADBB82E} = {9DFE41A4-A214-4158-9475-FE486F5FF36C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DA537FD4-C8C5-4457-A8AD-AC9735D67A3B}

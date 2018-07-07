@@ -3,6 +3,7 @@
 ;
 
 #include "lib/bitw.hasm"
+#include "lib/colors.hasm"
 
 #ifndef _bitwise_h_             ; Если библиотека не была загружена bitw.hasm,
      
@@ -23,5 +24,8 @@
 
     out R1                      ; Выводим R1
     out R2                      ; Выводим R2
+    
+    out cl_RED                  ; Выводим R2
+    out cl_BLUE                 ; Выводим R2
     
 #endif

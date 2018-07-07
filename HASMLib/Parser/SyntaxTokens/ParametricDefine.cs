@@ -6,8 +6,8 @@ namespace HASMLib.Parser.SyntaxTokens
 {
     public class ParametricDefine : Define
     {
-        public static Regex ParametricDefineRegex = new Regex(@"^[A-Za-z](?:(?!\W)\w)*\(([A-Za-z](?:(?!\W\s)\w)*(, *?[A-Za-z](\w)*){0,}){1,}\)");
-        public static Regex ParametricUsageRegex = new Regex(@"[A-Za-z](?:(?!\W)\w)*\(([^(),]+(, *?[^(),]+){0,}){1,}\)");
+        public static Regex ParametricDefineRegex = new Regex(@"^[A-Za-z_](?:(?!\W)\w)*\(([A-Za-z_](?:(?!\W\s)\w)*(, *?[A-Za-z_](\w)*)*)+\)");
+        public static Regex ParametricUsageRegex = new Regex(@"[A-Za-z_](?:(?!\W)\w)*\(([^(),]+(, *?[^(),]+)*)+\)");
 
         public ParametricDefine(string name, string value) : base(name.Split('(')[0], value)
         {

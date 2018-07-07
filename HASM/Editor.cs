@@ -85,13 +85,21 @@ namespace HASM
                     var max = tb.VerticalScroll.Maximum;
                     var min = tb.VerticalScroll.Minimum;
                     var currentLine = error.Line;
+                    var maxLinesInScreen = tb.Height / tb.Font.SizeInPoints;
+
+                    (tabControl1.SelectedTab as TextEditor).TextBox[error.Line - 1].BackgroundBrush = Brushes.Pink;
+
+
+                    if (maxLinesInScreen > maxLines)
+                        return;
+
+                    currentLine = Math.Max(currentLine - (int)(maxLinesInScreen / 2), 0);
 
                     int position = (int)((currentLine - minLines) * (max - min) / (float)(maxLines - minLines) + min);
 
-                    tb.VerticalScroll.Value = position;
+                    tb.VerticalScroll.Value = position - 1;
                     tb.VerticalScroll.Value = position;
 
-                    (tabControl1.SelectedTab as TextEditor).TextBox[error.Line - 1].BackgroundBrush = Brushes.Pink;
                 }
 
                 return;
@@ -220,7 +228,7 @@ namespace HASM
                     string compileConfigFileName = folderBrowserDialog1.SelectedPath + WorkingFolder.CompileConfigPostfix;
                     string userConfigFileName = folderBrowserDialog1.SelectedPath + WorkingFolder.UserConfigPostfix;
 
-                    Directory.CreateDirectory(folderBrowserDialog1.SelectedPath + "/_ide");
+                    Directory.CreateDirectory(folderBrowserDialog1.SelectedPath + WorkingFolder.IdeDirPostfix);
 
                     workingFolder = new WorkingFolder()
                     {
@@ -621,7 +629,7 @@ namespace HASM
                 return;
             }
 
-            string newPath = destinationNode.AbsolutePath + '/' + Path.GetFileName(sourceNode.AbsolutePath);
+            string newPath = destinationNode.AbsolutePath + '\\' + Path.GetFileName(sourceNode.AbsolutePath);
 
             if(!sourceNode.IsDir)
             {

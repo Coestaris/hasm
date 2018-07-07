@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
@@ -14,9 +13,10 @@ namespace HASM
     [Serializable]
     public class WorkingFolder : ICloneable
     {
-        public readonly static string MainConfigPostfix = "/_ide/.cfg";
-        public readonly static string CompileConfigPostfix = "/_ide/compile.cfg";
-        public readonly static string UserConfigPostfix = "/_ide/user.cfg";
+        public const string IdeDirPostfix = "\\_ide";
+        public const string MainConfigPostfix = IdeDirPostfix + "\\.cfg";
+        public const string CompileConfigPostfix = IdeDirPostfix + "\\compile.cfg";
+        public const string UserConfigPostfix = IdeDirPostfix + "\\user.cfg";
 
         [XmlIgnore]
         public List<SourceFile> SourceFiles;
@@ -164,7 +164,8 @@ namespace HASM
                     parent.Nodes.Add(new FileNode(removeFunc(file), file, false));
                 }
 
-                SourceFiles.Add(new SourceFile(removeFunc(file), file));
+                if(file.EndsWith(".hasm"))
+                    SourceFiles.Add(new SourceFile(Formatter.MakeRelative(file, Path + "\\"), file));
             }
         }
     }

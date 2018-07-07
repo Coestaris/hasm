@@ -1,0 +1,26 @@
+; Взято с https://sites.google.com/site/avrasmintro/home/2b-basic-math
+
+#define ANS R0              ; To hold answer     
+#define REM R2              ; To hold remainder
+#define A R16               ; To hold dividend
+#define B R18               ; To hold divisor   
+#define C R20               ; Bit Counter
+
+        ldi A,255           ; Load dividend into A
+        ldi B,5             ; Load divisor into B
+DIV88:
+        ldi C,9             ; Load bit counter
+        sub REM,REM         ; Clear Remainder and Carry
+        mov ANS,A           ; Copy Dividend to Answer
+LOOP:   rol ANS             ; Shift the answer to the left
+        dec C               ; Decrement Counter
+        breq DONE           ; Exit if eight bits done
+        rol REM             ; Shift the remainder to the left
+        sub REM,B           ; Try to Subtract divisor from remainder
+        brcc SKIP           ; If the result was negative then
+        add REM,B           ; reverse the subtraction to try again
+        clc                 ; Clear Carry Flag so zero shifted into A 
+        rjmp LOOP           ; Loop Back
+SKIP:   sec                 ; Set Carry Flag to be shifted into A
+        rjmp LOOP
+DONE:   out ANS   

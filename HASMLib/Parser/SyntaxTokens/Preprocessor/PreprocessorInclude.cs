@@ -23,7 +23,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         //Для include
         protected override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
         {
-            if (!enableStack.Contains(false))
+            if (enableStack.Contains(false))
             {
                 error = null;
                 return null;

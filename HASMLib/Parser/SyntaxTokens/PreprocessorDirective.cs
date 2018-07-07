@@ -106,7 +106,7 @@ namespace HASMLib.Parser.SyntaxTokens
                     if(directive.CanAddNewLines)
                     {
                         var newLines = directive.Apply(line, enableStack, defines, out ParseError parseError, RecursiveParse);
-                        if (parseError != null) return new RecursiveParseResult(null, new ParseError(parseError.Type, index, fileName));
+                        if (parseError != null) return new RecursiveParseResult(null, parseError);
                         result.AddRange(newLines);
                     }
                     else

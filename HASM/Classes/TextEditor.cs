@@ -10,17 +10,18 @@ namespace HASM
 {
     public class TextEditor : TabPage
     {
-        private Regex LabelRegex = new Regex(@"^\w{1,100}:", RegexOptions.Multiline);
-        private Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
-        private Regex RegisterRegex = new Regex(@"R\d{1,2}", RegexOptions.Multiline);
+        private static Regex LabelRegex = new Regex(@"^\w{1,100}:", RegexOptions.Multiline);
+        private static Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
+        private static Regex RegisterRegex = new Regex(@"R\d{1,2}", RegexOptions.Multiline);
         
-        private Regex BinRegex = new Regex(@"0[bB][0-1]{1,100}(_[sdq]){0,1}");
-        private Regex DecRegex = new Regex(@"\d{1,30}(_[sdq]){0,1}");
-        private Regex HexRegex = new Regex(@"0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
+        private static Regex BinRegex = new Regex(@"0[bB][0-1]{1,100}(_[sdq]){0,1}");
+        private static Regex DecRegex = new Regex(@"\d{1,30}(_[sdq]){0,1}");
+        private static Regex HexRegex = new Regex(@"0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
 
-        private Regex String1Regex = new Regex("\\\".*\\\"");
-        private Regex String2Regex = new Regex(@"<.*>");
+        private static Regex String1Regex = new Regex("\\\".*\\\"");
+        private static Regex String2Regex = new Regex(@"<.*>");
 
+        public int HighlightedLine = -1;
 
         public bool Close()
         {
@@ -105,8 +106,13 @@ namespace HASM
 
                 TextBox.TextChanged += (obj, args) =>
                 {
-                    for (int i = 0; i < TextBox.LinesCount - 1; i++)
-                        TextBox[i].BackgroundBrush = Brushes.White;
+                    if(HighlightedLine != -1)
+                    /*for (int i = 0; i < TextBox.LinesCount - 1; i++)
+                        TextBox[i].BackgroundBrush = Brushes.Transparent;*/
+                    {
+                        TextBox[HighlightedLine].BackgroundBrush = Brushes.Transparent;
+                        HighlightedLine = -1;
+                    }
                 };
 
                 TextBox.VisibleRangeChanged += (obj, args) =>
