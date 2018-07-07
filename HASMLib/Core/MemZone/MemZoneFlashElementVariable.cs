@@ -6,7 +6,7 @@ namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneFlashElementVariable : MemZoneFlashElement
     {
-		public UInt24 Index;
+		public UIntDouble Index;
 		public LengthQualifier VariableType;
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Variable;
@@ -24,7 +24,7 @@ namespace HASMLib.Core.MemoryZone
 			return bytes.ToArray();
 		}
 
-		public MemZoneFlashElementVariable(UInt24 index, LengthQualifier type)
+		public MemZoneFlashElementVariable(UIntDouble index, LengthQualifier type)
 		{
 			Index = index;
 			VariableType = type;

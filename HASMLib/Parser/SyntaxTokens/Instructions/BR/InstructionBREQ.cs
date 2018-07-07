@@ -11,7 +11,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionBREQ(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "breq";
             Name = new Regex("^breq", RegexOptions.IgnoreCase);
@@ -28,7 +28,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
             if(result.HasFlag(ComapreResult.Equal))
             {
-                UInt24 position = (UInt24)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+                UIntDouble position = (UIntDouble)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
 
                 RuntimeMachineJump(position, runtimeMachine);
             }

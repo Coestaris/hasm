@@ -16,12 +16,12 @@ namespace HASMLib.Core.MemoryZone
             SetValue(value.GetNumericValue());
         }
 
-        public List<UInt12> ToUInt12()
+        public List<UIntSingle> ToUInt12()
         {
             switch(Length)
             {
                 case LengthQualifier.Single:
-                    return new List<UInt12> { (this as MemZoneVariableUInt12).Value };
+                    return new List<UIntSingle> { (this as MemZoneVariableUInt12).Value };
                 case LengthQualifier.Double:
                     return (this as MemZoneVariableUInt24).Value.ToUInt12().ToList();
                 case LengthQualifier.Quad:
@@ -36,13 +36,13 @@ namespace HASMLib.Core.MemoryZone
             switch (Length)
             {
                 case LengthQualifier.Single:
-                    (this as MemZoneVariableUInt12).Value = (UInt12)value;
+                    (this as MemZoneVariableUInt12).Value = (UIntSingle)value;
                     break;
                 case LengthQualifier.Double:
-                    (this as MemZoneVariableUInt24).Value = (UInt24)value;
+                    (this as MemZoneVariableUInt24).Value = (UIntDouble)value;
                     break;
                 case LengthQualifier.Quad:
-                    (this as MemZoneVariableUInt48).Value = (UInt48)value;
+                    (this as MemZoneVariableUInt48).Value = (UIntQuad)value;
                     break;
             }
         }
@@ -52,13 +52,13 @@ namespace HASMLib.Core.MemoryZone
             switch (Length)
             {
                 case LengthQualifier.Single:
-                    (this as MemZoneVariableUInt12).Value += (UInt12)value;
+                    (this as MemZoneVariableUInt12).Value += (UIntSingle)value;
                     break;
                 case LengthQualifier.Double:
-                    (this as MemZoneVariableUInt24).Value += (UInt24)value;
+                    (this as MemZoneVariableUInt24).Value += (UIntDouble)value;
                     break;
                 case LengthQualifier.Quad:
-                    (this as MemZoneVariableUInt48).Value += (UInt48)value;
+                    (this as MemZoneVariableUInt48).Value += (UIntQuad)value;
                     break;
             }
         }

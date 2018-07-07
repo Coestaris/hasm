@@ -17,11 +17,11 @@ namespace HASMLib.Parser.SyntaxTokens
             switch (lengthQualifier)
             {
                 case LengthQualifier.Single:
-                    return (UInt12)value;
+                    return (UIntSingle)value;
                 case LengthQualifier.Double:
-                    return (UInt24)value;
+                    return (UIntDouble)value;
                 case LengthQualifier.Quad:
-                    return (UInt24)value;
+                    return (UIntDouble)value;
             }
 
             return 0;
@@ -80,16 +80,16 @@ namespace HASMLib.Parser.SyntaxTokens
             return new ParseError(ParseErrorType.Syntax_Constant_WrongFormat, 0);
         }
 
-        public List<UInt12> ToUInt12()
+        public List<UIntSingle> ToUInt12()
         {
             switch (Length)
             {
                 case LengthQualifier.Single:
-                    return new List<UInt12>() { (UInt12)Value };
+                    return new List<UIntSingle>() { (UIntSingle)Value };
                 case LengthQualifier.Double:
-                    return ((UInt24)Value).ToUInt12().ToList();
+                    return ((UIntDouble)Value).ToUInt12().ToList();
                 case LengthQualifier.Quad:
-                    return ((UInt48)Value).ToUInt12().ToList();
+                    return ((UIntQuad)Value).ToUInt12().ToList();
             }
             return null;
         }
@@ -99,11 +99,11 @@ namespace HASMLib.Parser.SyntaxTokens
 			switch (Length) 
 			{
 				case LengthQualifier.Single:
-					return new MemZoneFlashElementConstantUInt12 ((UInt12)Value, index);
+					return new MemZoneFlashElementConstantUInt12 ((UIntSingle)Value, index);
 				case LengthQualifier.Double:
-					return new MemZoneFlashElementConstantUInt24 ((UInt24)Value, index);
+					return new MemZoneFlashElementConstantUInt24 ((UIntDouble)Value, index);
 				case LengthQualifier.Quad:	
-					return new MemZoneFlashElementConstantUInt48 ((UInt48)Value, index);
+					return new MemZoneFlashElementConstantUInt48 ((UIntQuad)Value, index);
 			}
 			return null;
 		}

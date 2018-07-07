@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionPUSH(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "push";
             Name = new Regex("^push", RegexOptions.IgnoreCase);

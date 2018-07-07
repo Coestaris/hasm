@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionNOP(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "nop";
             Name = new Regex("^nop", RegexOptions.IgnoreCase);

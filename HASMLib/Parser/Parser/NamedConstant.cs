@@ -10,10 +10,10 @@ namespace HASMLib.Parser
         public MemZoneFlashElementConstant constant;
 
         public string Name;
-        public UInt24 Index;
+        public UIntDouble Index;
         public Constant Constant;
 
-        public NamedConstant(string name, UInt24 index, Constant value)
+        public NamedConstant(string name, UIntDouble index, Constant value)
         {
             Name = name;
             Index = index;

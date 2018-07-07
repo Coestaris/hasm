@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionMOV(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "mov";
             Name = new Regex("^mov", RegexOptions.IgnoreCase);

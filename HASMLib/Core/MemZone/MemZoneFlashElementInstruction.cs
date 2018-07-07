@@ -8,11 +8,11 @@ namespace HASMLib.Core.MemoryZone
 {
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
-        public UInt24 InstructionNumber;
+        public UIntDouble InstructionNumber;
         public List<ObjectReference> Parameters;
-        public UInt24 ProgramIndex;
+        public UIntDouble ProgramIndex;
 
-        public UInt24 RuntimeAbsoluteIndex;
+        public UIntDouble RuntimeAbsoluteIndex;
 
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
@@ -54,7 +54,7 @@ namespace HASMLib.Core.MemoryZone
             return bytes.ToArray();
         }
 
-        public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, UInt24 index)
+        public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, UIntDouble index)
         {
             InstructionNumber = instruction.Index;
             Parameters = arguments;

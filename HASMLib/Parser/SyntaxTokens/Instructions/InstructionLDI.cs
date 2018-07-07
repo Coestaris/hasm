@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionLDI(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "ldi";
             Name = new Regex("^ldi", RegexOptions.IgnoreCase);

@@ -2,23 +2,23 @@
 {
     internal class MemZoneVariableUInt48 : MemZoneVariable
     {
-        public UInt48 Value;
+        public UIntQuad Value;
 
-        public MemZoneVariableUInt48(UInt48 value, string name)
+        public MemZoneVariableUInt48(UIntQuad value, string name)
         {
             Length = LengthQualifier.Quad;
             Value = value;
             Name = name;
         }
 
-        public MemZoneVariableUInt48(UInt48 value, int uid)
+        public MemZoneVariableUInt48(UIntQuad value, int uid)
         {
             Length = LengthQualifier.Quad;
             Value = value;
             Index = uid;
         }
 
-        public MemZoneVariableUInt48(UInt48 value, int uid, string name)
+        public MemZoneVariableUInt48(UIntQuad value, int uid, string name)
         {
             Length = LengthQualifier.Quad;
             Value = value;

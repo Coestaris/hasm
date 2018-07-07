@@ -5,12 +5,12 @@ namespace HASMLib.Parser
 {
     public class ObjectReference
     {
-        public UInt24 Index;
+        public UIntDouble Index;
         public ReferenceType Type;
 
         public MemZoneFlashElement Object;
 
-        public ObjectReference(UInt24 index, ReferenceType type)
+        public ObjectReference(UIntDouble index, ReferenceType type)
         {
             Index = index;
             Type = type;

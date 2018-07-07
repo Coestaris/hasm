@@ -107,7 +107,7 @@ namespace HASMLib.Parser
             var result = new List<MemZoneFlashElement>();
             machine.GetRegisterNames().ForEach(p =>
             {
-                var a = new MemZoneFlashElementVariable((UInt12)(_varIndex++), LengthQualifier.Single);
+                var a = new MemZoneFlashElementVariable((UIntSingle)(_varIndex++), LengthQualifier.Single);
                 Variables.Add(new Variable(p, LengthQualifier.Single)
                 {
                     variable = a
@@ -140,13 +140,13 @@ namespace HASMLib.Parser
                 switch (lq)
                 {
                     case LengthQualifier.Single:
-                        info.memZoneFlashElementConstant.UpdateValue((UInt12)value, info.ConstIndex);
+                        info.memZoneFlashElementConstant.UpdateValue((UIntSingle)value, info.ConstIndex);
                         break;
                     case LengthQualifier.Double:
-                        info.memZoneFlashElementConstant.UpdateValue((UInt24)value, info.ConstIndex);
+                        info.memZoneFlashElementConstant.UpdateValue((UIntDouble)value, info.ConstIndex);
                         break;
                     case LengthQualifier.Quad:
-                        info.memZoneFlashElementConstant.UpdateValue((UInt48)value, info.ConstIndex);
+                        info.memZoneFlashElementConstant.UpdateValue((UIntQuad)value, info.ConstIndex);
                         break;
                 }
 
@@ -157,10 +157,10 @@ namespace HASMLib.Parser
             //Расчет нового индекса константы	
             int constIndex = ++_constIndex;
 
-            var constant = new MemZoneFlashElementConstantUInt24((UInt24)value, constIndex);
+            var constant = new MemZoneFlashElementConstantUInt24((UIntDouble)value, constIndex);
             
             //Заносим данную констатнту в список именных констант
-            _namedConsts.Add(new NamedConstant(name, (UInt24)constIndex, new Constant(value, LengthQualifier.Double))
+            _namedConsts.Add(new NamedConstant(name, (UIntDouble)constIndex, new Constant(value, LengthQualifier.Double))
             {
                 constant = constant
             });
@@ -176,7 +176,7 @@ namespace HASMLib.Parser
 
         private List<MemZoneFlashElement> GetFlashElementsNoArguents(SourceLineInstruction line, out ParseError error)
         {
-            UInt24 currentInstructionProgramIndex = (UInt24)(_instructionIndex++);
+            UIntDouble currentInstructionProgramIndex = (UIntDouble)(_instructionIndex++);
             
             var result = new List<MemZoneFlashElement>();
             error = null;
@@ -206,7 +206,7 @@ namespace HASMLib.Parser
 
         private List<MemZoneFlashElement> GetFlashElementsWithArguents(SourceLineInstruction line, out ParseError error)
         {
-            UInt24 currentInstructionProgramIndex = (UInt24)(_instructionIndex++);
+            UIntDouble currentInstructionProgramIndex = (UIntDouble)(_instructionIndex++);
             var result = new List<MemZoneFlashElement>();
 
             //Если кол-во параметров не совпадает с предполагаемым
@@ -264,7 +264,7 @@ namespace HASMLib.Parser
                                 //Получаем индекс переменной со списка переменных
                                 int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(token.RawValue);
                                 //Запоминаем индекс переменной
-                                return new ObjectReference((UInt24)varIndex, ReferenceType.Variable)
+                                return new ObjectReference((UIntDouble)varIndex, ReferenceType.Variable)
                                     {
                                         Object = Variables[varIndex].variable
                                     };
@@ -295,7 +295,7 @@ namespace HASMLib.Parser
                                     {
                                         var item = UnknownLabelNameErrorList.Find(p => p.Name == token.RawValue);
                                     //После такой "грязной" хуйни мне хочется сходить с душ!
-                                    return new ObjectReference((UInt24)item.ConstIndex, ReferenceType.Constant)
+                                    return new ObjectReference((UIntDouble)item.ConstIndex, ReferenceType.Constant)
                                         {
                                             Object = UnknownLabelNameErrorList.Find(p => p.Name == token.RawValue).memZoneFlashElementConstant
                                         };
@@ -305,7 +305,7 @@ namespace HASMLib.Parser
 
                                         int constIndex = ++_constIndex;
                                         MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy(constIndex);
-                                        NamedConstant dummyNamedConstant = new NamedConstant(token.RawValue, (UInt24)constIndex, new Constant())
+                                        NamedConstant dummyNamedConstant = new NamedConstant(token.RawValue, (UIntDouble)constIndex, new Constant())
                                         {
                                             constant = dummyConstant
                                         };
@@ -320,7 +320,7 @@ namespace HASMLib.Parser
                                     //Записываем его во флеш память
                                     result.Add(dummyConstant);
 
-                                        return new ObjectReference((UInt24)constIndex, ReferenceType.Constant)
+                                        return new ObjectReference((UIntDouble)constIndex, ReferenceType.Constant)
                                         {
                                             Object = dummyConstant
                                         };
@@ -336,14 +336,14 @@ namespace HASMLib.Parser
 
                                 result.Add(flashElement);
 
-                                return new ObjectReference((UInt24)constIndex, ReferenceType.Constant)
+                                return new ObjectReference((UIntDouble)constIndex, ReferenceType.Constant)
                                 {
                                     Object = flashElement
                                 };
 
                             });
 
-                        UInt24 index = (UInt24)(++_expressionIndex);
+                        UIntDouble index = (UIntDouble)(++_expressionIndex);
                         result.Add(new MemZoneFlashElementExpression(expression, index));
                         usedIndexes.Add(new ObjectReference(index, ReferenceType.Expression));
                     }
@@ -375,7 +375,7 @@ namespace HASMLib.Parser
                             !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
                         {
                             //Запоминаем индекс константы
-                            usedIndexes.Add(new ObjectReference((UInt24)(++_constIndex), ReferenceType.Constant));
+                            usedIndexes.Add(new ObjectReference((UIntDouble)(++_constIndex), ReferenceType.Constant));
                             //Записываем во флеш константу
                             result.Add(constant.ToFlashElement(_constIndex));
                         };
@@ -387,7 +387,7 @@ namespace HASMLib.Parser
                             //Получаем индекс переменной со списка переменных
                             int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(argument);
                             //Запоминаем индекс переменной
-                            usedIndexes.Add(new ObjectReference((UInt24)varIndex, ReferenceType.Variable));
+                            usedIndexes.Add(new ObjectReference((UIntDouble)varIndex, ReferenceType.Variable));
                         }
                     } else
 
@@ -409,7 +409,7 @@ namespace HASMLib.Parser
                         }
 
                         //Запоминаем индекс константы
-                        usedIndexes.Add(new ObjectReference((UInt24)(++_constIndex), ReferenceType.Constant));
+                        usedIndexes.Add(new ObjectReference((UIntDouble)(++_constIndex), ReferenceType.Constant));
                         //Заносим константу во флеш
                         result.Add(constant.ToFlashElement(_constIndex));
                     } else 
@@ -429,7 +429,7 @@ namespace HASMLib.Parser
                             //Получаем индекс переменной со списка переменных 
                             int varIndex = Variables.Select(p => p.Name).ToList().IndexOf(argument);
                             //Запоминаем индекс переменной
-                            usedIndexes.Add(new ObjectReference((UInt24)varIndex, ReferenceType.Variable));
+                            usedIndexes.Add(new ObjectReference((UIntDouble)varIndex, ReferenceType.Variable));
                         } else 
                         
                         //Если это не переменная, а просили константу, не переменную
@@ -460,14 +460,14 @@ namespace HASMLib.Parser
                                     var item = UnknownLabelNameErrorList.Find(p => p.Name == argument);
 
                                     //После такой "грязной" хуйни мне хочется сходить с душ!
-                                    usedIndexes.Add(new ObjectReference((UInt24)item.ConstIndex, ReferenceType.Constant));
+                                    usedIndexes.Add(new ObjectReference((UIntDouble)item.ConstIndex, ReferenceType.Constant));
                                 }
                                 else
                                 {
 
                                     int constIndex = ++_constIndex;
                                     MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy(constIndex);
-                                    NamedConstant dummyNamedConstant = new NamedConstant(argument, (UInt24)constIndex, new Constant())
+                                    NamedConstant dummyNamedConstant = new NamedConstant(argument, (UIntDouble)constIndex, new Constant())
                                     {
                                         constant = dummyConstant
                                     };
@@ -482,7 +482,7 @@ namespace HASMLib.Parser
                                     //Записываем его во флеш память
                                     result.Add(dummyConstant);
 
-                                    usedIndexes.Add(new ObjectReference((UInt24)constIndex, ReferenceType.Constant));
+                                    usedIndexes.Add(new ObjectReference((UIntDouble)constIndex, ReferenceType.Constant));
                                 }
 
                                 //error = NewParseError (ParseErrorType.Syntax_UnknownConstName, label, stringParts, argIndex, index);

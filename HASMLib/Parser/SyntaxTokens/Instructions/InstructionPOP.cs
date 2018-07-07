@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionPOP(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "pop";
             Name = new Regex("^pop", RegexOptions.IgnoreCase);

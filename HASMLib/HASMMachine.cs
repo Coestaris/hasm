@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-
-using HASMLib.Core;
-using HASMLib.Core.MemoryZone;
+﻿using HASMLib.Core;
 using HASMLib.Runtime;
+using System;
+using System.Collections.Generic;
 
 namespace HASMLib
 {
     public class HASMMachine
     {
-        public HASMMachine(uint ram, uint eeprom, uint flash)
+        public HASMMachine(uint ram, uint eeprom, uint flash, int hasmBase = 8)
         {
+            SetBase(hasmBase);
+
             RAM = ram;
             EEPROM = eeprom;
             Flash = flash;
@@ -28,6 +28,11 @@ namespace HASMLib
         {
             if (MemZone.RAM.Count > RegisterCount)
                 MemZone.RAM.RemoveRange(0, (int)RegisterCount);
+        }
+
+        public void SetBase(int hasmBase = 8)
+        {
+            HASMBase.Base = (uint)hasmBase;
         }
 
 		public List<string> GetRegisterNames()

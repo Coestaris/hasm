@@ -20,7 +20,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
         public InstructionCMP(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "cmp";
             //CP or CMP
@@ -46,7 +46,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             if (a > b) result |= ComapreResult.Greater;
             if (a < b) result |= ComapreResult.Less;
 
-            memZone.Stack.Push((UInt12)(int)result);
+            memZone.Stack.Push((UIntSingle)(int)result);
 
             return RuntimeOutputCode.OK;
         }

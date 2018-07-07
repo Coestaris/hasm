@@ -13,7 +13,7 @@ namespace HASMLib.Runtime
     public class RuntimeMachine
     {
         internal delegate void RuntimeMachineIOHandler();
-        internal delegate void RuntimeMachineIOBufferHandler(List<UInt12> data);
+        internal delegate void RuntimeMachineIOBufferHandler(List<UIntSingle> data);
 
         public TimeSpan TimeOfRunning { get; private set; }
 
@@ -29,12 +29,12 @@ namespace HASMLib.Runtime
             _source = source;
         }
 
-        internal void InbufferRecieved(List<UInt12> inBuffer)
+        internal void InbufferRecieved(List<UIntSingle> inBuffer)
         {
             InBuffer.AddRange(inBuffer);
         }
 
-        internal void OutBytes(List<UInt12> bytes)
+        internal void OutBytes(List<UIntSingle> bytes)
         {
             OutBufferUpdated?.Invoke(bytes);
         }
@@ -43,7 +43,7 @@ namespace HASMLib.Runtime
         internal event RuntimeMachineIOHandler OnBufferClosed;
         internal event RuntimeMachineIOBufferHandler OutBufferUpdated;
 
-        internal List<UInt12> InBuffer;
+        internal List<UIntSingle> InBuffer;
 
 		public bool IsRunning { get; private set; }
 
@@ -64,7 +64,7 @@ namespace HASMLib.Runtime
 			IsRunning = true;
 
             Ticks = 0;
-            InBuffer = new List<UInt12>();
+            InBuffer = new List<UIntSingle>();
             OnBufferFlushed?.Invoke();
 
             var result = RunInternal();
@@ -78,7 +78,7 @@ namespace HASMLib.Runtime
             return result;
         }
 
-        internal UInt24 CurrentPosition;
+        internal UIntDouble CurrentPosition;
 
         private RuntimeOutputCode RunInternal()
         {
@@ -91,7 +91,7 @@ namespace HASMLib.Runtime
                 var constant = (MemZoneFlashElementConstant)p;
                 return new NamedConstant(
                     string.Format(_constantFormat, constant.Index),
-                    (UInt24)constant.Index,
+                    (UIntDouble)constant.Index,
                     constant.ToConstant());
             }).ToList();
 
@@ -103,7 +103,7 @@ namespace HASMLib.Runtime
             //Удаляем их из коллекции
             data.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
 
-            UInt24 globalIndex = 0;
+            UIntDouble globalIndex = 0;
 
             data.ForEach(p =>
             {

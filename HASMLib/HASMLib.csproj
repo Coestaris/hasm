@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\HASMBase.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantDummy.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementExpression.cs" />
@@ -50,8 +51,8 @@
     <Compile Include="Core\MemZone\MemZoneVariableUint48.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint24.cs" />
     <Compile Include="Core\MemZone\MemZoneVariableUint12.cs" />
-    <Compile Include="Core\UInt48.cs" />
-    <Compile Include="Core\UInt24.cs" />
+    <Compile Include="Core\UIntQuad.cs" />
+    <Compile Include="Core\UIntDouble.cs" />
     <Compile Include="HASMMachine.cs" />
     <Compile Include="HASMMachineBannedFeatures.cs" />
     <Compile Include="HASMSource.cs" />
@@ -98,7 +99,7 @@
     <Compile Include="Parser\SyntaxTokens\PreprocessorDirective.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\MemZone.cs" />
-    <Compile Include="Core\UInt12.cs" />
+    <Compile Include="Core\UIntSingle.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstant.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt24.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantUInt12.cs" />

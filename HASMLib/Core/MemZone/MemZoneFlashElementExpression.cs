@@ -15,9 +15,9 @@ namespace HASMLib.Core.MemoryZone
 
         public Expression Expression; 
 
-        public UInt24 Index;
+        public UIntDouble Index;
 
-        public MemZoneFlashElementExpression(Expression expression, UInt24 index)
+        public MemZoneFlashElementExpression(Expression expression, UIntDouble index)
         {
             Index = index;
             Expression = expression;

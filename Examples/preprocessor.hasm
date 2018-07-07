@@ -23,12 +23,12 @@
 
 ; Использование дефайнов в #if
 #if someValue == 2      
-        out 0x999
+        out 0x99
 #endif
 
 ; Использование вложенных дефайнов в #if
 #if anotherInnerDefine == 5      
-        out 0x777
+        out 0x77
 #endif
 
 
@@ -46,7 +46,7 @@
 #ifdef someDef
         out 0x105
 #else   
-        out 0x205
+        out 0x21
 #endif
 
         out someValue + 2 * someValue   ; Вывести значение someValue (0x6)

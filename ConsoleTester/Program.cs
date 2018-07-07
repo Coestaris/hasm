@@ -145,22 +145,15 @@ namespace ConsoleTester
 
         static void Main(string[] args)
         {
-            Expression.InitGlobals();
-            UInt24 i = 0;
+            HASMBase.Base = 8;
+            UIntDouble i = (UInt32)10;
 
-            var error = Expression.Parse("2 - R3 + 0x31 + label1", out Expression result, 
-            (p) =>
-            {
-                Console.WriteLine("Запрашивается переменная: {0}", p);
-                return new ObjectReference(i++, ReferenceType.Variable);
-            }, 
-            (constant) => 
-            {
-                Console.WriteLine("Запрос на регистрацию константы {0}", constant);
-                return new ObjectReference(i++, ReferenceType.Constant);
-            });
+            i++;
+            i++;
+            i++;
+            i++;
 
-            Console.WriteLine(result);
+            Console.WriteLine(i);
             Console.ReadKey();
         }
     }

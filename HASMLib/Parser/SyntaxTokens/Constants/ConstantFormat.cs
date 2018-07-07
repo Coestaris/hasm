@@ -8,20 +8,16 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
     {
         public virtual Regex Regex { get; }
 
-        protected const long SMaxValue = 0xFFF;
-        protected const long DMaxValue = 0xFFFFF;
-        protected const long QMaxValue = 0xFFFFFFFFFFFF;
-
         public bool CheckMaxValues(long value, LengthQualifier qualifier)
         {
             switch (qualifier)
             {
                 case LengthQualifier.Single:
-                    return value > SMaxValue;
+                    return value > (long)HASMBase.SingleMaxValue;
                 case LengthQualifier.Double:
-                    return value > DMaxValue;
+                    return value > (long)HASMBase.DoubleMaxValue;
                 case LengthQualifier.Quad:
-                    return value > QMaxValue;
+                    return value > (long)HASMBase.QuadMaxValue;
                 default:
                     return false;
             }

@@ -33,7 +33,7 @@ namespace HASM
 
         private Thread runThread;
 
-        private List<UInt12> Output;
+        private List<UIntSingle> Output;
       
         public void Run(string FileName)
         {

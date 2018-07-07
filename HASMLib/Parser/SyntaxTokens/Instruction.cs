@@ -10,26 +10,26 @@ namespace HASMLib.Parser.SyntaxTokens
     public abstract class Instruction
     {
         public string NameString { get; protected set; }
-        public UInt24 Index { get; protected set; }
+        public int Index { get; protected set; }
         public Regex Name { get; protected set; }
         public int ParameterCount { get; protected set; }
         public List<InstructionParameterType> ParameterTypes { get; protected set; }
 
-        protected MemZoneVariable GetVar(MemZone mz, UInt24 index)
+        protected MemZoneVariable GetVar(MemZone mz, UIntDouble index)
         {
             return mz.RAM.Find(p => p.Index == index);
         }
 
-        protected NamedConstant GetConst(List<NamedConstant> constants, UInt24 index)
+        protected NamedConstant GetConst(List<NamedConstant> constants, UIntDouble index)
         {
             return constants.Find(p => p.Index == index);
         }
 
-        public void RuntimeMachineJump(UInt24 position, RuntimeMachine runtimeMachine)
+        public void RuntimeMachineJump(UIntDouble position, RuntimeMachine runtimeMachine)
         {
             var localIndex = position;
             var globalIndex = runtimeMachine.GetGlobalInstructionIndexByLocalOne(localIndex);
-            runtimeMachine.CurrentPosition = (UInt24)(globalIndex - 1);
+            runtimeMachine.CurrentPosition = (UIntDouble)(globalIndex - 1);
         }
 
         public Constant GetNumericValue(int index, MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)

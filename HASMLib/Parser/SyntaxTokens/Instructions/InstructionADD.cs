@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionADD(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "add";
             Name = new Regex("^add", RegexOptions.IgnoreCase);

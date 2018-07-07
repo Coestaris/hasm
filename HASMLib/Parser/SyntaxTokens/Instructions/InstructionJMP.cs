@@ -10,7 +10,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
     {
         public InstructionJMP(int index)
         {
-            Index = (UInt24)index;
+            Index = index;
 
             NameString = "jmp";
             Name = new Regex("^jmp", RegexOptions.IgnoreCase);
@@ -23,7 +23,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
         public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            UInt24 position = (UInt24)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+            UIntDouble position = (UIntDouble)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
 
             RuntimeMachineJump(position, runtimeMachine);
 

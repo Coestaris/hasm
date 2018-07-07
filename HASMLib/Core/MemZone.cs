@@ -1,13 +1,11 @@
-﻿using System;
+﻿using HASMLib.Core.MemoryZone;
 using System.Collections.Generic;
-using System.Linq;
-using HASMLib.Core.MemoryZone;
 
 namespace HASMLib.Core
 {
     public class MemZone
     {
-        public Stack<UInt12> Stack { get; private set; }
+        public Stack<UIntSingle> Stack { get; private set; }
 
         public List<MemZoneVariable> RAM { get; private set; }
 
@@ -23,7 +21,7 @@ namespace HASMLib.Core
         {
             Flash = new List<MemZoneFlashElement>();
             RAM = new List<MemZoneVariable>();
-            Stack = new Stack<UInt12>();
+            Stack = new Stack<UIntSingle>();
         }
 
         public MemZone(int flash_len, int ram, List<MemZoneFlashElement> flash)

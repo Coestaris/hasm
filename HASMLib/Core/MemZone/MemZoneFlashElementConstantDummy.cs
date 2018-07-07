@@ -10,14 +10,14 @@
 		}
 
         //MAKE CONSTANT NOT DUMMY AGAIN!
-        public void UpdateValue(UInt12 value, int index)
+        public void UpdateValue(UIntSingle value, int index)
         {
             isEmpty = false;
             Length = LengthQualifier.Single;
-            Value = new UInt12[] { value };
+            Value = new UIntSingle[] { value };
         }
 
-        public void UpdateValue(UInt24 value, int index)
+        public void UpdateValue(UIntDouble value, int index)
         {
             isEmpty = false;
 
@@ -25,7 +25,7 @@
             Value = value.ToUInt12();
         }
 
-        public void UpdateValue(UInt48 value, int index)
+        public void UpdateValue(UIntQuad value, int index)
         {
             isEmpty = false;
 
