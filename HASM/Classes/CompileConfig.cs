@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -27,6 +28,8 @@ namespace HASM
 
         public List<Define> Defines;
 
+        public int Base;
+
         public CompileConfig(int rAM, int flash, int eEPROM, HASMMachineBannedFeatures bannedFeatures, List<Define> defines)
         {
             RAM = rAM;
@@ -46,8 +49,11 @@ namespace HASM
             XmlSerializer ser = new XmlSerializer(typeof(CompileConfig));
 
             FileStream fs = new FileStream(filename, FileMode.Create);
-            XmlWriter writer = XmlWriter.Create(fs);
-
+            XmlTextWriter writer = new XmlTextWriter(fs, Encoding.UTF8)
+            {
+                Formatting = Formatting.Indented,
+                Indentation = 4
+            };
             ser.Serialize(writer, cfg);
 
             fs.Close();

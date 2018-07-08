@@ -46,6 +46,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textBox_registerNameFormat = new System.Windows.Forms.TextBox();
             this.textBox_registerCount = new System.Windows.Forms.TextBox();
+            this.label_base = new System.Windows.Forms.Label();
+            this.comboBox_base = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -196,11 +198,35 @@
             this.textBox_registerCount.Size = new System.Drawing.Size(101, 20);
             this.textBox_registerCount.TabIndex = 16;
             // 
+            // label_base
+            // 
+            this.label_base.AutoSize = true;
+            this.label_base.Location = new System.Drawing.Point(245, 71);
+            this.label_base.Name = "label_base";
+            this.label_base.Size = new System.Drawing.Size(56, 13);
+            this.label_base.TabIndex = 17;
+            this.label_base.Text = "ASM base";
+            // 
+            // comboBox_base
+            // 
+            this.comboBox_base.FormattingEnabled = true;
+            this.comboBox_base.Items.AddRange(new object[] {
+            "8",
+            "12",
+            "16"});
+            this.comboBox_base.Location = new System.Drawing.Point(327, 68);
+            this.comboBox_base.Name = "comboBox_base";
+            this.comboBox_base.Size = new System.Drawing.Size(101, 21);
+            this.comboBox_base.TabIndex = 18;
+            this.comboBox_base.Text = "8";
+            // 
             // CompileOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(448, 386);
+            this.Controls.Add(this.comboBox_base);
+            this.Controls.Add(this.label_base);
             this.Controls.Add(this.textBox_registerCount);
             this.Controls.Add(this.textBox_registerNameFormat);
             this.Controls.Add(this.label7);
@@ -245,5 +271,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox_registerNameFormat;
         private System.Windows.Forms.TextBox textBox_registerCount;
+        private System.Windows.Forms.Label label_base;
+        private System.Windows.Forms.ComboBox comboBox_base;
     }
 }

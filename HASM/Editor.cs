@@ -37,7 +37,11 @@ namespace HASM
       
         public void Run(string FileName)
         {
-            HASMMachine machine = new HASMMachine((uint)workingFolder.CompileConfig.RAM, (uint)workingFolder.CompileConfig.EEPROM, (uint)workingFolder.CompileConfig.Flash)
+            HASMMachine machine = new HASMMachine(
+                (uint)workingFolder.CompileConfig.RAM, 
+                (uint)workingFolder.CompileConfig.EEPROM, 
+                (uint)workingFolder.CompileConfig.Flash,
+                workingFolder.CompileConfig.Base)
             {
                 BannedFeatures = workingFolder.CompileConfig.BannedFeatures
             };
@@ -142,9 +146,9 @@ namespace HASM
                     int size = source.ParseResult.Sum(p => p.FixedSize);
                     toolStripLabel1.Text =
                         $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}. " +
-                        $"Parsed size: {size}TBN{(size == 1 ? "" : "s")}. " +
+                        $"Parsed size: {size} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(size == 1 ? "" : "s")}. " +
                         $"Run in: {Formatter.ToPrettyFormat(runtime.TimeOfRunning)} or {runtime.Ticks} step{(runtime.Ticks == 1 ? "" : "s")}. " +
-                        $"Result is: {Output.Count} TBN{(Output.Count == 1 ? "" : "s")}";
+                        $"Result is: {Output.Count} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(Output.Count == 1 ? "" : "s")}";
                 }
 
 
@@ -163,6 +167,16 @@ namespace HASM
                 {
                     case OutputType.Hex:
                         richTextBox1.Text = string.Join(", ", Output.Select(p => "0x" + p.ToString("X")));
+                        break;
+
+                    case OutputType.Bin:
+                        richTextBox1.Text = string.Join(", ", Output.Select(p =>
+                        {
+                            string baseStr = Convert.ToString((long)p, 2);
+                            baseStr = new string('0', workingFolder.CompileConfig.Base - baseStr.Length) + baseStr;
+                            return "0b" + baseStr;
+
+                        }));
                         break;
 
                     case OutputType.Dec:
@@ -689,6 +703,7 @@ namespace HASM
             outputType = OutputType.Hex;
             decOutputToolStripMenuItem.Checked = false;
             charOutputToolStripMenuItem.Checked = false;
+            binOutputToolStripMenuItem.Checked = false;
 
             OutputToTextBox();
             workingFolder.UserConfig.OutputType = outputType;
@@ -700,7 +715,8 @@ namespace HASM
             outputType = OutputType.Dec;
             hexOutputToolStripMenuItem.Checked = false;
             charOutputToolStripMenuItem.Checked = false;
-
+            binOutputToolStripMenuItem.Checked = false;
+            
             OutputToTextBox();
             workingFolder.UserConfig.OutputType = outputType;
             workingFolder.SaveUser();
@@ -711,6 +727,7 @@ namespace HASM
             outputType = OutputType.Char;
             decOutputToolStripMenuItem.Checked = false;
             hexOutputToolStripMenuItem.Checked = false;
+            binOutputToolStripMenuItem.Checked = false;
 
             OutputToTextBox();
             workingFolder.UserConfig.OutputType = outputType;
@@ -763,6 +780,19 @@ namespace HASM
                 workingFolder.UserConfig.WindowPosition = new Point(Left, Top);
                 workingFolder.SaveUser();
             }
+        }
+
+        private void binOutputToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            outputType = OutputType.Bin;
+            binOutputToolStripMenuItem.Checked = true;
+            charOutputToolStripMenuItem.Checked = false;
+            decOutputToolStripMenuItem.Checked = false;
+            hexOutputToolStripMenuItem.Checked = false;
+
+            OutputToTextBox();
+            workingFolder.UserConfig.OutputType = outputType;
+            workingFolder.SaveUser();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace HASM.Classes
 
         public List<string> OpenedTabs;
 
-        public Editor.OutputType OutputType;
+        public OutputType OutputType;
 
         public int SelectedTab;
 

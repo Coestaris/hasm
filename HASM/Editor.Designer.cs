@@ -80,6 +80,7 @@
             this.splitContainer_main = new System.Windows.Forms.SplitContainer();
             this.splitContainer_editor = new System.Windows.Forms.SplitContainer();
             this.loadingCircle1 = new MRG.Controls.UI.LoadingCircle();
+            this.binOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip_node.SuspendLayout();
@@ -292,25 +293,25 @@
             // addSourceFileToolStripMenuItem
             // 
             this.addSourceFileToolStripMenuItem.Name = "addSourceFileToolStripMenuItem";
-            this.addSourceFileToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.addSourceFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addSourceFileToolStripMenuItem.Text = "Add Source File";
             this.addSourceFileToolStripMenuItem.Click += new System.EventHandler(this.addSourceFileToolStripMenuItem_Click);
             // 
             // addHeaderFileToolStripMenuItem
             // 
             this.addHeaderFileToolStripMenuItem.Name = "addHeaderFileToolStripMenuItem";
-            this.addHeaderFileToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.addHeaderFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addHeaderFileToolStripMenuItem.Text = "Add Header File";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(155, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
             // 
             // precompileAllToolStripMenuItem
             // 
             this.precompileAllToolStripMenuItem.Name = "precompileAllToolStripMenuItem";
-            this.precompileAllToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.precompileAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.precompileAllToolStripMenuItem.Text = "Precompile All";
             // 
             // outputToolStripMenuItem
@@ -318,7 +319,8 @@
             this.outputToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.hexOutputToolStripMenuItem,
             this.decOutputToolStripMenuItem,
-            this.charOutputToolStripMenuItem});
+            this.charOutputToolStripMenuItem,
+            this.binOutputToolStripMenuItem});
             this.outputToolStripMenuItem.Name = "outputToolStripMenuItem";
             this.outputToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
             this.outputToolStripMenuItem.Text = "Output";
@@ -327,7 +329,7 @@
             // 
             this.hexOutputToolStripMenuItem.CheckOnClick = true;
             this.hexOutputToolStripMenuItem.Name = "hexOutputToolStripMenuItem";
-            this.hexOutputToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.hexOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.hexOutputToolStripMenuItem.Text = "Hex output";
             this.hexOutputToolStripMenuItem.Click += new System.EventHandler(this.hexOutputToolStripMenuItem_Click);
             // 
@@ -335,7 +337,7 @@
             // 
             this.decOutputToolStripMenuItem.CheckOnClick = true;
             this.decOutputToolStripMenuItem.Name = "decOutputToolStripMenuItem";
-            this.decOutputToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.decOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.decOutputToolStripMenuItem.Text = "Dec output";
             this.decOutputToolStripMenuItem.Click += new System.EventHandler(this.decOutputToolStripMenuItem_Click);
             // 
@@ -343,7 +345,7 @@
             // 
             this.charOutputToolStripMenuItem.CheckOnClick = true;
             this.charOutputToolStripMenuItem.Name = "charOutputToolStripMenuItem";
-            this.charOutputToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.charOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.charOutputToolStripMenuItem.Text = "Char output";
             this.charOutputToolStripMenuItem.Click += new System.EventHandler(this.charOutputToolStripMenuItem_Click);
             // 
@@ -496,6 +498,13 @@
             this.loadingCircle1.Text = "loadingCircle1";
             this.loadingCircle1.Visible = false;
             // 
+            // binOutputToolStripMenuItem
+            // 
+            this.binOutputToolStripMenuItem.Name = "binOutputToolStripMenuItem";
+            this.binOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.binOutputToolStripMenuItem.Text = "Bin output";
+            this.binOutputToolStripMenuItem.Click += new System.EventHandler(this.binOutputToolStripMenuItem_Click);
+            // 
             // Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -583,6 +592,7 @@
         private System.Windows.Forms.SplitContainer splitContainer_editor;
         private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
         private MRG.Controls.UI.LoadingCircle loadingCircle1;
+        private System.Windows.Forms.ToolStripMenuItem binOutputToolStripMenuItem;
     }
 }
 

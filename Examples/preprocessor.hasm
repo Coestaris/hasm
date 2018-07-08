@@ -14,7 +14,7 @@
 
 #define someDef
 #define someValue 0x2
-#define someAnotherDef 0x200 - 4
+#define someAnotherDef 0xFF - 4
 #define someExpression(a,b) 2 * a + b
 
 #define innerDefine someValue + 1

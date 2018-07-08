@@ -25,6 +25,13 @@ namespace HASMLib.Core
             get => _base;
             set
             {
+                if (value > 16)
+                    throw new ArgumentException("Пока битность не может превышать 16");
+
+                if(value <= 0)
+                    throw new ArgumentException("Битность должна быть больше 0");
+
+
                 _set = true;
 
                 _base = value;
