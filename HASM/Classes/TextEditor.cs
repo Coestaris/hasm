@@ -107,8 +107,7 @@ namespace HASM
                 TextBox.TextChanged += (obj, args) =>
                 {
                     if(HighlightedLine != -1)
-                    /*for (int i = 0; i < TextBox.LinesCount - 1; i++)
-                        TextBox[i].BackgroundBrush = Brushes.Transparent;*/
+                  
                     {
                         TextBox[HighlightedLine].BackgroundBrush = Brushes.Transparent;
                         HighlightedLine = -1;
@@ -187,7 +186,7 @@ namespace HASM
 
         public bool IsChanged = false;
 
-        private string DisplayName;
+        public string DisplayName;
         public string Path;
 
         public FastColoredTextBox TextBox { get; }

@@ -53,12 +53,15 @@ namespace HASMLib.Parser.SyntaxTokens
         private static Stack<bool> enableStack;
         private static List<Define> defines;
 
-        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<string>> GetLinesFunc)
+        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<string>> GetLinesFunc, List<Define> defines)
         {
             getLinesFunc = GetLinesFunc ?? throw new ArgumentNullException(nameof(GetLinesFunc));
             workingDirectory = WorkingDirectory;
             enableStack = new Stack<bool>();
-            defines = new List<Define>();
+            PreprocessorDirective.defines = new List<Define>();
+
+            if (defines != null)
+                PreprocessorDirective.defines.AddRange(defines);
 
             var result = RecursiveParse(fileName);
 

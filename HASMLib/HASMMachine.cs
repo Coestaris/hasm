@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core;
+using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Runtime;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,9 @@ namespace HASMLib
         public UInt32 Flash { get; set; }
 
         public MemZone MemZone;
-        
+
+        public List<Define> UserDefinedDefines { get; set; }
+
         public HASMMachineBannedFeatures BannedFeatures { get; set; }
 
 		private string _registerNameFormat;

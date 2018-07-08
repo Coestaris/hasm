@@ -67,7 +67,7 @@ namespace HASMLib
 		{
             DateTime startTime = DateTime.Now;
 
-            ParseResult = new HASMParser().Parse(Machine, out ParseError err, BaseFilename, WorkingDirectory);
+            ParseResult = new HASMParser().Parse(Machine, out ParseError err, BaseFilename, WorkingDirectory, Machine.UserDefinedDefines);
 
             if (err != null)
 				return err;

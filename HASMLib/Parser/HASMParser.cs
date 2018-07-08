@@ -538,7 +538,7 @@ namespace HASMLib.Parser
         //       instruction a1, a2, a3 ... ; comment
         //label: instruction                ; comment
         //etc
-        internal List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError, string filename, string workingDirectory)
+        internal List<MemZoneFlashElement> Parse(HASMMachine machine, out ParseError parseError, string filename, string workingDirectory, List<Define> defines = null)
         {
             //Задаем глобальные переменные выражений
             Expression.InitGlobals();
@@ -573,7 +573,7 @@ namespace HASMLib.Parser
             result.AddRange(SetupRegisters(machine));
 
             //Запускаем рекурсивный метод обработки препроцессором
-            List<SourceLine> lines = PreprocessorDirective.RecursiveParse(filename, workingDirectory, out parseError, BasePrepareLines);
+            List<SourceLine> lines = PreprocessorDirective.RecursiveParse(filename, workingDirectory, out parseError, BasePrepareLines, defines);
             if (parseError != null) return null;
 
             //Обрабатываем данные о инструкциях

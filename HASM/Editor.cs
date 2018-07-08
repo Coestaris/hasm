@@ -43,7 +43,11 @@ namespace HASM
                 (uint)workingFolder.CompileConfig.Flash,
                 workingFolder.CompileConfig.Base)
             {
-                BannedFeatures = workingFolder.CompileConfig.BannedFeatures
+                BannedFeatures = workingFolder.CompileConfig.BannedFeatures,
+                UserDefinedDefines = workingFolder.CompileConfig.Defines
+                    .FindAll(p => !string.IsNullOrEmpty(p.Name))
+                    .Select(p => new HASMLib.Parser.SyntaxTokens.Define(p.Name, p.Value))
+                    .ToList()
             };
 
             machine.SetRegisters(workingFolder.CompileConfig.RegisterNameFormat, (uint)workingFolder.CompileConfig.RegisterCount);
@@ -82,8 +86,8 @@ namespace HASM
 
                 if(error.Line != -1)
                 {
-                    FastColoredTextBox tb = (tabControl1.SelectedTab as TextEditor).TextBox;
-
+                    TextEditor tab = (tabControl1.SelectedTab as TextEditor);
+                    FastColoredTextBox tb = tab.TextBox;
                     var minLines = 0;
                     var maxLines = tb.LinesCount;
                     var max = tb.VerticalScroll.Maximum;
@@ -91,9 +95,15 @@ namespace HASM
                     var currentLine = error.Line;
                     var maxLinesInScreen = tb.Height / tb.Font.SizeInPoints;
 
-                    (tabControl1.SelectedTab as TextEditor).TextBox[error.Line - 1].BackgroundBrush = Brushes.Pink;
+                    if (tab.HighlightedLine != -1)
+                    { 
+                        tb[tab.HighlightedLine].BackgroundBrush = Brushes.Transparent;
+                        tab.HighlightedLine = -1;
+                    };
 
-
+                    tab.HighlightedLine = error.Line - 1;
+                    tb[error.Line - 1].BackgroundBrush = Brushes.Pink;
+                    
                     if (maxLinesInScreen > maxLines)
                         return;
 
@@ -371,15 +381,30 @@ namespace HASM
 
         private void tabControl1_MouseDown(object sender, MouseEventArgs e)
         {
-            for (int i = 0; i < tabControl1.TabPages.Count; i++)
+            if (e.Button == MouseButtons.Left)
             {
-                Rectangle r = tabControl1.GetTabRect(i);
-                //Getting the position of the "x" mark.
-                Rectangle closeButton = new Rectangle(r.Right - 15, r.Top + 4, 9, 7);
-                if (closeButton.Contains(e.Location))
+                for (int i = 0; i < tabControl1.TabPages.Count; i++)
                 {
-                    (tabControl1.TabPages[i] as TextEditor).Close();
-                    UpdateOpenedTabs();
+                    Rectangle r = tabControl1.GetTabRect(i);
+                    //Getting the position of the "x" mark.
+                    Rectangle closeButton = new Rectangle(r.Right - 15, r.Top + 4, 9, 7);
+                    if (closeButton.Contains(e.Location))
+                    {
+                        (tabControl1.TabPages[i] as TextEditor).Close();
+                        UpdateOpenedTabs();
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < tabControl1.TabPages.Count; i++)
+                {
+                    Rectangle r = tabControl1.GetTabRect(i);
+                    if (r.Contains(e.Location))
+                    {
+                        toolStripMenuItem_name.Text = (tabControl1.TabPages[i] as TextEditor).DisplayName;
+                        contextMenuStrip_tab.Show(PointToScreen(e.Location));
+                    }
                 }
             }
         }
@@ -393,6 +418,12 @@ namespace HASM
 
             Point pnt = PointToScreen(e.Location);
             pnt.Y += menuStrip1.Height;
+
+            if (fnode.isRoot) toolStripMenuItem_node_name.Text = "[root]";
+            else toolStripMenuItem_node_name.Text = 
+                    $"{(fnode.IsDir ? "[" : "")}" +
+                    $"{Formatter.MakeRelative(fnode.AbsolutePath, workingFolder.Path + "\\")}" +
+                    $"{(fnode.IsDir ? "]" : "")}";
 
             contextMenuStrip_node.Show(pnt);
             selectedNode = fnode;
@@ -793,6 +824,44 @@ namespace HASM
             OutputToTextBox();
             workingFolder.UserConfig.OutputType = outputType;
             workingFolder.SaveUser();
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var tab = (tabControl1.SelectedTab as TextEditor);
+
+            Run(tab.Path);
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            var tab = (tabControl1.SelectedTab as TextEditor);
+
+            tab.Save();
+        }
+
+        private void runToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var tab = (tabControl1.SelectedTab as TextEditor);
+
+            tab.Close();
+        }
+
+        private void closeAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (TextEditor tab in tabControl1.TabPages)
+            {
+                tab.Close();
+            }
+        }
+
+        private void closeAllExceptThisToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var currentTab = (tabControl1.SelectedTab as TextEditor);
+            foreach (TextEditor tab in tabControl1.TabPages)
+            {
+                if (tab != currentTab) tab.Close();
+            }
         }
     }
 }

@@ -1,0 +1,7 @@
+#ifndef _ide_hasm_
+
+#if defined(__ide_ver_minor) && defined(__ide_ver_major)
+#define _ide_ver __ide_ver_major * 100 + __ide_ver_minor
+#endif
+
+#endif
