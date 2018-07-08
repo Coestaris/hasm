@@ -6,6 +6,7 @@ namespace HASMLib.Parser.SyntaxTokens
     public class Define
     {
         public static Regex GeneralDefineNameRegex = new Regex(@"^\D\w*");
+        public static string FindBaseRegex = @"(^{0}(?=\W))|((?<=\W){0}(?=\W))|((?<=\W){0}$)";
 
         public Regex FindRegex;
 
@@ -18,8 +19,7 @@ namespace HASMLib.Parser.SyntaxTokens
 
         private void InitRegex()
         {
-            string baseRegex = @"(^{0}(?=\W))|((?<=\W){0}(?=\W))|((?<=\W){0}$)";
-            FindRegex = new Regex(string.Format(baseRegex, Name));
+            FindRegex = new Regex(string.Format(FindBaseRegex, Name));
         }
 
         public override string ToString()

@@ -21,8 +21,8 @@ namespace HASMLib.Core.MemoryZone
         {
             get
             {
-                if (Parameters == null) return 6;
-                else return (4 + 2 + 3 * Parameters.Count) * 8 / 12; //To get 12-representation of 8-bit
+                if (Parameters == null) return (4 + 2) * 8 / (int)HASMBase.Base;
+                else return (4 + 2 + 3 * Parameters.Count) * 8 / (int)HASMBase.Base;
             }
         }
 

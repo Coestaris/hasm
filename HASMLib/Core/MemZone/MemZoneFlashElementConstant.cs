@@ -22,7 +22,7 @@ namespace HASMLib.Core.MemoryZone
 					case LengthQualifier.Double : a += 3; break; 
 					case LengthQualifier.Quad   : a += 8; break;
 				}
-				return a * 8 / 12; //To get 12-bit representation
+				return a * 8 / (int)HASMBase.Base; //To get N-bit representation
 			}
 		}
 

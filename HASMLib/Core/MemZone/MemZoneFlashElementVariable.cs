@@ -10,7 +10,7 @@ namespace HASMLib.Core.MemoryZone
 		public LengthQualifier VariableType;
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Variable;
-		public override int FixedSize => 4; //(1 + 3 + 1) * 8 / 12;
+		public override int FixedSize => (1 + 3 + 1) * 8 / (int)HASMBase.Base;
 
 		public override byte[] ToBytes ()
 		{

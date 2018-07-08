@@ -122,7 +122,8 @@ namespace HASMLib.Parser
             return new ParseError(
                 error,
                 line.LineIndex,
-                line.Label.Length + 2 + line.Parameters.Take(argIndex).Sum(p => p.Length));
+                line.Label.Length + 2 + line.Parameters.Take(argIndex).Sum(p => p.Length),
+                line.FileName);
         }
         #endregion
 

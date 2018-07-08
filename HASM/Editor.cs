@@ -82,40 +82,39 @@ namespace HASM
                         }
 
                     if (!found) AddTab(error.FileName);
-                }
 
-                if(error.Line != -1)
-                {
-                    TextEditor tab = (tabControl1.SelectedTab as TextEditor);
-                    FastColoredTextBox tb = tab.TextBox;
-                    var minLines = 0;
-                    var maxLines = tb.LinesCount;
-                    var max = tb.VerticalScroll.Maximum;
-                    var min = tb.VerticalScroll.Minimum;
-                    var currentLine = error.Line;
-                    var maxLinesInScreen = tb.Height / tb.Font.SizeInPoints;
+                    if(error.Line != -1)
+                    {
+                        TextEditor tab = (tabControl1.SelectedTab as TextEditor);
+                        FastColoredTextBox tb = tab.TextBox;
+                        var minLines = 0;
+                        var maxLines = tb.LinesCount;
+                        var max = tb.VerticalScroll.Maximum;
+                        var min = tb.VerticalScroll.Minimum;
+                        var currentLine = error.Line;
+                        var maxLinesInScreen = tb.Height / tb.Font.SizeInPoints;
 
-                    if (tab.HighlightedLine != -1)
-                    { 
-                        tb[tab.HighlightedLine].BackgroundBrush = Brushes.Transparent;
-                        tab.HighlightedLine = -1;
-                    };
+                        if (tab.HighlightedLine != -1)
+                        { 
+                            tb[tab.HighlightedLine].BackgroundBrush = Brushes.Transparent;
+                            tab.HighlightedLine = -1;
+                        };
 
-                    tab.HighlightedLine = error.Line - 1;
-                    tb[error.Line - 1].BackgroundBrush = Brushes.Pink;
+                        tab.HighlightedLine = error.Line - 1;
+                        tb[error.Line - 1].BackgroundBrush = Brushes.Pink;
                     
-                    if (maxLinesInScreen > maxLines)
-                        return;
+                        if (maxLinesInScreen > maxLines)
+                            return;
 
-                    currentLine = Math.Max(currentLine - (int)(maxLinesInScreen / 2), 0);
+                        currentLine = Math.Max(currentLine - (int)(maxLinesInScreen / 2), 0);
 
-                    int position = (int)((currentLine - minLines) * (max - min) / (float)(maxLines - minLines) + min);
+                        int position = (int)((currentLine - minLines) * (max - min) / (float)(maxLines - minLines) + min);
 
-                    tb.VerticalScroll.Value = position - 1;
-                    tb.VerticalScroll.Value = position;
+                        tb.VerticalScroll.Value = position - 1;
+                        tb.VerticalScroll.Value = position;
 
+                    }
                 }
-
                 return;
             }
 
@@ -155,10 +154,10 @@ namespace HASM
                     Output = iostream.ReadAll();
                     int size = source.ParseResult.Sum(p => p.FixedSize);
                     toolStripLabel1.Text =
-                        $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}. " +
-                        $"Parsed size: {size} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(size == 1 ? "" : "s")}. " +
-                        $"Run in: {Formatter.ToPrettyFormat(runtime.TimeOfRunning)} or {runtime.Ticks} step{(runtime.Ticks == 1 ? "" : "s")}. " +
-                        $"Result is: {Output.Count} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(Output.Count == 1 ? "" : "s")}";
+                        $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}" +
+                        $" | Byte code size: {size} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(size == 1 ? "" : "s")}" +
+                        $" | Run in: {Formatter.ToPrettyFormat(runtime.TimeOfRunning)} or {runtime.Ticks} step{(runtime.Ticks == 1 ? "" : "s")}" +
+                        $" | Result is: {Output.Count} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(Output.Count == 1 ? "" : "s")}";
                 }
 
 
@@ -861,6 +860,23 @@ namespace HASM
             foreach (TextEditor tab in tabControl1.TabPages)
             {
                 if (tab != currentTab) tab.Close();
+            }
+        }
+
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            foreach (TextEditor tab in tabControl1.TabPages)
+            {
+                tab.Save();
+            }
+        }
+
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            var tab = (tabControl1.SelectedTab as TextEditor);
+            if (tab != null)
+            {
+                tab.Save();
             }
         }
     }

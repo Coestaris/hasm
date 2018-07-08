@@ -19,11 +19,16 @@ namespace HASMLib.Parser.SyntaxTokens
             part = part.Replace("\r", "");
 
             ParameterNames = part.Split(',').ToList();
+            ParameterRegexes = new List<Regex>();
+
+            foreach (var item in ParameterNames)
+                ParameterRegexes.Add(new Regex(string.Format(FindBaseRegex, item)));
 
             IsParametric = true;
         }
 
         public List<string> ParameterNames;
+        private List<Regex> ParameterRegexes;
 
         public string Expand(string input, out ParseError error)
         {
@@ -44,7 +49,12 @@ namespace HASMLib.Parser.SyntaxTokens
             string expanded = Value;
             for(int i = 0; i < parameters.Count; i++)
             {
-                expanded = expanded.Replace(ParameterNames[i], parameters[i]);
+                var matches = ParameterRegexes[i].Matches(expanded);
+                foreach (Match match in matches)
+                {
+                    expanded = expanded.Remove(match.Index, match.Length);
+                    expanded = expanded.Insert(match.Index, parameters[i]);
+                }
             }
 
             error = null;
