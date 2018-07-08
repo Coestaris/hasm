@@ -879,5 +879,10 @@ namespace HASM
                 tab.Save();
             }
         }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
     }
 }

@@ -19,6 +19,12 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                 return;
             }
 
+            if (enableStack.Contains(false))
+            {
+                error = null;
+                return;
+            }
+
             error = new ParseError(ParseErrorType.Preprocessor_UserDefinedError);
         }
 
