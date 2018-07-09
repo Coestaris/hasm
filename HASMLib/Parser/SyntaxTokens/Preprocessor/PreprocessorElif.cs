@@ -2,6 +2,7 @@
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
@@ -15,18 +16,18 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
         internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
-            if (enableStack.Contains(false))
-            {
-                error = null;
-                return;
-            }
-
             if (enableStack.Count == 0)
             {
                 error = new ParseError(ParseErrorType.Preprocessor_ElseWithoutPreviousConditionals);
                 return;
             }
-            
+
+            if (enableStack.Take(enableStack.Count - 1).Contains(false))
+            {
+                error = null;
+                return;
+            }
+
             PreprocessorIf.AllowDefinedFunction = true;
             PreprocessorIf.defines = defines;
 
