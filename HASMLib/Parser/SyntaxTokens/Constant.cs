@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using HASMLib.Parser.SyntaxTokens.Constants;
+﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
-using HASMLib.Core;
+using HASMLib.Parser.SyntaxTokens.Constants;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HASMLib.Parser.SyntaxTokens
 {
     public class Constant
     {
-        public Int64 Value;
-        public LengthQualifier Length;
+        public Int64 Value { get; internal set; }
+        public LengthQualifier Length { get; internal set; }
 
         public static long TrimValue(long value, LengthQualifier lengthQualifier)
         {
             switch (lengthQualifier)
             {
                 case LengthQualifier.Single:
-                    return (UIntSingle)value;
+                    return (FSingle)value;
                 case LengthQualifier.Double:
-                    return (UIntDouble)value;
+                    return (FDouble)value;
                 case LengthQualifier.Quad:
-                    return (UIntDouble)value;
+                    return (FDouble)value;
             }
 
             return 0;
@@ -80,16 +80,16 @@ namespace HASMLib.Parser.SyntaxTokens
             return new ParseError(ParseErrorType.Syntax_Constant_WrongFormat, 0);
         }
 
-        public List<UIntSingle> ToUInt12()
+        public List<FSingle> ToSingle()
         {
             switch (Length)
             {
                 case LengthQualifier.Single:
-                    return new List<UIntSingle>() { (UIntSingle)Value };
+                    return new List<FSingle>() { (FSingle)Value };
                 case LengthQualifier.Double:
-                    return ((UIntDouble)Value).ToUInt12().ToList();
+                    return ((FDouble)Value).ToSingle().ToList();
                 case LengthQualifier.Quad:
-                    return ((UIntQuad)Value).ToUInt12().ToList();
+                    return ((FQuad)Value).ToSingle().ToList();
             }
             return null;
         }
@@ -99,11 +99,11 @@ namespace HASMLib.Parser.SyntaxTokens
 			switch (Length) 
 			{
 				case LengthQualifier.Single:
-					return new MemZoneFlashElementConstantUInt12 ((UIntSingle)Value, index);
+					return new MemZoneFlashElementConstantSingle ((FSingle)Value, index);
 				case LengthQualifier.Double:
-					return new MemZoneFlashElementConstantUInt24 ((UIntDouble)Value, index);
+					return new MemZoneFlashElementConstantDouble ((FDouble)Value, index);
 				case LengthQualifier.Quad:	
-					return new MemZoneFlashElementConstantUInt48 ((UIntQuad)Value, index);
+					return new MemZoneFlashElementConstantQuad ((FQuad)Value, index);
 			}
 			return null;
 		}

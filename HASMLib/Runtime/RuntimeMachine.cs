@@ -1,11 +1,10 @@
-﻿using HASMLib.Core;
+﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using HASMLib.Parser;
-using System.Linq.Expressions;
 
 namespace HASMLib.Runtime
 {
@@ -13,15 +12,24 @@ namespace HASMLib.Runtime
     public class RuntimeMachine
     {
         internal delegate void RuntimeMachineIOHandler();
-        internal delegate void RuntimeMachineIOBufferHandler(List<UIntSingle> data);
+        internal delegate void RuntimeMachineIOBufferHandler(List<FSingle> data);
+
+        private const string _constantFormat = "_constant{0}";
+        private const string _variableFormat = "_var{0}";
 
         public TimeSpan TimeOfRunning { get; private set; }
-
         public int Ticks { get; internal set; }
+		public bool IsRunning { get; private set; }
+
+        internal List<FSingle> InBuffer;
+        internal FDouble ProgramCounter;
 
         private HASMMachine _machine;
-
         private HASMSource _source;
+
+        internal event RuntimeMachineIOHandler OnBufferFlushed;
+        internal event RuntimeMachineIOHandler OnBufferClosed;
+        internal event RuntimeMachineIOBufferHandler OutBufferUpdated;
 
         public RuntimeMachine(HASMMachine machine, HASMSource source)
         {
@@ -29,23 +37,15 @@ namespace HASMLib.Runtime
             _source = source;
         }
 
-        internal void InbufferRecieved(List<UIntSingle> inBuffer)
+        internal void InbufferRecieved(List<FSingle> inBuffer)
         {
             InBuffer.AddRange(inBuffer);
         }
 
-        internal void OutBytes(List<UIntSingle> bytes)
+        internal void OutBytes(List<FSingle> bytes)
         {
             OutBufferUpdated?.Invoke(bytes);
         }
-
-        internal event RuntimeMachineIOHandler OnBufferFlushed;
-        internal event RuntimeMachineIOHandler OnBufferClosed;
-        internal event RuntimeMachineIOBufferHandler OutBufferUpdated;
-
-        internal List<UIntSingle> InBuffer;
-
-		public bool IsRunning { get; private set; }
 
 		internal int GetGlobalInstructionIndexByLocalOne(int localIndex)
         {
@@ -53,10 +53,7 @@ namespace HASMLib.Runtime
                 .Select(p => (MemZoneFlashElementInstruction)p)
                 .First(p => p.ProgramIndex == localIndex).RuntimeAbsoluteIndex;
         }
-
-        private string _constantFormat = "_constant{0}";
-        private string _variableFormat = "_var{0}";
-
+        
         public RuntimeOutputCode Run()
         {
             DateTime startTime = DateTime.Now;
@@ -64,7 +61,7 @@ namespace HASMLib.Runtime
 			IsRunning = true;
 
             Ticks = 0;
-            InBuffer = new List<UIntSingle>();
+            InBuffer = new List<FSingle>();
             OnBufferFlushed?.Invoke();
 
             var result = RunInternal();
@@ -78,11 +75,9 @@ namespace HASMLib.Runtime
             return result;
         }
 
-        internal UIntDouble CurrentPosition;
-
         private RuntimeOutputCode RunInternal()
         {
-            CurrentPosition = 0;
+            ProgramCounter = 0;
             List<MemZoneFlashElement> data = new List<MemZoneFlashElement>();
             data.AddRange(_source.ParseResult);
 
@@ -91,7 +86,7 @@ namespace HASMLib.Runtime
                 var constant = (MemZoneFlashElementConstant)p;
                 return new NamedConstant(
                     string.Format(_constantFormat, constant.Index),
-                    (UIntDouble)constant.Index,
+                    (FDouble)constant.Index,
                     constant.ToConstant());
             }).ToList();
 
@@ -103,7 +98,7 @@ namespace HASMLib.Runtime
             //Удаляем их из коллекции
             data.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
 
-            UIntDouble globalIndex = 0;
+            FDouble globalIndex = 0;
 
             data.ForEach(p =>
             {
@@ -114,29 +109,29 @@ namespace HASMLib.Runtime
                 globalIndex += 1;
             });
 
-            for (; CurrentPosition < data.Count; CurrentPosition += 1)
+            for (; ProgramCounter < data.Count; ProgramCounter += 1)
             {
                 Ticks++;
 
-                if(data[CurrentPosition].Type == MemZoneFlashElementType.Variable)
+                if(data[ProgramCounter].Type == MemZoneFlashElementType.Variable)
                 {
-                    var var = ((MemZoneFlashElementVariable)data[CurrentPosition]);
+                    var var = ((MemZoneFlashElementVariable)data[ProgramCounter]);
                     switch (var.VariableType)
                     {
                         case LengthQualifier.Single:
-                            _machine.MemZone.RAM.Add(new MemZoneVariableUInt12(0, var.Index, string.Format(_variableFormat, var.Index)));
+                            _machine.MemZone.RAM.Add(new MemZoneVariableSingle(0, var.Index, string.Format(_variableFormat, var.Index)));
                             break;
                         case LengthQualifier.Double:
-                            _machine.MemZone.RAM.Add(new MemZoneVariableUInt24(0, var.Index, string.Format(_variableFormat, var.Index)));
+                            _machine.MemZone.RAM.Add(new MemZoneVariableDouble(0, var.Index, string.Format(_variableFormat, var.Index)));
                             break;
                         case LengthQualifier.Quad:
-                            _machine.MemZone.RAM.Add(new MemZoneVariableUInt48(0, var.Index, string.Format(_variableFormat, var.Index)));
+                            _machine.MemZone.RAM.Add(new MemZoneVariableQuad(0, var.Index, string.Format(_variableFormat, var.Index)));
                             break;
                     }
                     continue;
                 }
 
-                var instruction = (MemZoneFlashElementInstruction)data[CurrentPosition];
+                var instruction = (MemZoneFlashElementInstruction)data[ProgramCounter];
 
                 //Проверяем валидность ссылок
                 foreach (var parameter in instruction.Parameters)

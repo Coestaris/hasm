@@ -9,6 +9,10 @@ namespace HASMLib.Parser.SyntaxTokens
         public static Regex ParametricDefineRegex = new Regex(@"^[A-Za-z_](?:(?!\W)\w)*\(([A-Za-z_](?:(?!\W\s)\w)*(, *?[A-Za-z_](\w)*)*)+\)");
         public static Regex ParametricUsageRegex = new Regex(@"[A-Za-z_](?:(?!\W)\w)*\(([^(),]+(, *?[^(),]+)*)+\)");
 
+        public List<string> ParameterNames { get; private set; }
+
+        private List<Regex> ParameterRegexes;
+
         public ParametricDefine(string name, string value) : base(name.Split('(')[0], value)
         {
             var parts = name.Split('(');
@@ -26,10 +30,6 @@ namespace HASMLib.Parser.SyntaxTokens
 
             IsParametric = true;
         }
-
-        public List<string> ParameterNames;
-        private List<Regex> ParameterRegexes;
-
         public string Expand(string input, out ParseError error)
         {
             var parts = input.Split('(');

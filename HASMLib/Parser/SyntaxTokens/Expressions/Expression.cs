@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using HASMLib.Parser.SyntaxTokens.Preprocessor;
 using System;
@@ -63,13 +64,16 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public static readonly List<Function> Functions = new List<Function>()
         {
             new Function(1, "double", (a) => new Constant(a.Value * 2, a.Length)),
-            new Function(1, "low", (a) => new Constant((UIntSingle)a.Value, LengthQualifier.Single)),
-            new Function(2, "high", (a) => new Constant((UIntSingle)(a.Value >> 12), LengthQualifier.Single)),
-            new Function(2, "tbn2", (a) => new Constant((UIntSingle)(a.Value >> 12), LengthQualifier.Single)),
-            new Function(2, "tbn3", (a) => new Constant((UIntSingle)(a.Value >> 24), LengthQualifier.Single)),
-            new Function(2, "tbn4", (a) => new Constant((UIntSingle)(a.Value >> 36), LengthQualifier.Single)),
-            new Function(1, "lwrd", (a) => new Constant((UIntDouble)(a.Value), LengthQualifier.Double)),
-            new Function(2, "hwrd", (a) => new Constant((UIntDouble)(a.Value >> 24), LengthQualifier.Double)),
+            new Function(1, "low", (a) => new Constant((FSingle)a.Value, LengthQualifier.Single)),
+            new Function(2, "high", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base), LengthQualifier.Single)),
+            new Function(2, "fbn2", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base), LengthQualifier.Single)),
+            new Function(2, "fbn3", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 2), LengthQualifier.Single)),
+            new Function(2, "fbn4", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 3), LengthQualifier.Single)),
+            new Function(2, "byte2", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base), LengthQualifier.Single)),
+            new Function(2, "byte3", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 2), LengthQualifier.Single)),
+            new Function(2, "byte4", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 3), LengthQualifier.Single)),
+            new Function(1, "lwrd", (a) => new Constant((FDouble)(a.Value), LengthQualifier.Double)),
+            new Function(2, "hwrd", (a) => new Constant((FDouble)(a.Value >> (int)HASMBase.Base * 2), LengthQualifier.Double)),
             new Function(2, "exp2", (a) => new Constant(a.Value * a.Value, a.Length)),
             new Function(8, "log2", (a) => new Constant((long)Math.Log(a.Value, 2), a.Length)),
             new Function(2, "abs", (a) => new Constant(Math.Abs(a.Value), a.Length)),

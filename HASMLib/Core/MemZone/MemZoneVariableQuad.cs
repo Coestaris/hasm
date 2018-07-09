@@ -1,24 +1,26 @@
-﻿namespace HASMLib.Core.MemoryZone
-{
-    internal class MemZoneVariableUInt48 : MemZoneVariable
-    {
-        public UIntQuad Value;
+﻿using HASMLib.Core.BaseTypes;
 
-        public MemZoneVariableUInt48(UIntQuad value, string name)
+namespace HASMLib.Core.MemoryZone
+{
+    internal class MemZoneVariableQuad : MemZoneVariable
+    {
+        public FQuad Value { get; internal set; }
+
+        public MemZoneVariableQuad(FQuad value, string name)
         {
             Length = LengthQualifier.Quad;
             Value = value;
             Name = name;
         }
 
-        public MemZoneVariableUInt48(UIntQuad value, int uid)
+        public MemZoneVariableQuad(FQuad value, int uid)
         {
             Length = LengthQualifier.Quad;
             Value = value;
             Index = uid;
         }
 
-        public MemZoneVariableUInt48(UIntQuad value, int uid, string name)
+        public MemZoneVariableQuad(FQuad value, int uid, string name)
         {
             Length = LengthQualifier.Quad;
             Value = value;

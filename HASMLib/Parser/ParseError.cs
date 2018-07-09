@@ -2,7 +2,6 @@
 
 namespace HASMLib.Parser
 {
-
     public class ParseError
     {
 		private const int NullValue = -1;

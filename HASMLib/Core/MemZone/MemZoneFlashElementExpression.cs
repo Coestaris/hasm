@@ -1,7 +1,6 @@
-﻿using HASMLib.Parser;
+﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using System;
-using System.Collections.Generic;
 
 namespace HASMLib.Core.MemoryZone
 {
@@ -11,13 +10,11 @@ namespace HASMLib.Core.MemoryZone
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Expression;
 
-        public List<ObjectReference> Dependencies;
+        public Expression Expression { get; private set; }
 
-        public Expression Expression; 
+        public FDouble Index { get; private set; }
 
-        public UIntDouble Index;
-
-        public MemZoneFlashElementExpression(Expression expression, UIntDouble index)
+        public MemZoneFlashElementExpression(Expression expression, FDouble index)
         {
             Index = index;
             Expression = expression;

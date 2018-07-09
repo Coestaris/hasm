@@ -1,5 +1,4 @@
-﻿using HASMLib.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -8,22 +7,22 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 {
     public class SourceLineInstruction : SourceLine
     {
-        public string Label;
-        public Instruction Instruction;
-        public string[] Parameters;
+        private static Regex LabelRegex = new Regex(@"^\w{1,100}:");
+        private static List<Instruction> _instructions;
 
         private const string LabelReplaceChar = "";
-        private const char LabelTrimChar = ':';
-        private static Regex LabelRegex = new Regex(@"^\w{1,100}:");
-
-        private string input;
-
         private const int ArgumentInstructionIndex = 0;
         private const int ArgumentArgumentsIndex = 1;
         private const char ArgumentSplitChar = ',';
         private const char GetStringPartsSplitChar = ' ';
+        private const char LabelTrimChar = ':';
 
+        public string Label { get; private set; }
+        public Instruction Instruction { get; private set; }
+        public string[] Parameters { get; private set; }
         public bool IsEmpty => Instruction == null;
+
+        private string input;
 
         public override string ToString()
         {
@@ -31,7 +30,11 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
             {
                 return $"{Instruction.NameString} {string.Join(" ", Parameters)}";
             }
-            return $"No instruction line.{(string.IsNullOrEmpty(Label) ? "" : " [has label]")} {(Comment == null ? "" : " [has comment]")}";
+            else if(Instruction == null && string.IsNullOrEmpty(Label) && string.IsNullOrEmpty(Comment))
+            {
+                return $"Empty line";
+            } 
+            else return $"No instruction line.{(string.IsNullOrEmpty(Label) ? "" : " [has label]")} {(Comment == null ? "" : " [has comment]")}";
         }
 
         public static List<Instruction> Instructions
@@ -55,12 +58,12 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         }
 
-        public SourceLineInstruction(string input)
+        public SourceLineInstruction(string input, int index = -1, string filename = null)
         {
             this.input = input;
+            LineIndex = index;
+            FileName = filename;
         }
-
-        private static List<Instruction> _instructions;
         
         private void FindAndDeleteLabel(ref string input)
         {
@@ -130,7 +133,8 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
                     if(stringParts.Length == 2)
                     {
                         //Выделяем со строки параметры в отдельный массив
-                        SplitLineIntoArguments(stringParts, out var instructionName, out Parameters);
+                        SplitLineIntoArguments(stringParts, out var instructionName, out var parameters);
+                        Parameters = parameters;
                     }
 
                     Instruction = instruction;

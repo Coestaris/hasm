@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
             if(result.HasFlag(ComapreResult.Equal))
             {
-                UIntDouble position = (UIntDouble)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+                FDouble position = (FDouble)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
 
                 RuntimeMachineJump(position, runtimeMachine);
             }

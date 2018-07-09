@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HASMLib.Parser.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             CanAddNewLines = false;
         }
 
-        protected override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
+        internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
             if(enableStack.Contains(false))
             {
@@ -52,7 +53,9 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                     return;
                 }
 
-                Define.ResolveDefines(defines, ref newDef.Value, -1, null);
+                var value = newDef.Value;
+                Define.ResolveDefines(defines, ref value, -1, null);
+                newDef.Value = value;
                 defines.Add(newDef);
                 
                 error = null;
@@ -79,7 +82,9 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             else
             {
                 var newDef = new Define(name, string.Join(" ", parts.Skip(1)));
-                Define.ResolveDefines(defines, ref newDef.Value, -1, null);
+                var value = newDef.Value;
+                Define.ResolveDefines(defines, ref value, -1, null);
+                newDef.Value = value;
                 defines.Add(newDef);
             }
 
@@ -87,7 +92,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         }
 
         //Для include
-        protected override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
+        internal override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
         {
             throw new NotSupportedException();
         }

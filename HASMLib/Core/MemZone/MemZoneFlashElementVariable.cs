@@ -1,13 +1,12 @@
-﻿using HASMLib.Core;
-using HASMLib.Core.MemoryZone;
+﻿using HASMLib.Core.BaseTypes;
 using System.Collections.Generic;
 
 namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneFlashElementVariable : MemZoneFlashElement
     {
-		public UIntDouble Index;
-		public LengthQualifier VariableType;
+		public FDouble Index { get; private set; }
+		public LengthQualifier VariableType { get; private set; }
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Variable;
 		public override int FixedSize => (1 + 3 + 1) * 8 / (int)HASMBase.Base;
@@ -24,7 +23,7 @@ namespace HASMLib.Core.MemoryZone
 			return bytes.ToArray();
 		}
 
-		public MemZoneFlashElementVariable(UIntDouble index, LengthQualifier type)
+		public MemZoneFlashElementVariable(FDouble index, LengthQualifier type)
 		{
 			Index = index;
 			VariableType = type;

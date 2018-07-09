@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
 using System;
@@ -46,7 +47,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             if (a > b) result |= ComapreResult.Greater;
             if (a < b) result |= ComapreResult.Less;
 
-            memZone.Stack.Push((UIntSingle)(int)result);
+            memZone.Stack.Push((FSingle)(int)result);
 
             return RuntimeOutputCode.OK;
         }

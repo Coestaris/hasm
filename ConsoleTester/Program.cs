@@ -146,7 +146,7 @@ namespace ConsoleTester
         static void Main(string[] args)
         {
             HASMBase.Base = 8;
-            UIntDouble i = (UInt32)10;
+            FDouble i = (UInt32)10;
 
             i++;
             i++;

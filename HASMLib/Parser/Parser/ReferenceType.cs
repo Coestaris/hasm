@@ -4,9 +4,7 @@
     {
         Constant,
         Variable,
-
         Expression,
-
         Define
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace HASMLib.Core
+﻿namespace HASMLib.Core.BaseTypes
 {
     public enum LengthQualifier
     {

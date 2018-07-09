@@ -2,8 +2,5 @@
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions.Exceptions
 {
-    public class WrongTokenException : Exception
-    {
-        
-    }
+    public class WrongTokenException : Exception { }
 }

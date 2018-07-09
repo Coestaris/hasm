@@ -1,10 +1,8 @@
-﻿using HASMLib.Core;
+﻿using HASMLib.Core.BaseTypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Runtime
 {
@@ -12,9 +10,9 @@ namespace HASMLib.Runtime
     {
         private RuntimeMachine _runtimeMachine;
 
-        private List<UIntSingle> _buffer;
+        private List<FSingle> _buffer;
 
-        private void UpdateBuffer(List<UIntSingle> inBuffer)
+        private void UpdateBuffer(List<FSingle> inBuffer)
         {
             _buffer.AddRange(inBuffer);
         }
@@ -79,17 +77,17 @@ namespace HASMLib.Runtime
 
         public void Flush()
         {
-            _buffer = new List<UIntSingle>();
+            _buffer = new List<FSingle>();
         }
 
-        public List<UIntSingle> ReadAll()
+        public List<FSingle> ReadAll()
         {
-            UIntSingle[] buffer = new UIntSingle[Length];
+            FSingle[] buffer = new FSingle[Length];
             Read(buffer, 0, (int)Length);
             return buffer.ToList();
         }
 
-        public int Read(UIntSingle[] buffer, int offset, int count)
+        public int Read(FSingle[] buffer, int offset, int count)
         {
             if (count > _buffer.Count)
                 throw new ArgumentException();
@@ -109,9 +107,9 @@ namespace HASMLib.Runtime
             throw new NotSupportedException();
         }
 
-        public void Write(UIntSingle[] buffer, int offset, int count)
+        public void Write(FSingle[] buffer, int offset, int count)
         {
-            List<UIntSingle> inBuffer = buffer.Skip(offset).Take(count).ToList();
+            List<FSingle> inBuffer = buffer.Skip(offset).Take(count).ToList();
             _runtimeMachine.InbufferRecieved(inBuffer);
         }
     }

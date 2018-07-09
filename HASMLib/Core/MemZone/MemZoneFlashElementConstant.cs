@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Core.BaseTypes;
 
 namespace HASMLib.Core.MemoryZone
 {
@@ -8,8 +8,8 @@ namespace HASMLib.Core.MemoryZone
     {
 		public int Index;
 
-		protected LengthQualifier Length;
-        protected UIntSingle[] Value;
+		protected LengthQualifier Length { get; set; }
+        protected FSingle[] Value { get; set; }
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Constant;
 		public override int FixedSize 
@@ -31,8 +31,8 @@ namespace HASMLib.Core.MemoryZone
             switch (Length)
             {
                 case LengthQualifier.Single : return new Constant(Value[0], LengthQualifier.Single);
-                case LengthQualifier.Double : return new Constant(UIntDouble.FromUInt12(Value), LengthQualifier.Double);
-                case LengthQualifier.Quad   : return new Constant(UIntQuad.FromUInt12(Value), LengthQualifier.Quad);
+                case LengthQualifier.Double : return new Constant(FDouble.FromSingle(Value), LengthQualifier.Double);
+                case LengthQualifier.Quad   : return new Constant(FQuad.FromSingle(Value), LengthQualifier.Quad);
                 default                     : return null;
             }
         }
@@ -45,7 +45,7 @@ namespace HASMLib.Core.MemoryZone
 			// 4. (n bytes) - data
 			List<byte> bytes = new List<byte>();
 			bytes.Add(Element_Const);					// Is Const;
-			bytes.AddRange(((UIntDouble)Index).ToBytes()); 	// Global Index
+			bytes.AddRange(((FDouble)Index).ToBytes()); 	// Global Index
 			bytes.Add((byte)Length);							// Length of const
 			foreach (var item in Value) {
 				bytes.AddRange (item.ToBytes());		// Data

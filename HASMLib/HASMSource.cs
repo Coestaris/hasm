@@ -10,12 +10,10 @@ namespace HASMLib
     public class HASMSource
     {
         public TimeSpan ParseTime { get; private set; }
-
         public string Source { get; set; }
-
         public string BaseFilename { get; set; }
-
         public string WorkingDirectory { get; set; }
+		public List<MemZoneFlashElement> ParseResult { get; private set; }
 
         public HASMSource(HASMMachine machine, string fileName, string workingDirectory = null)
         {
@@ -37,7 +35,6 @@ namespace HASMLib
 			Machine = machine;
         }
 
-		public List<MemZoneFlashElement> ParseResult { get; private set; }
 
 		public HASMMachine Machine { get ; set; }
 

@@ -4,7 +4,6 @@
     {
         UnknownConstantReference,
         UnknownVariableReference,
-
         OK,
         StackOverFlow
     }

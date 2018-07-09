@@ -1,4 +1,6 @@
-﻿namespace HASMLib.Core.MemoryZone
+﻿using HASMLib.Core.BaseTypes;
+
+namespace HASMLib.Core.MemoryZone
 {
 	public class MemZoneFlashElementConstantDummy : MemZoneFlashElementConstant
     {
@@ -10,27 +12,27 @@
 		}
 
         //MAKE CONSTANT NOT DUMMY AGAIN!
-        public void UpdateValue(UIntSingle value, int index)
+        public void UpdateValue(FSingle value, int index)
         {
             isEmpty = false;
             Length = LengthQualifier.Single;
-            Value = new UIntSingle[] { value };
+            Value = new FSingle[] { value };
         }
 
-        public void UpdateValue(UIntDouble value, int index)
+        public void UpdateValue(FDouble value, int index)
         {
             isEmpty = false;
 
             Length = LengthQualifier.Double;
-            Value = value.ToUInt12();
+            Value = value.ToSingle();
         }
 
-        public void UpdateValue(UIntQuad value, int index)
+        public void UpdateValue(FQuad value, int index)
         {
             isEmpty = false;
 
             Length = LengthQualifier.Quad;
-            Value = value.ToUInt12();
+            Value = value.ToSingle();
         }
     }
 }

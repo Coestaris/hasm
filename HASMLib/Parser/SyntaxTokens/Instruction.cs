@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Runtime;
@@ -15,21 +16,21 @@ namespace HASMLib.Parser.SyntaxTokens
         public int ParameterCount { get; protected set; }
         public List<InstructionParameterType> ParameterTypes { get; protected set; }
 
-        protected MemZoneVariable GetVar(MemZone mz, UIntDouble index)
+        protected MemZoneVariable GetVar(MemZone mz, FDouble index)
         {
             return mz.RAM.Find(p => p.Index == index);
         }
 
-        protected NamedConstant GetConst(List<NamedConstant> constants, UIntDouble index)
+        protected NamedConstant GetConst(List<NamedConstant> constants, FDouble index)
         {
             return constants.Find(p => p.Index == index);
         }
 
-        public void RuntimeMachineJump(UIntDouble position, RuntimeMachine runtimeMachine)
+        public void RuntimeMachineJump(FDouble position, RuntimeMachine runtimeMachine)
         {
             var localIndex = position;
             var globalIndex = runtimeMachine.GetGlobalInstructionIndexByLocalOne(localIndex);
-            runtimeMachine.CurrentPosition = (UIntDouble)(globalIndex - 1);
+            runtimeMachine.ProgramCounter = (FDouble)(globalIndex - 1);
         }
 
         public Constant GetNumericValue(int index, MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)

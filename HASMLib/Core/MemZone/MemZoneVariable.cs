@@ -1,4 +1,4 @@
-﻿using HASMLib.Parser.SyntaxTokens;
+﻿using HASMLib.Core.BaseTypes;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,6 +6,10 @@ namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneVariable
     {
+        public LengthQualifier Length { get; protected set; }
+        public string Name { get; protected set; }
+        public int Index { get; protected set; }
+
         public void AddValue(MemZoneVariable value)
         {
             AddValue(value.GetNumericValue());
@@ -16,16 +20,16 @@ namespace HASMLib.Core.MemoryZone
             SetValue(value.GetNumericValue());
         }
 
-        public List<UIntSingle> ToUInt12()
+        public List<FSingle> ToSingle()
         {
             switch(Length)
             {
                 case LengthQualifier.Single:
-                    return new List<UIntSingle> { (this as MemZoneVariableUInt12).Value };
+                    return new List<FSingle> { (this as MemZoneVariableSingle).Value };
                 case LengthQualifier.Double:
-                    return (this as MemZoneVariableUInt24).Value.ToUInt12().ToList();
+                    return (this as MemZoneVariableDouble).Value.ToSingle().ToList();
                 case LengthQualifier.Quad:
-                    return (this as MemZoneVariableUInt48).Value.ToUInt12().ToList();
+                    return (this as MemZoneVariableQuad).Value.ToSingle().ToList();
                 default:
                     return null;
             }
@@ -36,13 +40,13 @@ namespace HASMLib.Core.MemoryZone
             switch (Length)
             {
                 case LengthQualifier.Single:
-                    (this as MemZoneVariableUInt12).Value = (UIntSingle)value;
+                    (this as MemZoneVariableSingle).Value = (FSingle)value;
                     break;
                 case LengthQualifier.Double:
-                    (this as MemZoneVariableUInt24).Value = (UIntDouble)value;
+                    (this as MemZoneVariableDouble).Value = (FDouble)value;
                     break;
                 case LengthQualifier.Quad:
-                    (this as MemZoneVariableUInt48).Value = (UIntQuad)value;
+                    (this as MemZoneVariableQuad).Value = (FQuad)value;
                     break;
             }
         }
@@ -52,13 +56,13 @@ namespace HASMLib.Core.MemoryZone
             switch (Length)
             {
                 case LengthQualifier.Single:
-                    (this as MemZoneVariableUInt12).Value += (UIntSingle)value;
+                    (this as MemZoneVariableSingle).Value += (FSingle)value;
                     break;
                 case LengthQualifier.Double:
-                    (this as MemZoneVariableUInt24).Value += (UIntDouble)value;
+                    (this as MemZoneVariableDouble).Value += (FDouble)value;
                     break;
                 case LengthQualifier.Quad:
-                    (this as MemZoneVariableUInt48).Value += (UIntQuad)value;
+                    (this as MemZoneVariableQuad).Value += (FQuad)value;
                     break;
             }
         }
@@ -68,20 +72,15 @@ namespace HASMLib.Core.MemoryZone
             switch (Length)
             {
                 case LengthQualifier.Single:
-                    return (this as MemZoneVariableUInt12).Value;
+                    return (this as MemZoneVariableSingle).Value;
                 case LengthQualifier.Double:
-                    return (this as MemZoneVariableUInt24).Value;
+                    return (this as MemZoneVariableDouble).Value;
                 case LengthQualifier.Quad:
-                    return (this as MemZoneVariableUInt48).Value;
+                    return (this as MemZoneVariableQuad).Value;
 
                 default:
                     return 0;
             }
         }
-
-        public LengthQualifier Length;
-
-        public string Name;
-        public int Index;
     }
 }

@@ -8,6 +8,16 @@ namespace HASMLib
 {
     public class HASMMachine
     {
+        public UInt32 RegisterCount { get; set; }
+        public UInt32 RAM { get; set; }
+        public UInt32 EEPROM { get; set; }
+        public UInt32 Flash { get; set; }
+        public MemZone MemZone;
+        public List<Define> UserDefinedDefines { get; set; }
+        public HASMMachineBannedFeatures BannedFeatures { get; set; }
+
+        private string _registerNameFormat;
+
         public HASMMachine(uint ram, uint eeprom, uint flash, int hasmBase = 8)
         {
             SetBase(hasmBase);
@@ -43,20 +53,6 @@ namespace HASMLib
 				a.Add(string.Format(_registerNameFormat, i));
 			return a;
 		}
-
-        public UInt32 RegisterCount;
-
-        public UInt32 RAM { get; set; }
-        public UInt32 EEPROM { get; set; }
-        public UInt32 Flash { get; set; }
-
-        public MemZone MemZone;
-
-        public List<Define> UserDefinedDefines { get; set; }
-
-        public HASMMachineBannedFeatures BannedFeatures { get; set; }
-
-		private string _registerNameFormat;
 
         public RuntimeMachine CreateRuntimeMachine(HASMSource source, IOStream iostream = null)
         {

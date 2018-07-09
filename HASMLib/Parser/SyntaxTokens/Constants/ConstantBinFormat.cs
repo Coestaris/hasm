@@ -1,4 +1,4 @@
-﻿using HASMLib.Core;
+﻿using HASMLib.Core.BaseTypes;
 using System;
 using System.Text.RegularExpressions;
 

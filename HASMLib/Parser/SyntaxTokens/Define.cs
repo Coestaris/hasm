@@ -8,13 +8,10 @@ namespace HASMLib.Parser.SyntaxTokens
         public static Regex GeneralDefineNameRegex = new Regex(@"^\D\w*");
         public static string FindBaseRegex = @"(^{0}(?=\W))|((?<=\W){0}(?=\W))|((?<=\W){0}$)";
 
-        public Regex FindRegex;
-
-        public bool IsParametric;
-
-        public string Name;
-        public string Value;
-
+        public Regex FindRegex { get; private set; }
+        public bool IsParametric { get; protected set; }
+        public string Name { get; private set; }
+        public string Value { get; internal set; }
         public bool IsEmpty => string.IsNullOrEmpty(Value);
 
         private void InitRegex()

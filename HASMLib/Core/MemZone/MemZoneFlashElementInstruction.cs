@@ -1,20 +1,17 @@
-﻿using HASMLib.Parser.SyntaxTokens;
-using System.Linq;
-using System.Collections.Generic;
-using System;
+﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Parser;
+using HASMLib.Parser.SyntaxTokens;
+using System.Collections.Generic;
 
 namespace HASMLib.Core.MemoryZone
 {
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
-        public UIntDouble InstructionNumber;
-        public List<ObjectReference> Parameters;
-        public UIntDouble ProgramIndex;
-
-        public UIntDouble RuntimeAbsoluteIndex;
-
-
+        public FDouble InstructionNumber { get; private set; }
+        public List<ObjectReference> Parameters { get; private set; }
+        public FDouble ProgramIndex { get; private set; }
+        public FDouble RuntimeAbsoluteIndex { get; internal set; }
+        
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
 
         public override int FixedSize
@@ -54,7 +51,7 @@ namespace HASMLib.Core.MemoryZone
             return bytes.ToArray();
         }
 
-        public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, UIntDouble index)
+        public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, FDouble index)
         {
             InstructionNumber = instruction.Index;
             Parameters = arguments;

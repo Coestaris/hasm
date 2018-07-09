@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HASMLib.Parser.Parser;
+using System;
 using System.Collections.Generic;
 
 namespace HASMLib.Parser.SyntaxTokens.Preprocessor
@@ -11,7 +12,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             CanAddNewLines = false;
         }
 
-        protected override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
+        internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
             if (enableStack.Contains(false))
             {
@@ -30,7 +31,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         }
 
         //Для include
-        protected override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, RecursiveParseResult> recursiveFunc)
+        internal override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
         {
             throw new NotSupportedException();
         }

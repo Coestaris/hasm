@@ -1,16 +1,15 @@
-﻿using HASMLib.Core;
+﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 
 namespace HASMLib.Parser
 {
     public class ObjectReference
     {
-        public UIntDouble Index;
-        public ReferenceType Type;
+        public FDouble Index { get; private set; }
+        public ReferenceType Type { get; private set; }
+        public MemZoneFlashElement Object { get; internal set; }
 
-        public MemZoneFlashElement Object;
-
-        public ObjectReference(UIntDouble index, ReferenceType type)
+        public ObjectReference(FDouble index, ReferenceType type)
         {
             Index = index;
             Type = type;

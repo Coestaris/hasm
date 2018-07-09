@@ -2,8 +2,5 @@
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions.Exceptions
 {
-    public class NotAllowedDefinedFunctionException : Exception
-    {
-        
-    }
+    public class NotAllowedDefinedFunctionException : Exception { }
 }

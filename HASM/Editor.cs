@@ -1,7 +1,7 @@
 ﻿using FastColoredTextBoxNS;
 using HASM.Classes;
 using HASMLib;
-using HASMLib.Core;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Parser;
 using HASMLib.Runtime;
 
@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -33,7 +32,7 @@ namespace HASM
 
         private Thread runThread;
 
-        private List<UIntSingle> Output;
+        private List<FSingle> Output;
       
         public void Run(string FileName)
         {

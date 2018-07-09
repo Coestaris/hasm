@@ -1,24 +1,26 @@
-﻿namespace HASMLib.Core.MemoryZone
-{
-    internal class MemZoneVariableUInt12 : MemZoneVariable
-    {
-        public UIntSingle Value;
+﻿using HASMLib.Core.BaseTypes;
 
-        public MemZoneVariableUInt12(UIntSingle value, string name)
+namespace HASMLib.Core.MemoryZone
+{
+    internal class MemZoneVariableSingle : MemZoneVariable
+    {
+        public FSingle Value { get; internal set; }
+
+        public MemZoneVariableSingle(FSingle value, string name)
         {
             Length = LengthQualifier.Single;
             Value = value;
             Name = name;
         }
 
-        public MemZoneVariableUInt12(UIntSingle value, int uid)
+        public MemZoneVariableSingle(FSingle value, int uid)
         {
             Length = LengthQualifier.Single;
             Value = value;
             Index = uid;
         }
 
-        public MemZoneVariableUInt12(UIntSingle value, int uid, string name)
+        public MemZoneVariableSingle(FSingle value, int uid, string name)
         {
             Length = LengthQualifier.Single;
             Value = value;

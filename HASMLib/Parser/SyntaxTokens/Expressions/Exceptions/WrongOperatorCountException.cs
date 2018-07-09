@@ -2,8 +2,5 @@
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions.Exceptions
 {
-    internal class WrongOperatorCountException : Exception
-    {
-      
-    }
+    internal class WrongOperatorCountException : Exception { }
 }
