@@ -8,10 +8,10 @@ namespace HASMLib.Parser
     {
         public MemZoneFlashElementConstant FEReference { get; internal set; }
         public string Name { get; private set; }
-        public FDouble Index { get; private set; }
+        public Integer Index { get; private set; }
         public Constant Constant { get; internal set; }
 
-        public NamedConstant(string name, FDouble index, Constant value)
+        public NamedConstant(string name, Integer index, Constant value)
         {
             Name = name;
             Index = index;

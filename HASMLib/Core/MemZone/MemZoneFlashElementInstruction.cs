@@ -7,10 +7,10 @@ namespace HASMLib.Core.MemoryZone
 {
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
-        public FDouble InstructionNumber { get; private set; }
+        public Integer InstructionNumber { get; private set; }
         public List<ObjectReference> Parameters { get; private set; }
-        public FDouble ProgramIndex { get; private set; }
-        public FDouble RuntimeAbsoluteIndex { get; internal set; }
+        public Integer ProgramIndex { get; private set; }
+        public Integer RuntimeAbsoluteIndex { get; internal set; }
         
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
 
@@ -51,7 +51,7 @@ namespace HASMLib.Core.MemoryZone
             return bytes.ToArray();
         }
 
-        public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, FDouble index)
+        public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, Integer index)
         {
             InstructionNumber = instruction.Index;
             Parameters = arguments;

@@ -1,5 +1,4 @@
-﻿using HASMLib.Core;
-using HASMLib.Core.BaseTypes;
+﻿using HASMLib.Core.BaseTypes;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -9,48 +8,38 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
     {
         public virtual Regex Regex { get; }
 
-        public bool CheckMaxValues(long value, LengthQualifier qualifier)
+        public bool CheckMaxValues(long value, BaseIntegerType type)
         {
-            switch (qualifier)
-            {
-                case LengthQualifier.Single:
-                    return value > (long)HASMBase.SingleMaxValue;
-                case LengthQualifier.Double:
-                    return value > (long)HASMBase.DoubleMaxValue;
-                case LengthQualifier.Quad:
-                    return value > (long)HASMBase.QuadMaxValue;
-                default:
-                    return false;
-            }
+            return ((ulong)value > type.MaxValue) || (value < type.MinValue);
         }
 
         public ParseError Parse(string str, out Constant constant)
         {
-            if (str.Last() == 's' || str.Last() == 'q' || (str.Last() == 'd' && str[str.Length - 2] == '_'))
+            if(str.Contains('_'))
             {
-
-                char c = str.Last();
-                str = str.Remove(str.Length - 2, 2);
-
-                switch (c)
+                var parts = str.Split('_');
+                if(parts.Length != 2)
                 {
-                    case 's':
-                        return Parse(str, LengthQualifier.Single, out constant);
-                    case 'd':
-                        return Parse(str, LengthQualifier.Double, out constant);
-                    case 'q':
-                        return Parse(str, LengthQualifier.Quad, out constant);
-                    default:
-                        constant = null;
-                        return new ParseError(ParseErrorType.Syntax_Constant_UnknownConstantLengthQualifier);
+                    constant = null;
+                    return new ParseError(ParseErrorType.Syntax_Constant_WrongFormat);
                 }
+
+                var type = BaseIntegerType.Types.Find(p => p.Name == parts[0]);
+
+                if(type == null)
+                {
+                    constant = null;
+                    return new ParseError(ParseErrorType.Syntax_Constant_WrongType);
+                }
+
+                return Parse(parts[1], type, out constant);
             }
             else
             {
-                return Parse(str, LengthQualifier.Single, out constant);
+                return Parse(str, BaseIntegerType.CommonType, out constant);
             }
         }
 
-        protected virtual ParseError Parse(string str, LengthQualifier Length, out Constant constant) { constant = null; return null; }
+        protected virtual ParseError Parse(string str, BaseIntegerType type, out Constant constant) { constant = null; return null; }
     }
 }

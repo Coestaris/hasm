@@ -29,7 +29,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
             if(result.HasFlag(ComapreResult.Equal))
             {
-                FDouble position = (FDouble)GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+                Integer position = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
 
                 RuntimeMachineJump(position, runtimeMachine);
             }

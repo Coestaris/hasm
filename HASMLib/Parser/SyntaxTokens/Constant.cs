@@ -9,24 +9,8 @@ namespace HASMLib.Parser.SyntaxTokens
 {
     public class Constant
     {
-        public Int64 Value { get; internal set; }
-        public LengthQualifier Length { get; internal set; }
-
-        public static long TrimValue(long value, LengthQualifier lengthQualifier)
-        {
-            switch (lengthQualifier)
-            {
-                case LengthQualifier.Single:
-                    return (FSingle)value;
-                case LengthQualifier.Double:
-                    return (FDouble)value;
-                case LengthQualifier.Quad:
-                    return (FDouble)value;
-            }
-
-            return 0;
-        }
-
+        public Integer Value;
+                
         public bool AsBool()
         {
             return Value == 1;
@@ -34,23 +18,16 @@ namespace HASMLib.Parser.SyntaxTokens
 
         internal Constant() { }
 
-        internal Constant(bool value) : this(value ? 1 : 0, LengthQualifier.Single) { }
-
-        public static LengthQualifier GetQualifier(LengthQualifier a, LengthQualifier b)
-        {
-            return (LengthQualifier)Math.Max((int)a, (int)b);
-        }
+        internal Constant(bool value) : this(value ? 1 : 0) { }
 
         internal Constant(MemZoneVariable variable)
         {
-            Length = variable.Length;
-            Value = variable.GetNumericValue();
+            Value = variable.Value;
         }
 
-        internal Constant(Int64 value, LengthQualifier lq)
+        internal Constant(Integer value)
         {
-            Length = lq;
-            Value = TrimValue(value, lq);
+            Value = value;
         }
 
         private static List<ConstantFormat> _formats = new List<ConstantFormat>()
@@ -62,10 +39,7 @@ namespace HASMLib.Parser.SyntaxTokens
 
         public override string ToString()
         {
-            return string.Format("Constant[{0}{1}]", Value, 
-                    (Length == LengthQualifier.Single ? 's' :
-                     Length == LengthQualifier.Double ? 'd' :
-                     'q'));
+            return string.Format("Constant[{0}]", Value.ToString());
         }
 
         public static ParseError Parse(string value, out Constant constant)
@@ -80,32 +54,14 @@ namespace HASMLib.Parser.SyntaxTokens
             return new ParseError(ParseErrorType.Syntax_Constant_WrongFormat, 0);
         }
 
-        public List<FSingle> ToSingle()
+        internal List<Integer> ToPrimitive()
         {
-            switch (Length)
-            {
-                case LengthQualifier.Single:
-                    return new List<FSingle>() { (FSingle)Value };
-                case LengthQualifier.Double:
-                    return ((FDouble)Value).ToSingle().ToList();
-                case LengthQualifier.Quad:
-                    return ((FQuad)Value).ToSingle().ToList();
-            }
-            return null;
+            return Value.Cast(BaseIntegerType.PrimitiveType);
         }
 
         public MemZoneFlashElementConstant ToFlashElement(int index)
 		{
-			switch (Length) 
-			{
-				case LengthQualifier.Single:
-					return new MemZoneFlashElementConstantSingle ((FSingle)Value, index);
-				case LengthQualifier.Double:
-					return new MemZoneFlashElementConstantDouble ((FDouble)Value, index);
-				case LengthQualifier.Quad:	
-					return new MemZoneFlashElementConstantQuad ((FQuad)Value, index);
-			}
-			return null;
+            return new MemZoneFlashElementConstant(Value, index);
 		}
     }
 }

@@ -32,7 +32,7 @@ namespace HASM
 
         private Thread runThread;
 
-        private List<FSingle> Output;
+        private List<Integer> Output;
       
         public void Run(string FileName)
         {

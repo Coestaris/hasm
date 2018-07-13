@@ -1,62 +1,72 @@
-﻿using System;
+﻿using HASMLib.Core.BaseTypes;
+using System;
+using System.Collections.Generic;
 
 namespace HASMLib.Core
 {
     public static class HASMBase
     {
-        private static uint _base;
-
-        private static ulong singleBase;
-        private static ulong doubleBase;
-        private static ulong quadBase;
-
-        private static ulong singleMaxValue;
-        private static ulong doubleMaxValue;
-        private static ulong quadMaxValue;
-
-        private static ulong singleBitMask;
-        private static ulong doubleBitMask;
-        private static ulong quadBitMask;
+        private static int _base;
 
         private static bool _set = false;
 
-        public static uint Base
+        public static int Base
         {
             get => _base;
             set
             {
-                if (value > 16)
-                    throw new ArgumentException("Пока битность не может превышать 16");
-
-                if(value <= 0)
-                    throw new ArgumentException("Битность должна быть больше 0");
-
-
-                _set = true;
-
                 _base = value;
-                singleBase = _base;
-                doubleBase = _base * 2u;
-                quadBase = _base * 4u;
+                _set = true;
+                switch (value)
+                {
+                    case (64):
+                    case (32):
+                    case (16):
+                    case (8):
+                        BaseIntegerType.Types = new List<BaseIntegerType>()
+                        {
+                            new BaseIntegerType(64, false, "ulong"),
+                            new BaseIntegerType(64, true , "long"),
+                            new BaseIntegerType(32, false, "uint"),
+                            new BaseIntegerType(32, true , "int"),
+                            new BaseIntegerType(16, false, "ushort"),
+                            new BaseIntegerType(16, true , "short"),
+                            new BaseIntegerType(8, false,  "byte"),
+                            new BaseIntegerType(8, true,   "sbyte")
+                        };
+                        BaseIntegerType.PrimitiveType = BaseIntegerType.Types.Find(p => p.Name == "byte");
+                        break;
+                    default:
+                        if (BaseIntegerType.Types == null || 
+                            BaseIntegerType.CommonType == null ||
+                            BaseIntegerType.CommonSignedType == null)
+                            throw new InvalidOperationException("Если указанная битность не 64, 32, 16 или 8 вы должны сами указать все базовые типы");
+                        break;
+                }
 
-                singleMaxValue = (ulong)Math.Pow(2, singleBase);
-                doubleMaxValue = (ulong)Math.Pow(2, doubleBase);
-                quadMaxValue = (ulong)Math.Pow(2, quadBase);
+                switch (value)
+                {
+                    case (64):
+                        BaseIntegerType.CommonType = BaseIntegerType.Types.Find(p => p.Name == "ulong");
+                        BaseIntegerType.CommonSignedType = BaseIntegerType.Types.Find(p => p.Name == "long");
+                        break;
 
-                singleBitMask = singleMaxValue - 1;
-                doubleBitMask = doubleMaxValue - 1;
-                quadBitMask = quadMaxValue - 1;
+                    case (32):
+                        BaseIntegerType.CommonType = BaseIntegerType.Types.Find(p => p.Name == "uint");
+                        BaseIntegerType.CommonSignedType = BaseIntegerType.Types.Find(p => p.Name == "int");
+                        break;
+
+                    case (16):
+                        BaseIntegerType.CommonType = BaseIntegerType.Types.Find(p => p.Name == "ulong");
+                        BaseIntegerType.CommonSignedType = BaseIntegerType.Types.Find(p => p.Name == "short");
+                        break;
+
+                    case (8):
+                        BaseIntegerType.CommonType = BaseIntegerType.Types.Find(p => p.Name == "byte");
+                        BaseIntegerType.CommonSignedType = BaseIntegerType.Types.Find(p => p.Name == "sbyte");
+                        break;
+                }
             }
         }
-
-        internal static ulong SingleBase        { get => !_set ? throw new InvalidOperationException() : singleBase; }
-        internal static ulong DoubleBase        { get => !_set ? throw new InvalidOperationException() : doubleBase; }
-        internal static ulong QuadBase          { get => !_set ? throw new InvalidOperationException() : quadBase; }
-        internal static ulong SingleMaxValue    { get => !_set ? throw new InvalidOperationException() : singleMaxValue; }
-        internal static ulong DoubleMaxValue    { get => !_set ? throw new InvalidOperationException() : doubleMaxValue; }
-        internal static ulong QuadMaxValue      { get => !_set ? throw new InvalidOperationException() : quadMaxValue; }
-        internal static ulong SingleBitMask     { get => !_set ? throw new InvalidOperationException() : singleBitMask; }
-        internal static ulong DoubleBitMask     { get => !_set ? throw new InvalidOperationException() : doubleBitMask; }
-        internal static ulong QuadBitMask       { get => !_set ? throw new InvalidOperationException() : quadBitMask; }
     }
 }

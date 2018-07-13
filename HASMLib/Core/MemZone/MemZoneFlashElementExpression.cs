@@ -6,15 +6,13 @@ namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneFlashElementExpression : MemZoneFlashElement
     {
-        public override int FixedSize => 0; //TODO:
+        public Expression Expression { get; private set; }
+        public Integer Index { get; private set; }
 
+        public override int FixedSize => 0; //TODO:
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Expression;
 
-        public Expression Expression { get; private set; }
-
-        public FDouble Index { get; private set; }
-
-        public MemZoneFlashElementExpression(Expression expression, FDouble index)
+        public MemZoneFlashElementExpression(Expression expression, Integer index)
         {
             Index = index;
             Expression = expression;

@@ -2,9 +2,9 @@
 ; Пример работы с директивой препроцессора include
 ;
 
+#include "lib/ide.hasm"
 #include "lib/bitw.hasm"
 #include "lib/colors.hasm"
-#include "lib/ide.hasm"
 
 #ifndef _bitwise_h_             ; Если библиотека не была загружена bitw.hasm,
      
@@ -13,7 +13,7 @@
 
 #else
 
-    out _ide_ver
+    out __base__
 
     ldi R1, 0x0                 ; Устанавливаем R1 как 0
     ldi R1, bitw_set(R1, 1)     ; Устанавливаем 1й бит как 1

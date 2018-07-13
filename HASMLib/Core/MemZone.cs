@@ -6,7 +6,7 @@ namespace HASMLib.Core
 {
     public class MemZone
     {
-        public Stack<FSingle> Stack { get; private set; }
+        public Stack<Integer> Stack { get; private set; }
 
         public List<MemZoneVariable> RAM { get; private set; }
 
@@ -22,7 +22,7 @@ namespace HASMLib.Core
         {
             Flash = new List<MemZoneFlashElement>();
             RAM = new List<MemZoneVariable>();
-            Stack = new Stack<FSingle>();
+            Stack = new Stack<Integer>();
         }
 
         public MemZone(int flash_len, int ram, List<MemZoneFlashElement> flash)

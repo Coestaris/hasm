@@ -7,12 +7,12 @@ namespace HASMLib.Parser
     {
         public MemZoneFlashElementVariable FEReference { get; internal set; }
         public string Name { get; private set; }
-        public LengthQualifier Length { get; private set; }
+        public int Base { get; private set; }
 
-        public Variable(string name, LengthQualifier length)
+        public Variable(string name, int _base)
         {
             Name = name;
-            Length = length;
+            Base = _base;
         }
     }
 }

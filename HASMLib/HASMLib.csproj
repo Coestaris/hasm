@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\BaseTypes\Array.cs" />
+    <Compile Include="Core\BaseTypes\BaseType.cs" />
+    <Compile Include="Core\BaseTypes\Integer.cs" />
     <Compile Include="Core\HASMBase.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantDummy.cs" />
@@ -48,11 +51,6 @@
     <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
     <Compile Include="Core\MemZone\MemZoneVariable.cs" />
-    <Compile Include="Core\MemZone\MemZoneVariableQuad.cs" />
-    <Compile Include="Core\MemZone\MemZoneVariableDouble.cs" />
-    <Compile Include="Core\MemZone\MemZoneVariableSingle.cs" />
-    <Compile Include="Core\BaseTypes\FQuad.cs" />
-    <Compile Include="Core\BaseTypes\FDouble.cs" />
     <Compile Include="HASMMachine.cs" />
     <Compile Include="HASMMachineBannedFeatures.cs" />
     <Compile Include="HASMSource.cs" />
@@ -99,11 +97,7 @@
     <Compile Include="Parser\Parser\UnknownLabelNameError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\MemZone.cs" />
-    <Compile Include="Core\BaseTypes\FSingle.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstant.cs" />
-    <Compile Include="Core\MemZone\MemZoneFlashElementConstantDouble.cs" />
-    <Compile Include="Core\MemZone\MemZoneFlashElementConstantSingle.cs" />
-    <Compile Include="Core\MemZone\MemZoneFlashElementConstantQuad.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
     <Compile Include="Parser\HASMParser.cs" />
     <Compile Include="Parser\SyntaxTokens\Constant.cs" />
@@ -111,7 +105,6 @@
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantDecFormat.cs" />
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantFormat.cs" />
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantHexFormat.cs" />
-    <Compile Include="Core\BaseTypes\LengthQualifier.cs" />
     <Compile Include="Parser\SyntaxTokens\Instruction.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionADD.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionJMP.cs" />

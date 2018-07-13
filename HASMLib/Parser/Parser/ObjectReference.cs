@@ -5,11 +5,11 @@ namespace HASMLib.Parser
 {
     public class ObjectReference
     {
-        public FDouble Index { get; private set; }
+        public Integer Index { get; private set; }
         public ReferenceType Type { get; private set; }
         public MemZoneFlashElement Object { get; internal set; }
 
-        public ObjectReference(FDouble index, ReferenceType type)
+        public ObjectReference(Integer index, ReferenceType type)
         {
             Index = index;
             Type = type;

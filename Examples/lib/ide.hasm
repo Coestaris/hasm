@@ -4,4 +4,19 @@
 #define _ide_ver __ide_ver_major * 100 + __ide_ver_minor
 #endif
 
+#ifndef __base__
+#error Base must be set by parser
+#endif
+
+#if __base__ == 8
+#define _8base
+#elif __base__ == 16
+#define _16base
+#elif __base__ == 12
+#define _12base
+#elif __base__ == 4
+#define _4base
+#endif
+
+
 #endif

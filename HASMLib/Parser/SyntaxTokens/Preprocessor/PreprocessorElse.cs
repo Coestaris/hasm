@@ -21,7 +21,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                 return;
             }
 
-            if (enableStack.Take(enableStack.Count - 1).Contains(false))
+            if (enableStack.Skip(1).Contains(false))
             {
                 error = null;
                 return;

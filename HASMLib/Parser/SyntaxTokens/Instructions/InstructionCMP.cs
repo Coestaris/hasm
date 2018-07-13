@@ -47,7 +47,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             if (a > b) result |= ComapreResult.Greater;
             if (a < b) result |= ComapreResult.Less;
 
-            memZone.Stack.Push((FSingle)(int)result);
+            memZone.Stack.Push(BaseIntegerType.PrimitiveType.Cast((int)result)[0]);
 
             return RuntimeOutputCode.OK;
         }

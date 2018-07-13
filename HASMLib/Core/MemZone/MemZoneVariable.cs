@@ -6,81 +6,37 @@ namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneVariable
     {
-        public LengthQualifier Length { get; protected set; }
         public string Name { get; protected set; }
         public int Index { get; protected set; }
+        public Integer Value { get; set; }
+
+        public MemZoneVariable(BaseIntegerType type, int index) : this(new Integer(0, type), index) 
+        { }
+
+        public MemZoneVariable(Integer value, int index)
+        {
+            Value = value;
+            Index = index;
+        }
 
         public void AddValue(MemZoneVariable value)
         {
-            AddValue(value.GetNumericValue());
+            AddValue(value.Value);
         }
 
         public void SetValue(MemZoneVariable value)
         {
-            SetValue(value.GetNumericValue());
-        }
-
-        public List<FSingle> ToSingle()
-        {
-            switch(Length)
-            {
-                case LengthQualifier.Single:
-                    return new List<FSingle> { (this as MemZoneVariableSingle).Value };
-                case LengthQualifier.Double:
-                    return (this as MemZoneVariableDouble).Value.ToSingle().ToList();
-                case LengthQualifier.Quad:
-                    return (this as MemZoneVariableQuad).Value.ToSingle().ToList();
-                default:
-                    return null;
-            }
+            SetValue(value.Value);
         }
 
         public void SetValue(long value)
         {
-            switch (Length)
-            {
-                case LengthQualifier.Single:
-                    (this as MemZoneVariableSingle).Value = (FSingle)value;
-                    break;
-                case LengthQualifier.Double:
-                    (this as MemZoneVariableDouble).Value = (FDouble)value;
-                    break;
-                case LengthQualifier.Quad:
-                    (this as MemZoneVariableQuad).Value = (FQuad)value;
-                    break;
-            }
+            Value = new Integer(value, Value.Type);
         }
 
         public void AddValue(long value)
         {
-            switch (Length)
-            {
-                case LengthQualifier.Single:
-                    (this as MemZoneVariableSingle).Value += (FSingle)value;
-                    break;
-                case LengthQualifier.Double:
-                    (this as MemZoneVariableDouble).Value += (FDouble)value;
-                    break;
-                case LengthQualifier.Quad:
-                    (this as MemZoneVariableQuad).Value += (FQuad)value;
-                    break;
-            }
-        }
-
-        public long GetNumericValue()
-        {
-            switch (Length)
-            {
-                case LengthQualifier.Single:
-                    return (this as MemZoneVariableSingle).Value;
-                case LengthQualifier.Double:
-                    return (this as MemZoneVariableDouble).Value;
-                case LengthQualifier.Quad:
-                    return (this as MemZoneVariableQuad).Value;
-
-                default:
-                    return 0;
-            }
+            Value = new Integer(Value.Value + value, Value.Type);
         }
     }
 }

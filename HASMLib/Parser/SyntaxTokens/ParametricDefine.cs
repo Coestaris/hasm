@@ -50,10 +50,10 @@ namespace HASMLib.Parser.SyntaxTokens
             for(int i = 0; i < parameters.Count; i++)
             {
                 var matches = ParameterRegexes[i].Matches(expanded);
-                foreach (Match match in matches)
+                for(int j = matches.Count - 1; j >= 0; j--)
                 {
-                    expanded = expanded.Remove(match.Index, match.Length);
-                    expanded = expanded.Insert(match.Index, parameters[i]);
+                    expanded = expanded.Remove(matches[j].Index, matches[j].Length);
+                    expanded = expanded.Insert(matches[j].Index, parameters[i]);
                 }
             }
 

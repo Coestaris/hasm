@@ -3,24 +3,24 @@
 #ifndef _colors_h_
 #define _colors_h_
 
-#define cl_BLACK       0x0000_d
-#define cl_NAVY        0x000F_d
-#define cl_DARKGREEN   0x03E0_d
-#define cl_DARKCYAN    0x03EF_d
-#define cl_MAROON      0x7800_d
-#define cl_PURPLE      0x780F_d
-#define cl_OLIVE       0x7BE0_d
-#define cl_LIGHTGREY   0xC618_d
-#define cl_DARKGREY    0x7BEF_d
-#define cl_BLUE        0x001F_d
-#define cl_GREEN       0x07E0_d
-#define cl_CYAN        0x07FF_d
-#define cl_RED         0xF800_d
-#define cl_MAGENTA     0xF81F_d
-#define cl_YELLOW      0xFFE0_d
-#define cl_WHITE       0xFFFF_d
-#define cl_ORANGE      0xFD20_d
-#define cl_GREENYELLOW 0xAFE5_d
-#define cl_PINK        0xF81F_d
+#define cl_BLACK       ushort_0x0000
+#define cl_NAVY        ushort_0x000F
+#define cl_DARKGREEN   ushort_0x03E0
+#define cl_DARKCYAN    ushort_0x03EF
+#define cl_MAROON      ushort_0x7800
+#define cl_PURPLE      ushort_0x780F
+#define cl_OLIVE       ushort_0x7BE0
+#define cl_LIGHTGREY   ushort_0xC618
+#define cl_DARKGREY    ushort_0x7BEF
+#define cl_BLUE        ushort_0x001F
+#define cl_GREEN       ushort_0x07E0
+#define cl_CYAN        ushort_0x07FF
+#define cl_RED         ushort_0xF800
+#define cl_MAGENTA     ushort_0xF81F
+#define cl_YELLOW      ushort_0xFFE0
+#define cl_WHITE       ushort_0xFFFF
+#define cl_ORANGE      ushort_0xFD20
+#define cl_GREENYELLOW ushort_0xAFE5
+#define cl_PINK        ushort_0xF81F
 
 #endif

@@ -25,7 +25,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             var source = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine);
 
-            memZone.Stack.Push(source.ToSingle()[0]);
+            memZone.Stack.Push(source.ToPrimitive()[0]);
 
             return RuntimeOutputCode.OK;
         }

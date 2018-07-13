@@ -1,4 +1,5 @@
-﻿using HASMLib.Parser.Parser;
+﻿using HASMLib.Core;
+using HASMLib.Parser.Parser;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,8 @@ namespace HASMLib.Parser.SyntaxTokens
 
             if (defines != null)
                 PreprocessorDirective.defines.AddRange(defines);
+
+            PreprocessorDirective.defines.Add(new Define("__base__", HASMBase.Base.ToString()));
 
             var result = RecursiveParse(fileName);
 
@@ -136,14 +139,15 @@ namespace HASMLib.Parser.SyntaxTokens
                 {
                     if (!enableStack.Contains(false))
                     {
+                        if (string.IsNullOrWhiteSpace(line))
+                            continue;
+
                         ParseError parseError = Define.ResolveDefines(defines, ref line, index, fileName);
                         if(parseError != null) return new PreprocessorParseResult(null, parseError);
                         result.Add(new SourceLineInstruction(line, index, fileName));
                     }
                 }
-
             }
-
             return new PreprocessorParseResult(result, null); 
         }
 

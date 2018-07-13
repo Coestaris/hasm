@@ -63,20 +63,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         public static readonly List<Function> Functions = new List<Function>()
         {
-            new Function(1, "double", (a) => new Constant(a.Value * 2, a.Length)),
-            new Function(1, "low", (a) => new Constant((FSingle)a.Value, LengthQualifier.Single)),
-            new Function(2, "high", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base), LengthQualifier.Single)),
-            new Function(2, "fbn2", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base), LengthQualifier.Single)),
-            new Function(2, "fbn3", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 2), LengthQualifier.Single)),
-            new Function(2, "fbn4", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 3), LengthQualifier.Single)),
-            new Function(2, "byte2", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base), LengthQualifier.Single)),
-            new Function(2, "byte3", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 2), LengthQualifier.Single)),
-            new Function(2, "byte4", (a) => new Constant((FSingle)(a.Value >> (int)HASMBase.Base * 3), LengthQualifier.Single)),
-            new Function(1, "lwrd", (a) => new Constant((FDouble)(a.Value), LengthQualifier.Double)),
-            new Function(2, "hwrd", (a) => new Constant((FDouble)(a.Value >> (int)HASMBase.Base * 2), LengthQualifier.Double)),
-            new Function(2, "exp2", (a) => new Constant(a.Value * a.Value, a.Length)),
-            new Function(8, "log2", (a) => new Constant((long)Math.Log(a.Value, 2), a.Length)),
-            new Function(2, "abs", (a) => new Constant(Math.Abs(a.Value), a.Length)),
+            new Function(1, "double", (a) => new Constant(a.Value * 2)),
+            new Function(2, "exp2", (a) => new Constant(a.Value * a.Value)),
+            new Function(8, "log2", (a) => new Constant((long)Math.Log((long)a.Value, 2))),
+            new Function(2, "abs", (a) => new Constant((long)Math.Abs(a.Value))),
             new Function(1, "defined", (a) => a), //TODO!
             new Function(1, "strlen", (a) => new Constant()),
         };
@@ -93,35 +83,35 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public static readonly List<Operator> Operators = new List<Operator>()
         {
             //Unary 
-            new Operator(1, "!", (a) => new Constant(a.AsBool() ? 0 : 1, a.Length)),
-            new Operator(1, "~", (a) => new Constant(~ a.Value, a.Length)),
-            new Operator(1, "-", (a) => new Constant(- a.Value, a.Length), true),
+            new Operator(1, "!", (a) => new Constant(new Integer(a.AsBool() ? 0 : 1, a.Value.Type))),
+            new Operator(1, "~", (a) => new Constant(new Integer(~ a.Value, a.Value.Type))),
+            new Operator(1, "-", (a) => new Constant(new Integer(- a.Value, a.Value.Type)), true),
 
             //Binnary
-            new Operator(2, 13, "*",  (a, b) => new Constant(a.Value * b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(2, 13, "/",  (a, b) => new Constant(a.Value / b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 13, "*",  (a, b) => new Constant(a.Value * b.Value)),
+            new Operator(2, 13, "/",  (a, b) => new Constant(a.Value / b.Value)),
 
-            new Operator(2, 12, "%",  (a, b) => new Constant(a.Value % b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 12, "%",  (a, b) => new Constant(a.Value % b.Value)),
 
-            new Operator(2, 11, "+",  (a, b) => new Constant(a.Value + b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(2, 11, "-",  (a, b) => new Constant(a.Value - b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 11, "+",  (a, b) => new Constant(a.Value + b.Value)),
+            new Operator(2, 11, "-",  (a, b) => new Constant(a.Value - b.Value)),
 
-            new Operator(2, 10, "<<", (a, b) => new Constant(a.Value << (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(2, 10, ">>", (a, b) => new Constant(a.Value >> (int)b.Value, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 10, "<<", (a, b) => new Constant(a.Value << b.Value)),
+            new Operator(2, 10, ">>", (a, b) => new Constant(a.Value >> b.Value)),
 
-            new Operator(1, 9, "<",   (a, b) => new Constant(a.Value < b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(1, 9, "<=",  (a, b) => new Constant(a.Value <= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(1, 9, ">",   (a, b) => new Constant(a.Value > b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(1, 9, ">=",  (a, b) => new Constant(a.Value >= b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 9, "<",   (a, b) => new Constant(new Integer(a.Value < b.Value ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(1, 9, "<=",  (a, b) => new Constant(new Integer(a.Value <= b.Value ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(1, 9, ">",   (a, b) => new Constant(new Integer(a.Value > b.Value ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(1, 9, ">=",  (a, b) => new Constant(new Integer(a.Value >= b.Value ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
 
-            new Operator(1, 8, "!=",  (a, b) => new Constant(a.Value != b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(1, 8, "==",  (a, b) => new Constant(a.Value == b.Value ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(1, 8, "!=",  (a, b) => new Constant(new Integer(a.Value != b.Value ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(1, 8, "==",  (a, b) => new Constant(new Integer(a.Value == b.Value ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
 
-            new Operator(2, 7, "&",  (a, b) => new Constant(a.Value & b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(2, 6, "^",  (a, b) => new Constant(a.Value ^ b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(2, 5, "|",  (a, b) => new Constant(a.Value | b.Value, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(2, 4, "&&", (a, b) => new Constant(a.AsBool() && b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
-            new Operator(2, 3, "||", (a, b) => new Constant(a.AsBool() || b.AsBool() ? 1 : 0, Constant.GetQualifier(a.Length, b.Length))),
+            new Operator(2, 7, "&",  (a, b) => new Constant(a.Value & b.Value)),
+            new Operator(2, 6, "^",  (a, b) => new Constant(a.Value ^ b.Value)),
+            new Operator(2, 5, "|",  (a, b) => new Constant(a.Value | b.Value)),
+            new Operator(2, 4, "&&", (a, b) => new Constant(new Integer(a.AsBool() && b.AsBool() ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(2, 3, "||", (a, b) => new Constant(new Integer(a.AsBool() || b.AsBool() ? 1 : 0, Integer.SelectType(a.Value, b.Value)))),
 
             new Operator(1, 2, "?",  (a, b) => 
             {

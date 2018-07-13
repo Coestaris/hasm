@@ -5,11 +5,11 @@ namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneFlashElementVariable : MemZoneFlashElement
     {
-		public FDouble Index { get; private set; }
-		public LengthQualifier VariableType { get; private set; }
+		public Integer Index { get; private set; }
+        public BaseIntegerType VariableType { get; private set; }
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Variable;
-		public override int FixedSize => (1 + 3 + 1) * 8 / (int)HASMBase.Base;
+		public override int FixedSize => (1 + 3 + 1) * 8 / HASMBase.Base;
 
 		public override byte[] ToBytes ()
 		{
@@ -19,14 +19,14 @@ namespace HASMLib.Core.MemoryZone
 			List<byte> bytes = new List<byte>();
 			bytes.Add(Element_Var);				    //Its a var
 			bytes.AddRange(Index.ToBytes());	    //variable index
-			bytes.Add((byte)VariableType);			//variable type
+			bytes.Add((byte)VariableType.Base);			//variable type
 			return bytes.ToArray();
 		}
 
-		public MemZoneFlashElementVariable(FDouble index, LengthQualifier type)
+		public MemZoneFlashElementVariable(Integer index)
 		{
 			Index = index;
-			VariableType = type;
+            VariableType = index.Type;
 		}
     }
 }

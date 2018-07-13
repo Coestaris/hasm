@@ -16,21 +16,21 @@ namespace HASMLib.Parser.SyntaxTokens
         public int ParameterCount { get; protected set; }
         public List<InstructionParameterType> ParameterTypes { get; protected set; }
 
-        protected MemZoneVariable GetVar(MemZone mz, FDouble index)
+        protected MemZoneVariable GetVar(MemZone mz, Integer index)
         {
             return mz.RAM.Find(p => p.Index == index);
         }
 
-        protected NamedConstant GetConst(List<NamedConstant> constants, FDouble index)
+        protected NamedConstant GetConst(List<NamedConstant> constants, Integer index)
         {
             return constants.Find(p => p.Index == index);
         }
 
-        public void RuntimeMachineJump(FDouble position, RuntimeMachine runtimeMachine)
+        public void RuntimeMachineJump(Integer position, RuntimeMachine runtimeMachine)
         {
             var localIndex = position;
             var globalIndex = runtimeMachine.GetGlobalInstructionIndexByLocalOne(localIndex);
-            runtimeMachine.ProgramCounter = (FDouble)(globalIndex - 1);
+            runtimeMachine.ProgramCounter = (Integer)(globalIndex - 1);
         }
 
         public Constant GetNumericValue(int index, MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)

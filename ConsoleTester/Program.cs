@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Parser;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using System;
@@ -145,8 +146,8 @@ namespace ConsoleTester
 
         static void Main(string[] args)
         {
-            HASMBase.Base = 8;
-            FDouble i = (UInt32)10;
+            HASMBase.Base = 64;
+            Integer i = 10;
 
             i++;
             i++;

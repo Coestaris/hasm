@@ -10,9 +10,9 @@ namespace HASMLib.Runtime
     {
         private RuntimeMachine _runtimeMachine;
 
-        private List<FSingle> _buffer;
+        private List<Integer> _buffer;
 
-        private void UpdateBuffer(List<FSingle> inBuffer)
+        private void UpdateBuffer(List<Integer> inBuffer)
         {
             _buffer.AddRange(inBuffer);
         }
@@ -77,17 +77,17 @@ namespace HASMLib.Runtime
 
         public void Flush()
         {
-            _buffer = new List<FSingle>();
+            _buffer = new List<Integer>();
         }
 
-        public List<FSingle> ReadAll()
+        public List<Integer> ReadAll()
         {
-            FSingle[] buffer = new FSingle[Length];
+            Integer[] buffer = new Integer[Length];
             Read(buffer, 0, (int)Length);
             return buffer.ToList();
         }
 
-        public int Read(FSingle[] buffer, int offset, int count)
+        public int Read(Integer[] buffer, int offset, int count)
         {
             if (count > _buffer.Count)
                 throw new ArgumentException();
@@ -107,9 +107,9 @@ namespace HASMLib.Runtime
             throw new NotSupportedException();
         }
 
-        public void Write(FSingle[] buffer, int offset, int count)
+        public void Write(Integer[] buffer, int offset, int count)
         {
-            List<FSingle> inBuffer = buffer.Skip(offset).Take(count).ToList();
+            List<Integer> inBuffer = buffer.Skip(offset).Take(count).ToList();
             _runtimeMachine.InbufferRecieved(inBuffer);
         }
     }

@@ -40,5 +40,6 @@
         Preprocessor_WrongNameFormat,
         Preprocessor_UserDefinedError,
         Syntax_Expression_UnknownToken,
+        Syntax_Constant_WrongType,
     }
 }

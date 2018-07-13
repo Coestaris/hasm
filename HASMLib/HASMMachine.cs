@@ -43,7 +43,7 @@ namespace HASMLib
 
         public void SetBase(int hasmBase = 8)
         {
-            HASMBase.Base = (uint)hasmBase;
+            HASMBase.Base = hasmBase;
         }
 
 		public List<string> GetRegisterNames()
