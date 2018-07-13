@@ -1,4 +1,5 @@
-﻿using HASMLib.Parser.Parser;
+﻿using HASMLib.Core.BaseTypes;
+using HASMLib.Parser.Parser;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
             var expError = Expression.Parse(input, out Expression exp, (p) =>
             {
-                return new ObjectReference(0, ReferenceType.Define);
+                return new ObjectReference((Integer)0, ReferenceType.Define);
             });
 
             if (expError != null)

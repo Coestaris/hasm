@@ -1,4 +1,5 @@
-﻿using HASMLib.Parser.Parser;
+﻿using HASMLib.Core.BaseTypes;
+using HASMLib.Parser.Parser;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using System;
@@ -48,7 +49,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                     return null;
                 }
 
-                return new ObjectReference(0, ReferenceType.Define);
+                return new ObjectReference((Integer)0, ReferenceType.Define);
             });
 
             if(expError != null)

@@ -7,11 +7,11 @@ namespace HASMLib.Core.MemoryZone
 {
     public class MemZoneFlashElementConstant : MemZoneFlashElement
     {
-        public int Index { get; set; }
+        public Integer Index { get; set; }
         protected Integer Value { get; set; }
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Constant;
 
-        public MemZoneFlashElementConstant(Integer value, int index)
+        public MemZoneFlashElementConstant(Integer value, Integer index)
         {
             Index = index;
             Value = value;
@@ -34,8 +34,8 @@ namespace HASMLib.Core.MemoryZone
 			// 3. (1 byte)  - length: 1 - single, 2 - double, 3 - quad(n)
 			// 4. (n bytes) - data
 			List<byte> bytes = new List<byte>();
-			bytes.Add(Element_Const);					// Is Const;
-			bytes.AddRange(BitConverter.GetBytes(Index)); 	        // Global Index
+			bytes.Add(Element_Const);                   // Is Const;
+            bytes.AddRange(Index.ToBytes()); 	        // Global Index
 			bytes.Add((byte)Value.Type.Base);                   // Length of const
             bytes.AddRange(Value.ToBytes());
 			return bytes.ToArray();

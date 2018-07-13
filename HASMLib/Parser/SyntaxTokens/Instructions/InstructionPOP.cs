@@ -25,7 +25,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             var dest = GetVar(memZone, parameters[0].Index);
 
-            dest.SetValue(memZone.Stack.Pop());
+            dest.Value = memZone.Stack.Pop();
 
             return RuntimeOutputCode.OK;
         }

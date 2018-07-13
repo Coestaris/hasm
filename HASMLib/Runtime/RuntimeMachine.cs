@@ -47,7 +47,7 @@ namespace HASMLib.Runtime
             OutBufferUpdated?.Invoke(bytes);
         }
 
-		internal int GetGlobalInstructionIndexByLocalOne(int localIndex)
+		internal Integer GetGlobalInstructionIndexByLocalOne(Integer localIndex)
         {
             return _source.ParseResult.FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
                 .Select(p => (MemZoneFlashElementInstruction)p)
@@ -77,7 +77,7 @@ namespace HASMLib.Runtime
 
         private RuntimeOutputCode RunInternal()
         {
-            ProgramCounter = 0;
+            ProgramCounter = (Integer)0;
 
             List<MemZoneFlashElement> data = new List<MemZoneFlashElement>();
             data.AddRange(_source.ParseResult);
@@ -99,7 +99,7 @@ namespace HASMLib.Runtime
             //Удаляем их из коллекции
             data.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
 
-            Integer globalIndex = 0;
+            Integer globalIndex = (Integer)0;
 
             data.ForEach(p =>
             {
@@ -107,7 +107,7 @@ namespace HASMLib.Runtime
                 {
                     ((MemZoneFlashElementInstruction)p).RuntimeAbsoluteIndex = globalIndex;
                 }
-                globalIndex += 1;
+                globalIndex += (Integer)1;
             });
 
             //Проверяем валидность ссылок
@@ -136,23 +136,23 @@ namespace HASMLib.Runtime
                 }
             }
 
-            for (; ProgramCounter < data.Count; ProgramCounter += 1)
+            for (; (int)ProgramCounter < data.Count; ProgramCounter += (Integer)1)
             {
                 Ticks++;
-                if(data[ProgramCounter].Type == MemZoneFlashElementType.Variable)
+                if(data[(int)ProgramCounter].Type == MemZoneFlashElementType.Variable)
                 {
-                    var var = ((MemZoneFlashElementVariable)data[ProgramCounter]);
+                    var var = ((MemZoneFlashElementVariable)data[(int)ProgramCounter]);
                     _machine.MemZone.RAM.Add(new MemZoneVariable(var.VariableType, var.Index));
                     continue;
                 }
 
-                var instruction = (MemZoneFlashElementInstruction)data[ProgramCounter];
+                var instruction = (MemZoneFlashElementInstruction)data[(int)ProgramCounter];
                 
                 if (Ticks == int.MaxValue)
                     return RuntimeOutputCode.StackOverFlow;
 
                 //Если все ОК, то запускаем нашу инструкцию
-                RuntimeOutputCode output = SourceLineInstruction.Instructions[instruction.InstructionNumber].Apply(
+                RuntimeOutputCode output = SourceLineInstruction.Instructions[(int)instruction.InstructionNumber].Apply(
                     _machine.MemZone, constants, expressions, instruction.Parameters, this);
 
                 if (output != RuntimeOutputCode.OK)

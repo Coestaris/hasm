@@ -36,8 +36,8 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
 
         public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            long a = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
-            long b = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine).Value;
+            Integer a = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+            Integer b = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine).Value;
 
             ComapreResult result = 0;
 
@@ -47,7 +47,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             if (a > b) result |= ComapreResult.Greater;
             if (a < b) result |= ComapreResult.Less;
 
-            memZone.Stack.Push(BaseIntegerType.PrimitiveType.Cast((int)result)[0]);
+            memZone.Stack.Push(BaseIntegerType.PrimitiveType.Cast((Integer)(int)result)[0]);
 
             return RuntimeOutputCode.OK;
         }

@@ -30,7 +30,7 @@ namespace HASMLib.Parser.SyntaxTokens
         {
             var localIndex = position;
             var globalIndex = runtimeMachine.GetGlobalInstructionIndexByLocalOne(localIndex);
-            runtimeMachine.ProgramCounter = (Integer)(globalIndex - 1);
+            runtimeMachine.ProgramCounter = globalIndex - (Integer)1;
         }
 
         public Constant GetNumericValue(int index, MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)

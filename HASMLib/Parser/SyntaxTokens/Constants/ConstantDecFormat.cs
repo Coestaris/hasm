@@ -13,11 +13,11 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
         protected override ParseError Parse(string str, BaseIntegerType type, out Constant constant)
         {
             constant = new Constant();
-            long value = 0;
+            ulong value = 0;
 
             try
             {
-                value = Convert.ToInt64(str);
+                value = Convert.ToUInt64(str);
             }
             catch (OverflowException)
             {

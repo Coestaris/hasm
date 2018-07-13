@@ -121,7 +121,7 @@ namespace ConsoleTester
                     var result = item.expression.Calculate(null);
                     var calculated = TimeSpan.FromMilliseconds((DateTime.Now - now).TotalMilliseconds);
 
-                    if (result.Value == item.Result)
+                    if ((long)result.Value == item.Result)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write("PASSED");
@@ -147,12 +147,12 @@ namespace ConsoleTester
         static void Main(string[] args)
         {
             HASMBase.Base = 64;
-            Integer i = 10;
+            Integer i = (Integer)10;
 
-            i++;
-            i++;
-            i++;
-            i++;
+            i = i + (Integer)1;
+            i = i + (Integer)1;
+            i = i + (Integer)1;
+            i = i + (Integer)1;
 
             Console.WriteLine(i);
             Console.ReadKey();

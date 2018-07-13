@@ -113,7 +113,7 @@ namespace HASMLib.Parser
 
         }
 
-        private MemZoneFlashElementConstant RegisterConstant(string name, long value)
+        private MemZoneFlashElementConstant RegisterConstant(string name, ulong value)
         {
             //Если эта константа требовалась ранее, то подменяем ее!
             if (UnknownLabelNameErrorList.Exists(p => p.Name == name))
@@ -121,7 +121,7 @@ namespace HASMLib.Parser
                 var info = UnknownLabelNameErrorList.Find(p => p.Name == name);
 
                 info.namedConstant.Constant = new Constant(value);
-                info.memZoneFlashElementConstant.UpdateValue(value, info.ConstIndex);
+                info.memZoneFlashElementConstant.UpdateValue((Integer)value, info.ConstIndex);
                 
                 //Тут какбы нечего возвращать, все уже задано!
                 return null;
@@ -130,10 +130,10 @@ namespace HASMLib.Parser
             //Расчет нового индекса константы	
             int constIndex = ++_constIndex;
 
-            var constant = new MemZoneFlashElementConstant(value, constIndex);
+            var constant = new MemZoneFlashElementConstant((Integer)value, (Integer)constIndex);
             
             //Заносим данную констатнту в список именных констант
-            _namedConsts.Add(new NamedConstant(name, constIndex, new Constant(value))
+            _namedConsts.Add(new NamedConstant(name, (Integer)constIndex, new Constant(value))
             {
                 FEReference = constant
             });
@@ -149,7 +149,7 @@ namespace HASMLib.Parser
 
         private List<MemZoneFlashElement> GetFlashElementsNoArguents(SourceLineInstruction line, out ParseError error)
         {
-            Integer currentInstructionProgramIndex = _instructionIndex++;
+            Integer currentInstructionProgramIndex = (Integer)_instructionIndex++;
             
             var result = new List<MemZoneFlashElement>();
             error = null;
@@ -169,7 +169,7 @@ namespace HASMLib.Parser
             if (!string.IsNullOrEmpty(line.Label))
             {
                 //Регистируем эту константу
-                RegisterConstant(line.Label, currentInstructionProgramIndex);
+                RegisterConstant(line.Label, (ulong)currentInstructionProgramIndex);
             }
 
             //Закидываем во флеш нашу инструкцию без параметров
@@ -197,7 +197,7 @@ namespace HASMLib.Parser
             if (!string.IsNullOrEmpty(line.Label))
             {
                 //Регистируем эту константу
-                RegisterConstant(line.Label, currentInstructionProgramIndex);
+                RegisterConstant(line.Label, (ulong)currentInstructionProgramIndex);
             }
 
             //Индекс текущего аргумента
@@ -277,7 +277,7 @@ namespace HASMLib.Parser
                                     {
 
                                         int constIndex = ++_constIndex;
-                                        MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy(constIndex);
+                                        MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy((Integer)constIndex);
                                         NamedConstant dummyNamedConstant = new NamedConstant(token.RawValue, (Integer)constIndex, new Constant())
                                         {
                                             FEReference = dummyConstant
@@ -286,7 +286,7 @@ namespace HASMLib.Parser
                                         UnknownLabelNameErrorList.Add(new UnknownLabelNameError(
                                             token.RawValue,
                                             NewParseError(ParseErrorType.Syntax_UnknownConstName, line, argIndex),
-                                            constIndex,
+                                            (Integer)constIndex,
                                             dummyNamedConstant, dummyConstant));
 
                                         _namedConsts.Add(dummyNamedConstant);
@@ -305,7 +305,7 @@ namespace HASMLib.Parser
                             //Расчет нового индекса константы	
                             int constIndex = ++_constIndex;
                             //Записываем его во флеш память
-                            var flashElement = c.ToFlashElement(constIndex);
+                            var flashElement = c.ToFlashElement((Integer)constIndex);
 
                                 result.Add(flashElement);
 
@@ -350,7 +350,7 @@ namespace HASMLib.Parser
                             //Запоминаем индекс константы
                             usedIndexes.Add(new ObjectReference((Integer)(++_constIndex), ReferenceType.Constant));
                             //Записываем во флеш константу
-                            result.Add(constant.ToFlashElement(_constIndex));
+                            result.Add(constant.ToFlashElement((Integer)_constIndex));
                         };
 
                         //Если необходима переменная, а не константа
@@ -387,7 +387,7 @@ namespace HASMLib.Parser
                         //Запоминаем индекс константы
                         usedIndexes.Add(new ObjectReference((Integer)(++_constIndex), ReferenceType.Constant));
                         //Заносим константу во флеш
-                        result.Add(constant.ToFlashElement(_constIndex));
+                        result.Add(constant.ToFlashElement((Integer)_constIndex));
                     } else 
                     
                     //Если это не константа... 
@@ -442,7 +442,7 @@ namespace HASMLib.Parser
                                 {
 
                                     int constIndex = ++_constIndex;
-                                    MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy(constIndex);
+                                    MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy((Integer)constIndex);
                                     NamedConstant dummyNamedConstant = new NamedConstant(argument, (Integer)constIndex, new Constant())
                                     {
                                         FEReference = dummyConstant
@@ -451,7 +451,7 @@ namespace HASMLib.Parser
                                     UnknownLabelNameErrorList.Add(new UnknownLabelNameError(
                                         argument,
                                         NewParseError(expressionError == null ? ParseErrorType.Syntax_UnknownConstName : expressionError.Type, line, argIndex),
-                                        constIndex,
+                                        (Integer)constIndex,
                                         dummyNamedConstant, dummyConstant));
 
                                     _namedConsts.Add(dummyNamedConstant);

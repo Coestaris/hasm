@@ -1,28 +1,31 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens.Constants;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace HASMLib.Parser.SyntaxTokens
 {
     public class Constant
     {
         public Integer Value;
-                
+
         public bool AsBool()
         {
-            return Value == 1;
+            return Value == (Integer)1;
         }
 
         internal Constant() { }
 
-        internal Constant(bool value) : this(value ? 1 : 0) { }
+        internal Constant(bool value) : this(value ? (Integer)1 : (Integer)0) { }
 
         internal Constant(MemZoneVariable variable)
         {
             Value = variable.Value;
+        }
+
+        internal Constant(ulong value)
+        {
+            Value = new Integer(value, BaseIntegerType.CommonType);
         }
 
         internal Constant(Integer value)
@@ -59,7 +62,7 @@ namespace HASMLib.Parser.SyntaxTokens
             return Value.Cast(BaseIntegerType.PrimitiveType);
         }
 
-        public MemZoneFlashElementConstant ToFlashElement(int index)
+        public MemZoneFlashElementConstant ToFlashElement(Integer index)
 		{
             return new MemZoneFlashElementConstant(Value, index);
 		}

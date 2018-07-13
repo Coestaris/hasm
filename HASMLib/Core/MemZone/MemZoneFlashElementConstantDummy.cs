@@ -6,10 +6,10 @@ namespace HASMLib.Core.MemoryZone
     {
         public bool isEmpty = true;
 
-		public MemZoneFlashElementConstantDummy(int index) : base(new Integer(), index) { }
+		public MemZoneFlashElementConstantDummy(Integer index) : base(new Integer(), index) { }
 
         //MAKE CONSTANT NOT DUMMY AGAIN!
-        public void UpdateValue(Integer value, int index)
+        public void UpdateValue(Integer value, Integer index)
         {
             isEmpty = false;
             Value = value;

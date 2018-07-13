@@ -14,11 +14,11 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
         {
             constant = new Constant();
             str = str.Remove(0, 2);
-            long value = 0;
+            ulong value = 0;
 
             try
             {
-                value = Convert.ToInt64(str, 2);
+                value = Convert.ToUInt64(str, 2);
             }
             catch (OverflowException)
             {

@@ -27,7 +27,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             var dest = GetVar(memZone, parameters[0].Index);
             var source = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine);
 
-            dest.AddValue(source.Value);
+            dest.Value += source.Value;
 
             return RuntimeOutputCode.OK;
         }

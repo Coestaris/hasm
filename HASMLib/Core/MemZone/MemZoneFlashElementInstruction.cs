@@ -53,7 +53,7 @@ namespace HASMLib.Core.MemoryZone
 
         public MemZoneFlashElementInstruction(Instruction instruction, List<ObjectReference> arguments, Integer index)
         {
-            InstructionNumber = instruction.Index;
+            InstructionNumber = (Integer)instruction.Index;
             Parameters = arguments;
             ProgramIndex = index;
         }

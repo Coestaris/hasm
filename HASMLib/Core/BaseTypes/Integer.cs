@@ -6,7 +6,7 @@ namespace HASMLib.Core.BaseTypes
     public struct Integer
     {
         public BaseIntegerType Type;
-        public long Value;
+        public ulong Value;
 
         public override string ToString()
         {
@@ -25,15 +25,20 @@ namespace HASMLib.Core.BaseTypes
             else return b.Type;
         }
 
-        public Integer(long value, BaseIntegerType type)
+        public Integer(ulong value, BaseIntegerType type)
         {
             unchecked
             {
                 Type = type;
-                if (!type.IsSigned) Value = (long)((ulong)Math.Abs(value) & type.BitMask);
-                else Value = value & type.Base;
+                Value = value & type.BitMask;
             }
         }
+
+        public static Integer operator ~(Integer a)
+        {
+            return unchecked(new Integer(~a.Value, a.Type));
+        }
+
 
         public static bool operator >=(Integer a, Integer b)
         {
@@ -65,17 +70,17 @@ namespace HASMLib.Core.BaseTypes
             return unchecked(a.Value != b.Value);
         }
 
-        public static implicit operator byte(Integer a)
+        public static explicit operator byte(Integer a)
         {
             return unchecked((byte)(a.Value & 0xFF));
         }
 
-        public static implicit operator UInt16(Integer a)
+        public static explicit operator UInt16(Integer a)
         {
             return unchecked((UInt16)(a.Value & 0xFFFF));
         }
 
-        public static implicit operator UInt32(Integer a)
+        public static explicit operator UInt32(Integer a)
         {
             return unchecked((UInt32)(a.Value & 0xFFFFFF));
         }
@@ -97,62 +102,62 @@ namespace HASMLib.Core.BaseTypes
             }
         }
 
-        public static implicit operator Integer(UInt64 a)
+        public static explicit operator Integer(UInt64 a)
         {
-            return unchecked(new Integer((long)a, BaseIntegerType.CommonType));
+            return unchecked(new Integer((ulong)a, BaseIntegerType.CommonType));
         }
 
-        public static implicit operator Integer(UInt32 a)
-        {
-            return unchecked(new Integer(a, BaseIntegerType.CommonType));
-        }
-
-        public static implicit operator Integer(UInt16 a)
+        public static explicit operator Integer(UInt32 a)
         {
             return unchecked(new Integer(a, BaseIntegerType.CommonType));
         }
 
-        public static implicit operator Integer(byte a)
+        public static explicit operator Integer(UInt16 a)
         {
             return unchecked(new Integer(a, BaseIntegerType.CommonType));
         }
 
-        public static implicit operator Integer(Int64 a)
+        public static explicit operator Integer(byte a)
         {
             return unchecked(new Integer(a, BaseIntegerType.CommonType));
         }
 
-        public static implicit operator Integer(Int32 a)
+        public static explicit operator Integer(Int64 a)
         {
-            return unchecked(new Integer(a, BaseIntegerType.CommonType));
+            return unchecked(new Integer((ulong)a, BaseIntegerType.CommonType));
         }
 
-        public static implicit operator Integer(Int16 a)
+        public static explicit operator Integer(Int32 a)
         {
-            return unchecked(new Integer(a, BaseIntegerType.CommonType));
+            return unchecked(new Integer((ulong)a, BaseIntegerType.CommonType));
         }
 
-        public static implicit operator Integer(sbyte a)
+        public static explicit operator Integer(Int16 a)
         {
-            return unchecked(new Integer(a, BaseIntegerType.CommonType));
+            return unchecked(new Integer((ulong)a, BaseIntegerType.CommonType));
         }
 
-        public static implicit operator UInt64(Integer a)
+        public static explicit operator Integer(sbyte a)
+        {
+            return unchecked(new Integer((ulong)a, BaseIntegerType.CommonType));
+        }
+
+        public static explicit operator UInt64(Integer a)
         {
             return unchecked((UInt64)(a.Value & 0xFFFFFFFF));
         }
 
-        public static implicit operator Int16(Integer a)
+        public static explicit operator Int16(Integer a)
         {
             return unchecked((Int16)(a.Value & 0xFFFF));
         }
 
-        public static implicit operator Int32(Integer a)
+        public static explicit operator Int32(Integer a)
         {
             return unchecked((Int32)(a.Value & 0xFFFFFF));
         }
 
-        public static implicit operator Int64(Integer a)
+        public static explicit operator Int64(Integer a)
         {
             return unchecked((Int64)(a.Value & 0xFFFFFFFF));
         }
@@ -160,6 +165,11 @@ namespace HASMLib.Core.BaseTypes
         public static Integer operator <<(Integer a, int b)
         {
             return unchecked(new Integer(a.Value << b, a.Type));
+        }
+
+        public static Integer operator %(Integer a, Integer b)
+        {
+            return unchecked(new Integer(a.Value % b.Value, SelectType(a, b)));
         }
 
         public static Integer operator >>(Integer a, int b)

@@ -8,9 +8,9 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
     {
         public virtual Regex Regex { get; }
 
-        public bool CheckMaxValues(long value, BaseIntegerType type)
+        public bool CheckMaxValues(ulong value, BaseIntegerType type)
         {
-            return ((ulong)value > type.MaxValue) || (value < type.MinValue);
+            return (value > type.MaxValue) || ((long)value < type.MinValue);
         }
 
         public ParseError Parse(string str, out Constant constant)
