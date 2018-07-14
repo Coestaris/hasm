@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\BaseTypes\Array.cs" />
-    <Compile Include="Core\BaseTypes\BaseType.cs" />
+    <Compile Include="Core\BaseTypes\BaseIntegerType.cs" />
     <Compile Include="Core\BaseTypes\Integer.cs" />
     <Compile Include="Core\HASMBase.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
@@ -56,6 +56,7 @@
     <Compile Include="HASMSource.cs" />
     <Compile Include="Parser\Parser\NamedConstant.cs" />
     <Compile Include="Parser\Parser\ObjectReference.cs" />
+    <Compile Include="Parser\Parser\Optimizer.cs" />
     <Compile Include="Parser\Parser\PreprocessorParseResult.cs" />
     <Compile Include="Parser\Parser\ReferenceType.cs" />
     <Compile Include="Parser\Parser\Variable.cs" />

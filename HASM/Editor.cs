@@ -1,6 +1,7 @@
 ﻿using FastColoredTextBoxNS;
 using HASM.Classes;
 using HASMLib;
+using HASMLib.Core;
 using HASMLib.Core.BaseTypes;
 using HASMLib.Parser;
 using HASMLib.Runtime;
@@ -154,9 +155,9 @@ namespace HASM
                     int size = source.ParseResult.Sum(p => p.FixedSize);
                     toolStripLabel1.Text =
                         $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}" +
-                        $" | Byte code size: {size} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(size == 1 ? "" : "s")}" +
+                        $" | Byte code size: {size} {(HASMBase.IsSTD ? "byte" : "fbn")}{(size == 1 ? "" : "s")}" +
                         $" | Run in: {Formatter.ToPrettyFormat(runtime.TimeOfRunning)} or {runtime.Ticks} step{(runtime.Ticks == 1 ? "" : "s")}" +
-                        $" | Result is: {Output.Count} {(workingFolder.CompileConfig.Base == 8 ? "byte" : "fbn")}{(Output.Count == 1 ? "" : "s")}";
+                        $" | Result is: {Output.Count} {(HASMBase.IsSTD ? "byte" : "fbn")}{(Output.Count == 1 ? "" : "s")}";
                 }
 
 
@@ -181,7 +182,7 @@ namespace HASM
                         richTextBox1.Text = string.Join(", ", Output.Select(p =>
                         {
                             string baseStr = Convert.ToString((long)p, 2);
-                            baseStr = new string('0', workingFolder.CompileConfig.Base - baseStr.Length) + baseStr;
+                            baseStr = new string('0', (HASMBase.IsSTD ? 8 : BaseIntegerType.PrimitiveType.Base) - baseStr.Length) + baseStr;
                             return "0b" + baseStr;
 
                         }));

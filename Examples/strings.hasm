@@ -1,0 +1,11 @@
+;
+; Пример работы со строками
+;
+
+#include "lib/ide.hasm"
+
+#ifndef _std_base
+#error Cant work with strings with not standart base
+#endif
+
+        out "Hello string" ; Константная строка

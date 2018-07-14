@@ -9,13 +9,34 @@
 #endif
 
 #if __base__ == 8
+
 #define _8base
+#define _std_base
+
 #elif __base__ == 16
+
 #define _16base
+#define _std_base
+
+#elif __base__ == 32
+
+#define _32base
+#define _std_base
+
+
+#elif __base__ == 64
+
+#define _64base
+#define _std_base
+
 #elif __base__ == 12
+
 #define _12base
+
 #elif __base__ == 4
+
 #define _4base
+
 #endif
 
 

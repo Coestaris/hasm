@@ -10,6 +10,10 @@ namespace HASMLib.Core
 
         private static bool _set = false;
 
+        public static bool IsSTD => _base == 64 || _base == 32 || _base == 16 || _base == 8;
+
+        public static int PrimitiveTypesInCommon => BaseIntegerType.CommonType.Base / BaseIntegerType.PrimitiveType.Base;
+
         public static int Base
         {
             get => _base;

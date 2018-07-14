@@ -9,7 +9,7 @@ namespace HASMLib.Core.MemoryZone
         public BaseIntegerType VariableType { get; private set; }
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Variable;
-		public override int FixedSize => (1 + 3 + 1) * 8 / HASMBase.Base;
+		public override int FixedSize => 2 * 8 / BaseIntegerType.PrimitiveType.Base + HASMBase.PrimitiveTypesInCommon;
 
 		public override byte[] ToBytes ()
 		{

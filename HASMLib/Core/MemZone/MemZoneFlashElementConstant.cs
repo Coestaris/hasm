@@ -19,8 +19,8 @@ namespace HASMLib.Core.MemoryZone
 
         public override int FixedSize 
 		{
-			get => (1 + 2 + 1 + HASMBase.Base / BaseIntegerType.PrimitiveType.Base) * 8 / HASMBase.Base;
-		}
+            get => 2 * 8 / BaseIntegerType.PrimitiveType.Base + 2 * HASMBase.PrimitiveTypesInCommon;
+        }
 
         public Constant ToConstant()
         {
@@ -30,13 +30,13 @@ namespace HASMLib.Core.MemoryZone
 		public override byte[] ToBytes ()
 		{
 			// 1. (1 byte)  - is: const (0), var (1) or instruction (2)
-			// 2. (3 bytes) - const global index
+			// 2. (n bytes) - const global index
 			// 3. (1 byte)  - length: 1 - single, 2 - double, 3 - quad(n)
 			// 4. (n bytes) - data
 			List<byte> bytes = new List<byte>();
 			bytes.Add(Element_Const);                   // Is Const;
             bytes.AddRange(Index.ToBytes()); 	        // Global Index
-			bytes.Add((byte)Value.Type.Base);                   // Length of const
+			bytes.Add((byte)Value.Type.Base);           // Length of const
             bytes.AddRange(Value.ToBytes());
 			return bytes.ToArray();
 		}

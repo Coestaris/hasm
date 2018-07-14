@@ -18,8 +18,11 @@ namespace HASMLib.Core.MemoryZone
         {
             get
             {
-                if (Parameters == null) return (4 + 2) * 8 / (int)HASMBase.Base;
-                else return (4 + 2 + 3 * Parameters.Count) * 8 / (int)HASMBase.Base;
+                if (Parameters == null) return 8 / BaseIntegerType.PrimitiveType.Base + 2 * HASMBase.PrimitiveTypesInCommon;
+                else return 
+                        8 / BaseIntegerType.PrimitiveType.Base + 
+                        2 * HASMBase.PrimitiveTypesInCommon + 
+                        (8 / BaseIntegerType.PrimitiveType.Base + HASMBase.PrimitiveTypesInCommon) * Parameters.Count;
             }
         }
 

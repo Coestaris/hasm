@@ -7,9 +7,9 @@
 #include "lib/colors.hasm"
 
 #ifndef _bitwise_h_             ; Если библиотека не была загружена bitw.hasm,
-     
-    out 0_q                     ; Выведем 8 нулей
-    out 0_q                     ;
+      
+    out 0x0                     ; Выведем 8 нулей
+    out 0x0                     ;
 
 #else
 
@@ -30,5 +30,6 @@
     
     out cl_RED                  ; Выводим R2
     out cl_BLUE                 ; Выводим R2
+    out byte_0x12               ; Выводим R2
     
 #endif
