@@ -1,5 +1,5 @@
 ﻿using HASMLib.Core.BaseTypes;
-using HASMLib.Parser.Parser;
+using HASMLib.Parser.SourceParsing;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using System;

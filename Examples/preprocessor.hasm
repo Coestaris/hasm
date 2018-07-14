@@ -58,7 +58,7 @@
         out 0x0_q                   ; Если выполняется условие, вывести 4 нуля
 #elif !defined(someDef) && !defined(someValue) && !defined(someAnotherDef) && !defined(someExpression)
 #error This is sample error code!
-        out 0x1_q                   ; Если выполняется условие, вывести 1 и 3 нуля
+        out 0x11                   ; Если выполняется условие, вывести 1 и 3 нуля
 #endif
 
 #warning This is sample warning

@@ -1,7 +1,7 @@
 ﻿using HASMLib.Parser.SyntaxTokens;
 using System.Collections.Generic;
 
-namespace HASMLib.Parser.Parser
+namespace HASMLib.Parser
 {
     internal struct PreprocessorParseResult
     {

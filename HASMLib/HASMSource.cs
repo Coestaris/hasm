@@ -4,16 +4,28 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
+using HASMLib.Parser.SyntaxTokens;
 
 namespace HASMLib
 {
     public class HASMSource
     {
-        public TimeSpan ParseTime { get; private set; }
+        internal List<SourceLine> _lines;
+        internal List<UnknownLabelNameError> _unknownLabelNameErrorList;
+        internal List<Variable> _variables;
+        internal List<NamedConstant> _namedConsts;
+        internal int _constIndex;
+        internal int _expressionIndex;
+        internal int _varIndex;
+        internal int _instructionIndex;
+
         public string Source { get; set; }
         public string BaseFilename { get; set; }
         public string WorkingDirectory { get; set; }
-		public List<MemZoneFlashElement> ParseResult { get; private set; }
+        public HASMMachine Machine { get; set; }
+
+        public TimeSpan ParseTime { get; internal set; }
+        public List<MemZoneFlashElement> ParseResult { get; internal set; }
 
         public HASMSource(HASMMachine machine, string fileName, string workingDirectory = null)
         {
@@ -34,10 +46,7 @@ namespace HASMLib
 			Source = source;
 			Machine = machine;
         }
-
-
-		public HASMMachine Machine { get ; set; }
-
+        
 		public int UsedFlash 
 		{
 			get
@@ -58,23 +67,6 @@ namespace HASMLib
 		public void OutputCompiled(string fileName)
 		{
 			File.WriteAllBytes (fileName, OutputCompiled ());
-		}
-
-		public ParseError Parse()
-		{
-            DateTime startTime = DateTime.Now;
-
-            ParseResult = new HASMParser().Parse(Machine, out ParseError err, BaseFilename, WorkingDirectory, Machine.UserDefinedDefines);
-
-            if (err != null)
-				return err;
-
-			if (ParseResult == null)
-				return new ParseError (ParseErrorType.Other_UnknownError);
-
-            ParseTime = TimeSpan.FromMilliseconds((DateTime.Now - startTime).TotalMilliseconds);
-
-            return null;
 		}
     }
 }

@@ -16,18 +16,13 @@ namespace HASM.Classes
         public string Path;
 
         public List<string> OpenedTabs;
-
         public OutputType OutputType;
-
         public int SelectedTab;
-
         public Size WindowSize;
-
         public Point WindowPosition;
-
         public int EditorSplitterDistance;
-
         public int MainSplitterDistance;
+        public bool OutputBuildLog;
 
         public static void ToFile(string filename, UserConfig cfg)
         {

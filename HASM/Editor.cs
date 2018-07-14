@@ -4,6 +4,7 @@ using HASMLib;
 using HASMLib.Core;
 using HASMLib.Core.BaseTypes;
 using HASMLib.Parser;
+using HASMLib.Parser.SourceParsing;
 using HASMLib.Runtime;
 
 using System;
@@ -24,17 +25,13 @@ namespace HASM
         }
 
         public static Editor Self;
-
         private OutputType outputType;
-
         private WorkingFolder workingFolder;
-
         private FileNode selectedNode = null;
-
         private Thread runThread;
-
         private List<Integer> Output;
-      
+        private List<ParseTask> Tasks;
+
         public void Run(string FileName)
         {
             HASMMachine machine = new HASMMachine(
@@ -51,90 +48,117 @@ namespace HASM
             };
 
             machine.SetRegisters(workingFolder.CompileConfig.RegisterNameFormat, (uint)workingFolder.CompileConfig.RegisterCount);
-            HASMParser parser = new HASMParser();
-
+            
             HASMSource source = new HASMSource(machine, FileName, null);
 
             loadingCircle1.Visible = true;
-            splitContainer_editor.Enabled = false;
+            tabControl1.Enabled = false;
             stopToolStripMenuItem.Enabled = true;
 
-            ParseError error = source.Parse();
+            var parser = new ParseTaskRunner(source);
+            parser.AsyncParseEnd += ParsingEnd;
+            parser.AsyncTaskСhanged += Parser_AsyncTaskChanged;
 
-            if (error != null)
+            parser.RunAsync();
+        }
+
+        private void Parser_AsyncTaskChanged(ParseTaskRunner runner, HASMSource Source)
+        {
+            if (InvokeRequired)
             {
-                error.Line++;
-                MessageBox.Show(error.ToString(), "Parsing error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                loadingCircle1.Visible = false;
-                stopToolStripMenuItem.Enabled = false;
-                splitContainer_editor.Enabled = true;
-
-                if(error.FileName != null)
-                {
-                    bool found = false;
-                    foreach (TextEditor page in tabControl1.TabPages)
-                        if (page.Path == error.FileName)
-                        {
-                            tabControl1.SelectedTab = page;
-                            found = true;
-                            break;
-                        }
-
-                    if (!found) AddTab(error.FileName);
-
-                    if(error.Line != -1)
-                    {
-                        TextEditor tab = (tabControl1.SelectedTab as TextEditor);
-                        FastColoredTextBox tb = tab.TextBox;
-                        var minLines = 0;
-                        var maxLines = tb.LinesCount;
-                        var max = tb.VerticalScroll.Maximum;
-                        var min = tb.VerticalScroll.Minimum;
-                        var currentLine = error.Line;
-                        var maxLinesInScreen = tb.Height / tb.Font.SizeInPoints;
-
-                        if (tab.HighlightedLine != -1)
-                        { 
-                            tb[tab.HighlightedLine].BackgroundBrush = Brushes.Transparent;
-                            tab.HighlightedLine = -1;
-                        };
-
-                        tab.HighlightedLine = error.Line - 1;
-                        tb[error.Line - 1].BackgroundBrush = Brushes.Pink;
-                    
-                        if (maxLinesInScreen > maxLines)
-                            return;
-
-                        currentLine = Math.Max(currentLine - (int)(maxLinesInScreen / 2), 0);
-
-                        int position = (int)((currentLine - minLines) * (max - min) / (float)(maxLines - minLines) + min);
-
-                        tb.VerticalScroll.Value = position - 1;
-                        tb.VerticalScroll.Value = position;
-
-                    }
-                }
-                return;
+                Invoke(new ParseTaskRunner.AsyncTaskChangedDelegate(Parser_AsyncTaskChanged), runner, Source);
             }
-
-            IOStream iostream = new IOStream();
-            var runtime = machine.CreateRuntimeMachine(source, iostream);
-
-            runThread = new Thread(p =>
+            else
             {
-                var result = runtime.Run();
-                if (result != RuntimeOutputCode.OK)
-                    MessageBox.Show($"Runtime error: {result}", "Runtime error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                RunEnd(iostream, runtime, source);
-            });
-
-
-            runThread.Start();
+                Tasks = runner.Tasks;
+                OutputToTextBox();
+            }
         }
 
         delegate void RunEndDelegate(IOStream iostream, RuntimeMachine runtime, HASMSource source);
+
+        void ParsingEnd(ParseTaskRunner runner, HASMSource source)
+        {
+            if (InvokeRequired)
+            {
+                var del = new ParseTaskRunner.AsyncParseEndDelegate(ParsingEnd);
+                Invoke(del, runner, source);
+            }
+            else
+            {
+                if (runner.Status == ParseTaskStatus.Failed)
+                {
+                    ParseError error = runner.Tasks[runner.FailedTaskIndex].Error;
+
+                    error.Line++;
+                    MessageBox.Show($"Task \"{runner.Tasks[runner.FailedTaskIndex].Name}\" failed\n{error.ToString()}", "Parsing error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    loadingCircle1.Visible = false;
+                    stopToolStripMenuItem.Enabled = false;
+                    tabControl1.Enabled = true;
+
+                    if (error.FileName != null)
+                    {
+                        bool found = false;
+                        foreach (TextEditor page in tabControl1.TabPages)
+                            if (page.Path == error.FileName)
+                            {
+                                tabControl1.SelectedTab = page;
+                                found = true;
+                                break;
+                            }
+
+                        if (!found) AddTab(error.FileName);
+
+                        if (error.Line != -1)
+                        {
+                            TextEditor tab = (tabControl1.SelectedTab as TextEditor);
+                            FastColoredTextBox tb = tab.TextBox;
+                            var minLines = 0;
+                            var maxLines = tb.LinesCount;
+                            var max = tb.VerticalScroll.Maximum;
+                            var min = tb.VerticalScroll.Minimum;
+                            var currentLine = error.Line;
+                            var maxLinesInScreen = tb.Height / tb.Font.SizeInPoints;
+
+                            if (tab.HighlightedLine != -1)
+                            {
+                                tb[tab.HighlightedLine].BackgroundBrush = Brushes.Transparent;
+                                tab.HighlightedLine = -1;
+                            };
+
+                            tab.HighlightedLine = error.Line - 1;
+                            tb[error.Line - 1].BackgroundBrush = Brushes.Pink;
+
+                            if (maxLinesInScreen < maxLines)
+                            {
+                                currentLine = Math.Max(currentLine - (int)(maxLinesInScreen / 2), 0);
+                                int position = (int)((currentLine - minLines) * (max - min) / (float)(maxLines - minLines) + min);
+                                tb.VerticalScroll.Value = position - 1;
+                                tb.VerticalScroll.Value = position;
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    IOStream iostream = new IOStream();
+                    var runtime = source.Machine.CreateRuntimeMachine(source, iostream);
+
+                    runThread = new Thread(p =>
+                    {
+                        var result = runtime.Run();
+                        if (result != RuntimeOutputCode.OK)
+                            MessageBox.Show($"Runtime error: {result}", "Runtime error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        RunEnd(iostream, runtime, source);
+                    });
+
+                    runThread.Start();
+                }
+            }
+        }
 
         void RunEnd(IOStream iostream, RuntimeMachine runtime, HASMSource source)
         {
@@ -164,7 +188,7 @@ namespace HASM
                 OutputToTextBox();
                 loadingCircle1.Visible = false;
                 stopToolStripMenuItem.Enabled = false;
-                splitContainer_editor.Enabled = true;
+                tabControl1.Enabled = true;
 
                 (tabControl1.SelectedTab as TextEditor)?.TextBox.Focus();
             }
@@ -172,33 +196,53 @@ namespace HASM
 
         void OutputToTextBox()
         {
-            if (Output != null) switch (outputType)
-                {
-                    case OutputType.Hex:
-                        richTextBox1.Text = string.Join(", ", Output.Select(p => "0x" + p.ToString("X")));
-                        break;
+            if(workingFolder.UserConfig.OutputBuildLog)
+            {
+                TimeSpan timeSpan = TimeSpan.Zero;
+                Tasks.ForEach(p => timeSpan += p.Length);
 
-                    case OutputType.Bin:
-                        richTextBox1.Text = string.Join(", ", Output.Select(p =>
-                        {
-                            string baseStr = Convert.ToString((long)p, 2);
-                            baseStr = new string('0', (HASMBase.IsSTD ? 8 : BaseIntegerType.PrimitiveType.Base) - baseStr.Length) + baseStr;
-                            return "0b" + baseStr;
+                richTextBox1.Text =
+                    $" ==== Build started at {Tasks[0].StartTime} ====\n" +
+                    string.Join("\n", Tasks.Select((p) =>
+                    {
+                        string str = $"{p.Name} - {p.Status}";
+                        if (p.Status != ParseTaskStatus.Waiting)
+                            str += $" - {Formatter.ToPrettyFormat(p.Length)}";
 
-                        }));
-                        break;
+                        if (p.Status == ParseTaskStatus.Failed)
+                            str += $"\n\nParse Error: {p.Error}\n";
 
-                    case OutputType.Dec:
-                        richTextBox1.Text = string.Join(", ", Output.Select(p => p.ToString()));
-                        break;
+                        return str;
+                    })) +
+                    $"\n ==== Time spent: {Formatter.ToPrettyFormat(timeSpan)} ====";
+            }
+            else if (Output != null) switch (outputType)
+            {
+                case OutputType.Hex:
+                    richTextBox1.Text = string.Join(", ", Output.Select(p => "0x" + p.ToString("X")));
+                    break;
 
-                    case OutputType.Char:
-                        richTextBox1.Text = string.Join("", Output.Select(p => (char)p));
-                        break;
+                case OutputType.Bin:
+                    richTextBox1.Text = string.Join(", ", Output.Select(p =>
+                    {
+                        string baseStr = Convert.ToString((long)p, 2);
+                        baseStr = new string('0', (HASMBase.IsSTD ? 8 : BaseIntegerType.PrimitiveType.Base) - baseStr.Length) + baseStr;
+                        return "0b" + baseStr;
 
-                    default:
-                        break;
-                }
+                    }));
+                    break;
+
+                case OutputType.Dec:
+                    richTextBox1.Text = string.Join(", ", Output.Select(p => p.ToString()));
+                    break;
+
+                case OutputType.Char:
+                    richTextBox1.Text = string.Join("", Output.Select(p => (char)p));
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void AddTab(string path)
@@ -294,10 +338,18 @@ namespace HASM
                 workingFolder.UserConfig = UserConfig.FromFile(workingFolder.UserConfigPath, workingFolder.Path);
 
                 Size = workingFolder.UserConfig.WindowSize;
-                Left = workingFolder.UserConfig.WindowPosition.X;
-                Top = workingFolder.UserConfig.WindowPosition.Y;
                 splitContainer_main.SplitterDistance = workingFolder.UserConfig.MainSplitterDistance;
                 splitContainer_editor.SplitterDistance = workingFolder.UserConfig.EditorSplitterDistance;
+
+                if (workingFolder.UserConfig.WindowPosition.X == -32000)
+                {
+                    WindowState = FormWindowState.Minimized;
+                }
+                else
+                {
+                    Left = workingFolder.UserConfig.WindowPosition.X;
+                    Top = workingFolder.UserConfig.WindowPosition.Y;
+                }
             }
             else
             {
@@ -883,6 +935,28 @@ namespace HASM
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem_output.Checked = false;
+            toolStripMenuItem_buildLog.Checked = true;
+            workingFolder.UserConfig.OutputBuildLog = true;
+
+            workingFolder.SaveUser();
+
+            OutputToTextBox();
+        }
+
+        private void outputToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem_output.Checked = true;
+            toolStripMenuItem_buildLog.Checked = false;
+            workingFolder.UserConfig.OutputBuildLog = false;
+
+            workingFolder.SaveUser();
+
+            OutputToTextBox();
         }
     }
 }
