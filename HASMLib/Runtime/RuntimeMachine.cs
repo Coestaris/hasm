@@ -130,7 +130,7 @@ namespace HASMLib.Runtime
 
                         case ReferenceType.Expression:
                             if (!expressions.Exists(p => p.Index == parameter.Index))
-                                return RuntimeOutputCode.UnknownConstantReference;
+                                return RuntimeOutputCode.UnknownExpressionReference;
                             break;
                     }
                 }

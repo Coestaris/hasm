@@ -134,8 +134,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 if (!referenceConditional)
                     return false;
 
-                return (Subtokens.All(p => p._valueSet) ||
-                        Subtokens.All(p => p.IsSimple)) &&
+                return (Subtokens.All(p => p._valueSet) ||  Subtokens.All(p => p.IsSimple)) &&
                         (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null));
             }
             else if (_referenceSet && Reference.Type == ReferenceType.Variable)

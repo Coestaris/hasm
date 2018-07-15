@@ -6,7 +6,7 @@ namespace HASMLib.Parser
     public class ObjectReference
     {
         public Integer Index { get; internal set; }
-        public ReferenceType Type { get; private set; }
+        public ReferenceType Type { get; internal set; }
         public MemZoneFlashElement Object { get; internal set; }
 
         public ObjectReference(Integer index, ReferenceType type)

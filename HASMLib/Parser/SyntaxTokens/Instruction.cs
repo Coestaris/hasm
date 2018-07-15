@@ -18,12 +18,12 @@ namespace HASMLib.Parser.SyntaxTokens
 
         protected MemZoneVariable GetVar(MemZone mz, Integer index)
         {
-            return mz.RAM.Find(p => p.Index == index);
+            return mz.RAM[(int)index];
         }
 
         protected NamedConstant GetConst(List<NamedConstant> constants, Integer index)
         {
-            return constants.Find(p => p.Index == index);
+            return constants[(int)index];
         }
 
         public void RuntimeMachineJump(Integer position, RuntimeMachine runtimeMachine)

@@ -2,9 +2,10 @@
 {
     public enum RuntimeOutputCode
     {
+        UnknownExpressionReference,
         UnknownConstantReference,
         UnknownVariableReference,
+        StackOverFlow,
         OK,
-        StackOverFlow
     }
 }
