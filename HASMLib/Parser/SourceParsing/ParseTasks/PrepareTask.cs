@@ -19,7 +19,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             source.Machine.GetRegisterNames().ForEach(p =>
             {
                 var a = new MemZoneFlashElementVariable((Integer)(source._varIndex++));
-                source._variables.Add(new Variable(p, 64)
+                source._variables.Add(new Variable(p, BaseIntegerType.CommonType.Base)
                 {
                     FEReference = a
                 });
