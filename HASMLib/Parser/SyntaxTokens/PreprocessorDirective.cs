@@ -20,7 +20,7 @@ namespace HASMLib.Parser.SyntaxTokens
 
         public bool CanAddNewLines { get; protected set; }
         public string Name { get; protected set; }
-        
+
         public string ClearInput(string input)
         {
             var match = SourceLine.CommentRegex.Match(input);
@@ -30,7 +30,7 @@ namespace HASMLib.Parser.SyntaxTokens
 
             return input.TrimStart('#').Remove(0, Name.Length).Trim(' ', '\t', '\r');
         }
-       
+
         public static bool IsPreprocessorLine(string line)
         {
             return line.StartsWith("#");
@@ -105,7 +105,7 @@ namespace HASMLib.Parser.SyntaxTokens
             if (!File.Exists(fileName))
                 fileName = Path.Combine(workingDirectory, fileName);
 
-            if(!File.Exists(fileName))
+            if (!File.Exists(fileName))
             {
                 return new PreprocessorParseResult(
                     null,
@@ -114,7 +114,7 @@ namespace HASMLib.Parser.SyntaxTokens
 
             List<string> lines = getLinesFunc(fileName);
 
-            for(int index = 0; index < lines.Count; index++)
+            for (int index = 0; index < lines.Count; index++)
             {
                 string line = lines[index];
 
@@ -123,7 +123,7 @@ namespace HASMLib.Parser.SyntaxTokens
                     PreprocessorDirective directive = GetDirective(line, index, fileName, out ParseError error);
                     if (error != null) return new PreprocessorParseResult(null, error);
 
-                    if(directive.CanAddNewLines)
+                    if (directive.CanAddNewLines)
                     {
                         var newLines = directive.Apply(line, enableStack, defines, out ParseError parseError, RecursiveParse);
                         if (parseError != null) return new PreprocessorParseResult(null, parseError);
@@ -143,12 +143,12 @@ namespace HASMLib.Parser.SyntaxTokens
                             continue;
 
                         ParseError parseError = Define.ResolveDefines(defines, ref line, index, fileName);
-                        if(parseError != null) return new PreprocessorParseResult(null, parseError);
+                        if (parseError != null) return new PreprocessorParseResult(null, parseError);
                         result.Add(new SourceLineInstruction(line, index, fileName));
                     }
                 }
             }
-            return new PreprocessorParseResult(result, null); 
+            return new PreprocessorParseResult(result, null);
         }
 
         internal abstract void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error);

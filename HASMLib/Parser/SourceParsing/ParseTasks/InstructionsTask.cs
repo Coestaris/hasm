@@ -4,10 +4,8 @@ using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace HASMLib.Parser.SourceParsing.ParseTasks
 {
@@ -110,7 +108,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                 //Попытка пропарсить выражение
                 ParseError expressionError = expressionError = Expression.Parse(argument, out Expression expression);
-                
+
                 //Грубое определние типа нашего аргумента
                 bool isConst = constant != null;
                 bool isVar = source._variables.Select(p => p.Name).Contains(argument);

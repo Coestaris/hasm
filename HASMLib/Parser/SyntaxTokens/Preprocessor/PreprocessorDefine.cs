@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
-    internal class PreprocessorDefine: PreprocessorDirective
+    internal class PreprocessorDefine : PreprocessorDirective
     {
         public PreprocessorDefine()
         {
@@ -15,14 +15,14 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
         internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
-            if(enableStack.Contains(false))
+            if (enableStack.Contains(false))
             {
                 error = null;
                 return;
             }
 
             input = ClearInput(input);
-            if(string.IsNullOrEmpty(input))
+            if (string.IsNullOrEmpty(input))
             {
                 error = new ParseError(ParseErrorType.Preprocessor_NameExpected);
                 return;
@@ -31,7 +31,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             string[] parts = input.Split(' ');
             string name = parts[0];
 
-            if(name.Contains('(') || name.Contains(')') || name.Contains(','))
+            if (name.Contains('(') || name.Contains(')') || name.Contains(','))
             {
                 if (!ParametricDefine.ParametricDefineRegex.IsMatch(name))
                 {
@@ -39,7 +39,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                     return;
                 }
 
-                if(parts.Length == 1)
+                if (parts.Length == 1)
                 {
                     error = new ParseError(ParseErrorType.Preprocessor_ParametricDefineWithoutExpression);
                     return;
@@ -47,7 +47,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
                 var newDef = new ParametricDefine(name, string.Join(" ", parts.Skip(1)));
 
-                if(defines.Exists(p => p.Name == newDef.Name))
+                if (defines.Exists(p => p.Name == newDef.Name))
                 {
                     error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
                     return;
@@ -57,12 +57,12 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                 Define.ResolveDefines(defines, ref value, -1, null);
                 newDef.Value = value;
                 defines.Add(newDef);
-                
+
                 error = null;
                 return;
             }
 
-            if(!Define.GeneralDefineNameRegex.IsMatch(name))
+            if (!Define.GeneralDefineNameRegex.IsMatch(name))
             {
                 error = new ParseError(ParseErrorType.Preprocessor_WrongDefineName);
                 return;

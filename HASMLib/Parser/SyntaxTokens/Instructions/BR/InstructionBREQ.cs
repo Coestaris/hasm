@@ -27,7 +27,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
         {
             ComapreResult result = (ComapreResult)(int)memZone.Stack.Pop();
 
-            if(result.HasFlag(ComapreResult.Equal))
+            if (result.HasFlag(ComapreResult.Equal))
             {
                 Integer position = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
 

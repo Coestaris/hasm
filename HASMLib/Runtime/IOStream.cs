@@ -65,14 +65,14 @@ namespace HASMLib.Runtime
 
         public long Position
         {
-            get 
-			{
-				throw new NotSupportedException();
-			}
-			set
-			{
-				throw new NotSupportedException();
-			}
+            get
+            {
+                throw new NotSupportedException();
+            }
+            set
+            {
+                throw new NotSupportedException();
+            }
         }
 
         public void Flush()

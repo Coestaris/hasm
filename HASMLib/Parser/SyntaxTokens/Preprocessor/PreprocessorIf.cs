@@ -34,13 +34,13 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
             var expError = Expression.Parse(input, out Expression exp, (token) =>
             {
-                if(token.UnaryFunction == null || token.UnaryFunction.FunctionString != "defined")
+                if (token.UnaryFunction == null || token.UnaryFunction.FunctionString != "defined")
                 {
                     var def = defines.Find(p => p.Name == token.RawValue);
                     if (def == null) throw new WrongTokenException();
                     token.RawValue = def.Value;
 
-                    if(!token.IsSimple)
+                    if (!token.IsSimple)
                     {
                         Expression.Parse(token.RawValue, out Expression expression);
                         token.Subtokens = expression.TokenTree.Subtokens;
@@ -52,7 +52,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                 return new ObjectReference((Integer)0, ReferenceType.Define);
             });
 
-            if(expError != null)
+            if (expError != null)
             {
                 error = expError;
                 return;

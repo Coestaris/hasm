@@ -46,13 +46,13 @@ namespace HASMLib
             HASMBase.Base = hasmBase;
         }
 
-		public List<string> GetRegisterNames()
-		{
-			var a = new List<string> ();
-			for (int i = 0; i < RegisterCount; i++)
-				a.Add(string.Format(_registerNameFormat, i));
-			return a;
-		}
+        public List<string> GetRegisterNames()
+        {
+            var a = new List<string>();
+            for (int i = 0; i < RegisterCount; i++)
+                a.Add(string.Format(_registerNameFormat, i));
+            return a;
+        }
 
         public RuntimeMachine CreateRuntimeMachine(HASMSource source, IOStream iostream = null)
         {

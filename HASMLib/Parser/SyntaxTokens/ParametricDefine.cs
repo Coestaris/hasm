@@ -47,10 +47,10 @@ namespace HASMLib.Parser.SyntaxTokens
             }
 
             string expanded = Value;
-            for(int i = 0; i < parameters.Count; i++)
+            for (int i = 0; i < parameters.Count; i++)
             {
                 var matches = ParameterRegexes[i].Matches(expanded);
-                for(int j = matches.Count - 1; j >= 0; j--)
+                for (int j = matches.Count - 1; j >= 0; j--)
                 {
                     expanded = expanded.Remove(matches[j].Index, matches[j].Length);
                     expanded = expanded.Insert(matches[j].Index, parameters[i]);

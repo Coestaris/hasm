@@ -1,14 +1,13 @@
 ﻿using HASMLib.Parser.SourceParsing.ParseTasks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace HASMLib.Parser.SourceParsing
 {
     public class ParseTaskRunner
     {
-        public ParseTaskStatus Status { get; private set; } =  ParseTaskStatus.Waiting;
+        public ParseTaskStatus Status { get; private set; } = ParseTaskStatus.Waiting;
         private Thread workingThread;
 
         public int FailedTaskIndex;

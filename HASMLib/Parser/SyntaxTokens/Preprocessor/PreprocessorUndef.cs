@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
-    internal class PreprocessorUndef: PreprocessorDirective
+    internal class PreprocessorUndef : PreprocessorDirective
     {
         public PreprocessorUndef()
         {
@@ -28,7 +28,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                 return;
             }
 
-            if(!defines.Exists(p => p.Name == input))
+            if (!defines.Exists(p => p.Name == input))
             {
                 error = new ParseError(ParseErrorType.Preprocessor_UnknownDefineName);
                 return;

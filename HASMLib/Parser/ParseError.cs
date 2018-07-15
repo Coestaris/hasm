@@ -4,7 +4,7 @@ namespace HASMLib.Parser
 {
     public class ParseError
     {
-		private const int NullValue = -1;
+        private const int NullValue = -1;
 
         public override string ToString()
         {
@@ -17,9 +17,9 @@ namespace HASMLib.Parser
         }
 
         public ParseError(ParseErrorType type)
-		{
-			Type = type;
-		}
+        {
+            Type = type;
+        }
 
         public ParseError(ParseErrorType type, int index)
         {
@@ -31,7 +31,7 @@ namespace HASMLib.Parser
         {
             Type = type;
             Index = index;
-			Line = line;
+            Line = line;
         }
 
         public ParseError(ParseErrorType type, int line, int index, string fileName)
@@ -51,7 +51,7 @@ namespace HASMLib.Parser
 
         public string FileName { get; set; }
         public ParseErrorType Type { get; set; }
-		public int Line { get; set; } = NullValue;
-		public int Index { get; set; } = NullValue;
+        public int Line { get; set; } = NullValue;
+        public int Index { get; set; } = NullValue;
     }
 }

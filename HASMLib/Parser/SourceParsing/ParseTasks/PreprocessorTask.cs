@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace HASMLib.Parser.SourceParsing.ParseTasks
 {
@@ -30,7 +29,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerRun()
         {
-            List<SourceLine> lines = PreprocessorDirective.RecursiveParse(source.BaseFilename, 
+            List<SourceLine> lines = PreprocessorDirective.RecursiveParse(source.BaseFilename,
                 source.WorkingDirectory, out ParseError parseError, BasePrepareLines, source.Machine.UserDefinedDefines);
 
             source._lines = lines;

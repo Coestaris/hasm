@@ -15,11 +15,11 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
         internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
-           if (enableStack.Count == 0)
-           {
+            if (enableStack.Count == 0)
+            {
                 error = new ParseError(ParseErrorType.Preprocessor_EndifWithoutPreviousConditionals);
                 return;
-           }
+            }
 
             if (enableStack.Skip(1).Contains(false))
             {

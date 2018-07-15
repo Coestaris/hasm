@@ -19,7 +19,7 @@ namespace HASMLib.Runtime
 
         public TimeSpan TimeOfRunning { get; private set; }
         public int Ticks { get; internal set; }
-		public bool IsRunning { get; private set; }
+        public bool IsRunning { get; private set; }
 
         internal List<Integer> InBuffer;
         internal Integer ProgramCounter;
@@ -47,18 +47,18 @@ namespace HASMLib.Runtime
             OutBufferUpdated?.Invoke(bytes);
         }
 
-		internal Integer GetGlobalInstructionIndexByLocalOne(Integer localIndex)
+        internal Integer GetGlobalInstructionIndexByLocalOne(Integer localIndex)
         {
             return _source.ParseResult.FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
                 .Select(p => (MemZoneFlashElementInstruction)p)
                 .First(p => p.ProgramIndex == localIndex).RuntimeAbsoluteIndex;
         }
-        
+
         public RuntimeOutputCode Run()
         {
             DateTime startTime = DateTime.Now;
 
-			IsRunning = true;
+            IsRunning = true;
 
             Ticks = 0;
             InBuffer = new List<Integer>();
@@ -70,7 +70,7 @@ namespace HASMLib.Runtime
 
             TimeOfRunning = TimeSpan.FromMilliseconds((DateTime.Now - startTime).TotalMilliseconds);
 
-			IsRunning = false;
+            IsRunning = false;
 
             return result;
         }
@@ -111,7 +111,7 @@ namespace HASMLib.Runtime
             });
 
             //Проверяем валидность ссылок
-            foreach(MemZoneFlashElementInstruction instruction in data.FindAll(p => p.Type == MemZoneFlashElementType.Instruction))
+            foreach (MemZoneFlashElementInstruction instruction in data.FindAll(p => p.Type == MemZoneFlashElementType.Instruction))
             {
                 //Проверяем валидность ссылок
                 foreach (var parameter in instruction.Parameters)
@@ -139,7 +139,7 @@ namespace HASMLib.Runtime
             for (; (int)ProgramCounter < data.Count; ProgramCounter += (Integer)1)
             {
                 Ticks++;
-                if(data[(int)ProgramCounter].Type == MemZoneFlashElementType.Variable)
+                if (data[(int)ProgramCounter].Type == MemZoneFlashElementType.Variable)
                 {
                     var var = ((MemZoneFlashElementVariable)data[(int)ProgramCounter]);
                     _machine.MemZone.RAM.Add(new MemZoneVariable(var.VariableType, var.Index));
@@ -147,7 +147,7 @@ namespace HASMLib.Runtime
                 }
 
                 var instruction = (MemZoneFlashElementInstruction)data[(int)ProgramCounter];
-                
+
                 if (Ticks == int.MaxValue)
                     return RuntimeOutputCode.StackOverFlow;
 
@@ -158,7 +158,7 @@ namespace HASMLib.Runtime
                 if (output != RuntimeOutputCode.OK)
                     return output;
             }
-                      
+
             return RuntimeOutputCode.OK;
         }
     }

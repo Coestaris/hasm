@@ -15,7 +15,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             NameString = "push";
             Name = new Regex("^push", RegexOptions.IgnoreCase);
             ParameterCount = 1;
-            ParameterTypes  = new List<InstructionParameterType>()
+            ParameterTypes = new List<InstructionParameterType>()
             {
                 InstructionParameterType.Register | InstructionParameterType.Constant | InstructionParameterType.Expression
             };

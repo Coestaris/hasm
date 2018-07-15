@@ -11,10 +11,10 @@ namespace HASMLib.Core
         public List<MemZoneVariable> RAM { get; private set; }
 
         public List<MemZoneFlashElement> Flash { get; internal set; }
-    
+
         public int FreeRAM => _ram - Stack.Count - RAM.Count;
         public int FreeFlash => _flash - Flash.Count;
-        
+
         private int _flash;
         private int _ram;
 
@@ -35,6 +35,6 @@ namespace HASMLib.Core
             Flash = flash;
         }
 
-        
+
     }
 }

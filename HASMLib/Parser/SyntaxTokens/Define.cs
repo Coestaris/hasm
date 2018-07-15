@@ -21,7 +21,7 @@ namespace HASMLib.Parser.SyntaxTokens
 
         public override string ToString()
         {
-            return 
+            return
                 $"{Name}" +
                 $"{(IsParametric ? "(" + string.Join(",", (this as ParametricDefine).ParameterNames) + ")" : "")}" +
                 $"{(Value.Length > 10 ? "[" + Value.Substring(0, 10) + "...]" : (Value.Length != 0 ? "[" + Value + "]" : ""))}";
@@ -37,7 +37,7 @@ namespace HASMLib.Parser.SyntaxTokens
                 if (matches.Count != 0)
                 {
                     for (int matchIndex = matches.Count - 1; matchIndex >= 0; matchIndex--)
-                    { 
+                    {
                         Match match = matches[matchIndex];
 
                         if (commentIndex != -1 && match.Index > commentIndex)

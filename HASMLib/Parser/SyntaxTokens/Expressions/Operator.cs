@@ -92,7 +92,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             Priority = int.MaxValue;
             OperatorString = operatorString;
             IsUnary = true;
-          
+
             UnaryFunc = function;
         }
 

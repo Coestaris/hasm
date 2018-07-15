@@ -1,9 +1,7 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
-using HASMLib.Parser.SyntaxTokens.Expressions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace HASMLib.Parser.SourceParsing.ParseTasks
 {
@@ -30,7 +28,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         private List<MemZoneFlashElementInstruction> Instructions;
         private List<MemZoneFlashElementExpression> Expressions;
         private List<ConstnantGrouping> Constnants;
-        
+
         private void GetComponents()
         {
             Instructions = source.ParseResult

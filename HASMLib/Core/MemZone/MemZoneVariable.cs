@@ -1,6 +1,4 @@
 ﻿using HASMLib.Core.BaseTypes;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace HASMLib.Core.MemoryZone
 {
@@ -10,7 +8,7 @@ namespace HASMLib.Core.MemoryZone
         public Integer Index { get; protected set; }
         public Integer Value { get; set; }
 
-        public MemZoneVariable(BaseIntegerType type, Integer index) : this(new Integer(0, type), index) 
+        public MemZoneVariable(BaseIntegerType type, Integer index) : this(new Integer(0, type), index)
         { }
 
         public MemZoneVariable(Integer value, Integer index)

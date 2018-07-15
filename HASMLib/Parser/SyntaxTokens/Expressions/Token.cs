@@ -134,7 +134,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 if (!referenceConditional)
                     return false;
 
-                return (Subtokens.All(p => p._valueSet) ||  Subtokens.All(p => p.IsSimple)) &&
+                return (Subtokens.All(p => p._valueSet) || Subtokens.All(p => p.IsSimple)) &&
                         (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null));
             }
             else if (_referenceSet && Reference.Type == ReferenceType.Variable)
@@ -154,9 +154,9 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             if (_valueSet) return $"Value: {Value}";
             else
             {
-                if(UnaryOperator == null)
+                if (UnaryOperator == null)
                     return $"Raw Value: {RawValue}";
-                else 
+                else
                     return $"Raw Value: {UnaryOperator.OperatorString}({RawValue})";
             }
         }
@@ -362,7 +362,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             if (_valueSet)
                 return Value;
 
-            if(_referenceSet && Reference.Type == ReferenceType.Define)
+            if (_referenceSet && Reference.Type == ReferenceType.Define)
             {
                 return new Constant(PreprocessorIf.defines.Exists(p => p.Name == RawValue));
             }
@@ -401,7 +401,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             }
 
         }
-        
+
         /// <summary>
         /// Создает новый экземпляр класса <see cref="Token"/>
         /// </summary>
@@ -426,7 +426,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 UnaryFunction = UnaryFunction,
                 Value = Value,
                 Reference = Reference,
-                 _valueSet = _valueSet
+                _valueSet = _valueSet
             };
         }
     }

@@ -47,11 +47,12 @@ namespace HASMLib.Parser.SourceParsing
         {
             EndTime = DateTime.Now;
             Length = TimeSpan.FromMilliseconds((EndTime - StartTime).TotalMilliseconds);
-            if(isFailed)
+            if (isFailed)
             {
                 Status = ParseTaskStatus.Failed;
                 Error = error;
-            } else
+            }
+            else
             {
                 Status = ParseTaskStatus.Ok;
             }

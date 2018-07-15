@@ -35,38 +35,39 @@ namespace HASMLib
 
         public HASMSource(HASMMachine machine, Stream fs)
         {
-			byte[] bytes = new byte[fs.Length];
-			fs.Read (bytes, 0, (int)fs.Length);
-			Source = new string(bytes.Select(p => (char)p).ToArray());
-			Machine = machine;
+            byte[] bytes = new byte[fs.Length];
+            fs.Read(bytes, 0, (int)fs.Length);
+            Source = new string(bytes.Select(p => (char)p).ToArray());
+            Machine = machine;
         }
 
-		public HASMSource(HASMMachine machine, string source)
+        public HASMSource(HASMMachine machine, string source)
         {
-			Source = source;
-			Machine = machine;
+            Source = source;
+            Machine = machine;
         }
-        
-		public int UsedFlash 
-		{
-			get
-			{
-				return ParseResult.Sum (p => p.FixedSize);
-			}
-		}
 
-		public byte[] OutputCompiled()
-		{
-			List<byte> bytes = new List<byte> ();
-			foreach (var item in ParseResult) {
-				bytes.AddRange (item.ToBytes ());
-			}
-			return bytes.ToArray ();
-		}
+        public int UsedFlash
+        {
+            get
+            {
+                return ParseResult.Sum(p => p.FixedSize);
+            }
+        }
 
-		public void OutputCompiled(string fileName)
-		{
-			File.WriteAllBytes (fileName, OutputCompiled ());
-		}
+        public byte[] OutputCompiled()
+        {
+            List<byte> bytes = new List<byte>();
+            foreach (var item in ParseResult)
+            {
+                bytes.AddRange(item.ToBytes());
+            }
+            return bytes.ToArray();
+        }
+
+        public void OutputCompiled(string fileName)
+        {
+            File.WriteAllBytes(fileName, OutputCompiled());
+        }
     }
 }

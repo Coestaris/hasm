@@ -63,8 +63,8 @@ namespace HASMLib.Parser.SyntaxTokens
         }
 
         public MemZoneFlashElementConstant ToFlashElement(Integer index)
-		{
+        {
             return new MemZoneFlashElementConstant(Value, index);
-		}
+        }
     }
 }

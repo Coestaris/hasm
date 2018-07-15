@@ -113,7 +113,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             new Operator(2, 4, "&&", (a, b) => new Constant(new Integer(a.AsBool() && b.AsBool() ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
             new Operator(2, 3, "||", (a, b) => new Constant(new Integer(a.AsBool() || b.AsBool() ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
 
-            new Operator(1, 2, "?",  (a, b) => 
+            new Operator(1, 2, "?",  (a, b) =>
             {
                 Operator.ConditionalOperatorResult = a.AsBool();
                 Operator.ConditionalSecondOperand = b;
@@ -194,7 +194,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                             {
                                 unaryOperatorToAdd = FindUnaryOperator(currentOperator, true);
                                 operatorIsUnary = false;
-                            } else operators.Add(currentOperator);
+                            }
+                            else operators.Add(currentOperator);
                         }
 
                         //Сбрасываем накопительную переменную
@@ -204,12 +205,12 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     }
                     //Если прошлый символ был не оператором, значит что-то там таки было
                     //Возмонжно функция
-                    else if(bracketCount == 0 && currentToken != "" && firstOpenedBracketInCurrentLevel)
+                    else if (bracketCount == 0 && currentToken != "" && firstOpenedBracketInCurrentLevel)
                     {
                         firstOpenedBracketInCurrentLevel = false;
 
                         //Низя юзать дефайнед, если того не разрешено
-                        if(currentToken == "defined")
+                        if (currentToken == "defined")
                         {
                             if (!PreprocessorIf.AllowDefinedFunction)
                                 throw new NotAllowedDefinedFunctionException();
@@ -363,8 +364,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
                 tokens.Add(new Token(currentToken)
                 {
-                     UnaryOperator = unaryOperatorToAdd,
-                     UnaryFunction = unaryFunctionToAdd,
+                    UnaryOperator = unaryOperatorToAdd,
+                    UnaryFunction = unaryFunctionToAdd,
 
                 });
                 unaryOperatorToAdd = null;
@@ -399,7 +400,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     tokens[i].RightSideToken = tokens[i + 1];
                 }
                 //Самый правый токен
-                else if(i != 0 && i == tokens.Count - 1 && tokens.Count != 1)
+                else if (i != 0 && i == tokens.Count - 1 && tokens.Count != 1)
                 {
                     tokens[i].LeftSideOperator = FindOperator(operators[i - 1], false);
                     tokens[i].LeftSideToken = tokens[i - 1];
@@ -407,7 +408,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                     tokens[i].RightSideToken = null;
                 }
                 //Токен не скраю
-                else if(i != 0 && tokens.Count != 1)
+                else if (i != 0 && tokens.Count != 1)
                 {
                     tokens[i].LeftSideOperator = FindOperator(operators[i - 1], false);
                     tokens[i].LeftSideToken = tokens[i - 1];
@@ -501,7 +502,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             }
 
             if (token.Subtokens == null)
-                if(!isProbe) throw new Exception();
+                if (!isProbe) throw new Exception();
                 else return;
 
             //Рекурсивно считаем все дочерные токены, вплоть до самых последних,
@@ -521,7 +522,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             }
 
             //Ну тут уже безысходность
-            if(!isProbe)
+            if (!isProbe)
                 throw new Exception();
         }
 
@@ -557,9 +558,9 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             Calculate(zone, TokenTree, isProbe);
 
             var value = TokenTree.Value;
-            
+
             //Чистим расчитаные значения для тех токенов, которые зависят от переменных.
-            if(clearCache) ClearCache(TokenTree);
+            if (clearCache) ClearCache(TokenTree);
 
             return value;
         }
@@ -665,7 +666,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             try
             {
                 result = new Expression(input);
-            }  
+            }
             catch (UnknownFunctionException e)
             {
                 if (e.FuncName != null)
@@ -674,7 +675,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                         rawInput.IndexOf(e.FuncName));
                 else return new ParseError(ParseErrorType.Syntax_Expression_UnknownFunction);
             }
-            catch(UnknownOperatorException e)
+            catch (UnknownOperatorException e)
             {
                 if (e.OperatorName != null)
                     return new ParseError(
@@ -690,11 +691,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             {
                 return new ParseError(ParseErrorType.Syntax_Expression_NotAllowToUseDefinedFunction);
             }
-            catch(StackOverflowException)
+            catch (StackOverflowException)
             {
                 return new ParseError(ParseErrorType.Syntax_Expression_CantParse);
             }
-            catch(WrongTokenException)
+            catch (WrongTokenException)
             {
                 return new ParseError(ParseErrorType.Syntax_Expression_UnknownToken);
             }

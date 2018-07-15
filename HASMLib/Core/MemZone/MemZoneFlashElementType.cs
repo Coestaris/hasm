@@ -4,7 +4,7 @@
     {
         Variable,
         Instruction,
-		Constant,
+        Constant,
         Expression,
         Undefined
     }

@@ -15,7 +15,7 @@ namespace HASMLib.Core.MemoryZone
         public List<ObjectReference> Parameters { get; private set; }
         public Integer ProgramIndex { get; private set; }
         public Integer RuntimeAbsoluteIndex { get; internal set; }
-        
+
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Instruction;
 
         public override int FixedSize
@@ -23,9 +23,9 @@ namespace HASMLib.Core.MemoryZone
             get
             {
                 if (Parameters == null) return 8 / BaseIntegerType.PrimitiveType.Base + 2 * HASMBase.PrimitiveTypesInCommon;
-                else return 
-                        8 / BaseIntegerType.PrimitiveType.Base + 
-                        2 * HASMBase.PrimitiveTypesInCommon + 
+                else return
+                        8 / BaseIntegerType.PrimitiveType.Base +
+                        2 * HASMBase.PrimitiveTypesInCommon +
                         (8 / BaseIntegerType.PrimitiveType.Base + HASMBase.PrimitiveTypesInCommon) * Parameters.Count;
             }
         }

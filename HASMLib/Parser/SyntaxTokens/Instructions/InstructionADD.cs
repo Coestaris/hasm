@@ -15,7 +15,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             NameString = "add";
             Name = new Regex("^add", RegexOptions.IgnoreCase);
             ParameterCount = 2;
-            ParameterTypes  = new List<InstructionParameterType>()
+            ParameterTypes = new List<InstructionParameterType>()
             {
                 InstructionParameterType.Register,
                 InstructionParameterType.Register | InstructionParameterType.Constant | InstructionParameterType.Expression

@@ -31,8 +31,8 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             }
 
             input = ClearInput(input);
-            
-            if(!Name1Regex.IsMatch(input) && !Name2Regex.IsMatch(input))
+
+            if (!Name1Regex.IsMatch(input) && !Name2Regex.IsMatch(input))
             {
                 error = new ParseError(ParseErrorType.Preprocessor_WrongNameFormat);
                 return null;

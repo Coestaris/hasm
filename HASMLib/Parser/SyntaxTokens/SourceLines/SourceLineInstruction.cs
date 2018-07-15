@@ -26,14 +26,14 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         public override string ToString()
         {
-            if(Instruction != null)
+            if (Instruction != null)
             {
                 return $"{Instruction.NameString} {string.Join(" ", Parameters)}";
             }
-            else if(Instruction == null && string.IsNullOrEmpty(Label) && string.IsNullOrEmpty(Comment))
+            else if (Instruction == null && string.IsNullOrEmpty(Label) && string.IsNullOrEmpty(Comment))
             {
                 return $"Empty line";
-            } 
+            }
             else return $"No instruction line.{(string.IsNullOrEmpty(Label) ? "" : " [has label]")} {(Comment == null ? "" : " [has comment]")}";
         }
 
@@ -64,7 +64,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
             LineIndex = index;
             FileName = filename;
         }
-        
+
         private void FindAndDeleteLabel(ref string input)
         {
             Label = "";
@@ -130,7 +130,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
                              FileName);
                     }
 
-                    if(stringParts.Length == 2)
+                    if (stringParts.Length == 2)
                     {
                         //Выделяем со строки параметры в отдельный массив
                         SplitLineIntoArguments(stringParts, out var instructionName, out var parameters);

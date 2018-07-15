@@ -15,10 +15,10 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
 
         public ParseError Parse(string str, out Constant constant)
         {
-            if(str.Contains('_'))
+            if (str.Contains('_'))
             {
                 var parts = str.Split('_');
-                if(parts.Length != 2)
+                if (parts.Length != 2)
                 {
                     constant = null;
                     return new ParseError(ParseErrorType.Syntax_Constant_WrongFormat);
@@ -26,7 +26,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
 
                 var type = BaseIntegerType.Types.Find(p => p.Name == parts[0]);
 
-                if(type == null)
+                if (type == null)
                 {
                     constant = null;
                     return new ParseError(ParseErrorType.Syntax_Constant_WrongType);

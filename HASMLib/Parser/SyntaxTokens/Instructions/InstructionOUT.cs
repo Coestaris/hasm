@@ -15,13 +15,13 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             NameString = "out";
             Name = new Regex("^out", RegexOptions.IgnoreCase);
             ParameterCount = 1;
-            ParameterTypes  = new List<InstructionParameterType>()
+            ParameterTypes = new List<InstructionParameterType>()
             {
                 InstructionParameterType.Constant | InstructionParameterType.Expression | InstructionParameterType.Register
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions,  List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
             var value = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine);
             runtimeMachine.OutBytes(value.ToPrimitive());

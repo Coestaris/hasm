@@ -41,7 +41,7 @@ namespace HASMLib.Core
                         BaseIntegerType.PrimitiveType = BaseIntegerType.Types.Find(p => p.Name == "byte");
                         break;
                     default:
-                        if (BaseIntegerType.Types == null || 
+                        if (BaseIntegerType.Types == null ||
                             BaseIntegerType.CommonType == null ||
                             BaseIntegerType.CommonSignedType == null)
                             throw new InvalidOperationException("Если указанная битность не 64, 32, 16 или 8 вы должны сами указать все базовые типы");

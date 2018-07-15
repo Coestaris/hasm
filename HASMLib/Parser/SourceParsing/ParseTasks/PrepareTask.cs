@@ -3,7 +3,6 @@ using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 namespace HASMLib.Parser.SourceParsing.ParseTasks
 {
@@ -43,7 +42,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             }
 
             //Проверка валидности указанного имени рабочей директории
-            if (source.WorkingDirectory== null)
+            if (source.WorkingDirectory == null)
             {
                 source.WorkingDirectory = new FileInfo(source.BaseFilename).DirectoryName;
             }
