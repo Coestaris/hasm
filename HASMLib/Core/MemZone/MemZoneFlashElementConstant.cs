@@ -8,7 +8,7 @@ namespace HASMLib.Core.MemoryZone
     public class MemZoneFlashElementConstant : MemZoneFlashElement
     {
         public Integer Index { get; set; }
-        protected Integer Value { get; set; }
+        public Integer Value { get; set; }
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Constant;
 
         public MemZoneFlashElementConstant(Integer value, Integer index)
@@ -40,5 +40,10 @@ namespace HASMLib.Core.MemoryZone
             bytes.AddRange(Value.ToBytes());
 			return bytes.ToArray();
 		}
+
+        public override string ToString()
+        {
+            return $"Constant[Index: {Index}. Value: {Value}]";
+        }
     }
 }

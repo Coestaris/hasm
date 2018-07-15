@@ -1,12 +1,16 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Parser;
 using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System.Collections.Generic;
 
 namespace HASMLib.Core.MemoryZone
 {
     internal class MemZoneFlashElementInstruction : MemZoneFlashElement
     {
+        private const byte Parameter_Const = 1;
+        private const byte Parameter_Var = 2;
+
         public Integer InstructionNumber { get; private set; }
         public List<ObjectReference> Parameters { get; private set; }
         public Integer ProgramIndex { get; private set; }
@@ -25,9 +29,6 @@ namespace HASMLib.Core.MemoryZone
                         (8 / BaseIntegerType.PrimitiveType.Base + HASMBase.PrimitiveTypesInCommon) * Parameters.Count;
             }
         }
-
-        private const byte Parameter_Const = 1;
-        private const byte Parameter_Var = 2;
 
         public override byte[] ToBytes()
         {
@@ -59,6 +60,11 @@ namespace HASMLib.Core.MemoryZone
             InstructionNumber = (Integer)instruction.Index;
             Parameters = arguments;
             ProgramIndex = index;
+        }
+
+        public override string ToString()
+        {
+            return $"Instrution[{SourceLineInstruction.Instructions[(int)InstructionNumber].Name}]";
         }
     }
 }

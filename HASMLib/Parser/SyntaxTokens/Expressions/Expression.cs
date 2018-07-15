@@ -490,26 +490,30 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Рекурсивный метод расчета значения токенов
         /// </summary>
         /// <param name="token">Токен, который будет расчитываться</param>
-        private void Calculate(MemZone zone, Token token)
+        private void Calculate(MemZone zone, Token token, bool isProbe)
         {
             //Если токен можно посчитать сходу то делаем это
-            if (token.CanBeCalculated)
+            if (token.CanBeCalculated(zone))
             {
                 token.Calculate(zone);
                 Steps += token.Steps;
                 return;
             }
 
+            if (token.Subtokens == null)
+                if(!isProbe) throw new Exception();
+                else return;
+
             //Рекурсивно считаем все дочерные токены, вплоть до самых последних,
             //Которые обязаны считаться!
             foreach (Token subToken in token.Subtokens)
             {
-                Calculate(zone, subToken);
+                Calculate(zone, subToken, isProbe);
                 Steps += subToken.Steps;
             }
 
             //Если после пересчета возможно посчитать, то считаем
-            if (token.CanBeCalculated)
+            if (token.CanBeCalculated(zone))
             {
                 token.Calculate(zone);
                 Steps += token.Steps;
@@ -517,7 +521,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             }
 
             //Ну тут уже безысходность
-            throw new Exception();
+            if(!isProbe)
+                throw new Exception();
         }
 
         /// <summary>
@@ -541,14 +546,15 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Расчитывает числовое значение данного выражения
         /// </summary>
         /// <param name="clearCache">Стоит ли чистить числовыые значения токенов независящих от переменных</param>
+        /// <param name="isProbe">Указывает на то что данный запуск пробный, и не должен гарантировать получение результата</param>
         /// <returns>Числовое значение выражения</returns>
-        public Constant Calculate(MemZone zone = null, bool clearCache = false)
+        public Constant Calculate(MemZone zone = null, bool clearCache = false, bool isProbe = false)
         {
             Steps = 0;
 
             //Пытаемся посчиать его рекурсивно.
             //Там все ссылочно кладется в токены, так что не нужно ничего возвращать
-            Calculate(zone, TokenTree);
+            Calculate(zone, TokenTree, isProbe);
 
             var value = TokenTree.Value;
             
@@ -558,7 +564,6 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             return value;
         }
 
-
         /// <summary>
         /// Расчитывает числовое значение данного выражения
         /// </summary>
@@ -567,7 +572,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         {
             //Пытаемся посчиать его рекурсивно.
             //Там все ссылочно кладется в токены, так что не нужно ничего возвращать
-            Calculate(zone, TokenTree);
+            Calculate(zone, TokenTree, false);
 
             return TokenTree.Value;
         }

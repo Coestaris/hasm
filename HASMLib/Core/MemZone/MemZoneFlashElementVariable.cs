@@ -28,5 +28,10 @@ namespace HASMLib.Core.MemoryZone
 			Index = index;
             VariableType = index.Type;
 		}
+
+        public override string ToString()
+        {
+            return $"Variable[Index: {Index}, Type: {VariableType}]";
+        }
     }
 }

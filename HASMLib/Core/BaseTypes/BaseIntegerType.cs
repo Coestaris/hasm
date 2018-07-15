@@ -5,14 +5,16 @@ namespace HASMLib.Core.BaseTypes
 {
     public class BaseIntegerType
     {
-        public int Base;
+        public static List<BaseIntegerType> Types;
+        public static BaseIntegerType PrimitiveType;
+        public static BaseIntegerType CommonType;
+        public static BaseIntegerType CommonSignedType;
 
+        public int Base;
         public long MinValue;
         public ulong MaxValue;
         public ulong BitMask;
-
         public bool IsSigned;
-
         public string Name;
 
         public BaseIntegerType(int _base, bool isSigned, string name)
@@ -33,15 +35,15 @@ namespace HASMLib.Core.BaseTypes
             BitMask = (ulong)Math.Pow(2, _base) - 1;
         }
 
-        public static List<BaseIntegerType> Types;
-
-        public static BaseIntegerType PrimitiveType;
-        public static BaseIntegerType CommonType;
-        public static BaseIntegerType CommonSignedType;
 
         internal List<Integer> Cast(Integer integer)
         {
             return integer.Cast(this);
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} - ({Base} bits)";
         }
     }
 }

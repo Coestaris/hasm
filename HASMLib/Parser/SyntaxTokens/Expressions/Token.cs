@@ -102,31 +102,46 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Возможно ли расчитать числовое значение данного токена. Если да, то <see cref="Calculate"/> вернет данное значение
         /// </summary>
-        public bool CanBeCalculated
+        public bool CanBeCalculated(MemZone mz = null)
         {
-            get
+            //Можно посчиатать если:
+            //  1. Значение уже подсчитано
+            // или
+            //  2. Нету дочерных токенов
+            //  Если дочерные токены есть, то можно если:
+            //  3. Все значениея дочерных уже подсчиатыны
+            // или
+            //  4. Если ссылки на дочерные установлены 
+            //      4.1. И если ссылки - переменные, то если все переменные есть в mz
+            // или  
+            //  5. Все дочерные значения примитивные, и их можно подсчитать
+            // 
+            // Но подсчитать нельзя если:
+            //   Некоторые дочерние токены имеют унарные функции или операторы
+
+            if (_valueSet)
+                return true;
+
+            if (Subtokens != null)
             {
-                //Можно посчиатать если:
-                //  1. Значение уже подсчитано
-                // или
-                //  2. Нету дочерных токенов
-                //  Если дочерные токены есть, то можно если:
-                //  3. Все значениея дочерных уже подсчиатыны
-                // или
-                //  4. Если ссылки на дочерные установлены
-                // или  
-                //  5. Все дочерные значения примитивные, и их можно подсчитать
-                // 
-                // Но подсчитать нельзя если:
-                //   Некоторые дочерние токены имеют унарные функции или операторы
+                bool referenceConditional = true;
+                bool hasRefsToVar = Subtokens.Exists(p => p.Reference != null && p.Reference.Type == ReferenceType.Variable);
+                if (hasRefsToVar) referenceConditional = mz != null &&
+                            Subtokens
+                            .FindAll(p => p.Reference != null && p.Reference.Type == ReferenceType.Variable)
+                            .All(p => mz.RAM.Exists(j => j.Index == p.Reference.Index));
 
-                bool result = _valueSet || Subtokens == null;
-                if (Subtokens != null)
-                    result = result || ((Subtokens.All(p => p._valueSet) || Subtokens.All(p => p._referenceSet) || Subtokens.All(p => p.IsSimple)) &&
-                         (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null) ));
+                if (!referenceConditional)
+                    return false;
 
-                return result;
+                return (Subtokens.All(p => p._valueSet) ||
+                        Subtokens.All(p => p.IsSimple)) &&
+                        (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null));
             }
+            else if (_referenceSet && Reference.Type == ReferenceType.Variable)
+                return mz != null && mz.RAM.Exists(p => p.Index == Reference.Index);
+            else
+                return true;
         }
 
         /// <summary>

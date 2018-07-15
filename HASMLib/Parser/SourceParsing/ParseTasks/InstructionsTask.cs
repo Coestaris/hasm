@@ -194,8 +194,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                                         };
                                     }
                                 }
-                            },
-                            (c) =>
+                            }
+                            /*,(c) =>
                             {
                                 //Расчет нового индекса константы	
                                 int constIndex = ++source._constIndex;
@@ -209,7 +209,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                                     Object = flashElement
                                 };
 
-                            });
+                            }*/);
 
                         Integer index = (Integer)(++source._expressionIndex);
                         result.Add(new MemZoneFlashElementExpression(expression, index));

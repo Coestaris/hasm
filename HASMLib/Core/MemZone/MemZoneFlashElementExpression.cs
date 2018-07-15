@@ -22,5 +22,10 @@ namespace HASMLib.Core.MemoryZone
         {
             throw new NotImplementedException();
         }
+
+        public override string ToString()
+        {
+            return $"Expression[{Expression.TokenTree.RawValue}]";
+        }
     }
 }
