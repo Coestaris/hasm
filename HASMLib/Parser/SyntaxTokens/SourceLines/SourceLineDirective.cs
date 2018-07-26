@@ -1,4 +1,5 @@
-﻿using HASMLib.Parser.SyntaxTokens.Structure;
+﻿using HASMLib.Parser.SourceParsing.ParseTasks;
+using HASMLib.Parser.SyntaxTokens.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace HASMLib.Parser.SyntaxTokens.SourceLines
 {
-    class SourceLineDirective : SourceLine
+    public class SourceLineDirective : SourceLine
     {
         public class SourceLineDirectiveType
         {
@@ -22,7 +23,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
         }
 
         public const char DirectiveStartChar = '.';
-        private static Regex DirectiveRegex = new Regex(@"^\.\w+(\([^,]+?(,([^,]+?,\s?)+[^,]+)?\))?\s+\w+$");
+        private static Regex DirectiveRegex = new Regex(@"^\.\w+(\((([^,]+?,\s?)+[^,]+)?\))?\s+\w+$");
 
         private static List<SourceLineDirectiveType> _sourceLineTypes;
 
@@ -47,6 +48,8 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
                 return _sourceLineTypes;
             }
         }
+
+        public virtual RuleTarget Target => RuleTarget.Class;
 
         public bool RequireCodeBlock;
         public CodeBlock CodeBlock;

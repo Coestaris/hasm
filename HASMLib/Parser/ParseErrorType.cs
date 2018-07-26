@@ -50,5 +50,11 @@
         Directives_EndOfCodeBlockExpected,
         Other_DocumentWithNoParentClassIsNotAllowed,
         Other_InstructionsInRootOfDocumentIsNotAllowed,
+        Directives_InnerInstructionsAreNotAllowed,
+        Directives_NotAllowedAccessModifier,
+        Directives_UnknownModifier,
+        Directives_ModifierValueRequired,
+        Directives_SomeRequiredModifiersAreMissing,
+        Directives_WrongChildTarget,
     }
 }

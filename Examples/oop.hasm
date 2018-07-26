@@ -8,7 +8,7 @@
 #error Cant work with strings with not standart base
 #endif
 
-.class(public, sealed, debugName:"TestClass") TestClass
+.class(public, sealed) TestClass
 {
     
     .function(public, ret:void, param:uint32:a, param:uint32:b) AddValues

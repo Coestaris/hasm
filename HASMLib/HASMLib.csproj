@@ -57,9 +57,13 @@
     <Compile Include="Parser\SourceParsing\InnerTypes\NamedConstant.cs" />
     <Compile Include="Parser\SourceParsing\ObjectReference.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\InstructionsTask.cs" />
+    <Compile Include="Parser\SyntaxTokens\Structure\Modifier.cs" />
+    <Compile Include="Parser\SourceParsing\ParseTasks\ResolveStructureTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\OptimizeReferencesTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTaskStatus.cs" />
+    <Compile Include="Parser\SyntaxTokens\Structure\RuleTarget.cs" />
+    <Compile Include="Parser\SyntaxTokens\Structure\StructureRule.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\StructureTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\PrepareTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\PreprocessorTask.cs" />

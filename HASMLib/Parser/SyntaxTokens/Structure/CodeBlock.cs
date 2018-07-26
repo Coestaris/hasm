@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HASMLib.Parser.SyntaxTokens.Structure
 {
-    class CodeBlock
+    public class CodeBlock
     {
         public const string BlockOpened = "{";
         public const string BlockClosed = "}";

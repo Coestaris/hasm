@@ -1,9 +1,4 @@
 ﻿using HASMLib.Parser.SyntaxTokens.SourceLines;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Parser.SyntaxTokens.Structure
 {
@@ -11,8 +6,12 @@ namespace HASMLib.Parser.SyntaxTokens.Structure
     {
         public static string FindName = "class";
 
-        public SourceLineDirectiveClass(SourceLine line) : base(line)
+        public override RuleTarget Target => RuleTarget.Class;
+
+        public SourceLineDirectiveClass(SourceLineDirective line) : base(line)
         {
+            Name = line.Name;
+            Parameters = line.Parameters;
             RequireCodeBlock = true;
         }
     }
