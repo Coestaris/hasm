@@ -1,7 +1,0 @@
-; Взято с https://sites.google.com/site/avrasmintro/home/2b-basic-math
-
-#include "lib/ide.hasm"
-
-#ifndef _8base
-#error Работа с не 8-битным ассеблером невозможна
-#endif

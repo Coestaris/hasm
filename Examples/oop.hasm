@@ -1,0 +1,31 @@
+;
+; Пример работы со строками
+;
+
+#include "lib/ide.hasm"
+
+#ifndef _std_base
+#error Cant work with strings with not standart base
+#endif
+
+.class(public, sealed, debugName:"TestClass") TestClass
+{
+    
+    .function(public, ret:void, param:uint32:a, param:uint32:b) AddValues
+    {
+        mov R1, 0
+        add R1, a
+        add R1, b
+        out R1
+        ret
+    }
+    
+    .function(public, ret:uint32, param:uint32:a, param:uint32:b) AddValuesWithResult
+    {
+        mov R1, 0
+        add R1, a
+        add R1, b
+        out R1
+        ret R1
+    }
+}

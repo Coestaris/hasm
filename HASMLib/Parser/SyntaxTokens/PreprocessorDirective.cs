@@ -144,7 +144,7 @@ namespace HASMLib.Parser.SyntaxTokens
 
                         ParseError parseError = Define.ResolveDefines(defines, ref line, index, fileName);
                         if (parseError != null) return new PreprocessorParseResult(null, parseError);
-                        result.Add(new SourceLineInstruction(line, index, fileName));
+                        result.Add(new SourceLine(line, index, fileName));
                     }
                 }
             }

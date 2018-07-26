@@ -41,5 +41,14 @@
         Preprocessor_UserDefinedError,
         Syntax_Expression_UnknownToken,
         Syntax_Constant_WrongType,
+        Directives_WrongDirectiveFormat,
+        Directives_WrongBracketCount,
+        Directives_WrongDirective,
+        Directives_StartOfCodeBlockExpected,
+        Directives_StartOfCodeBlockIsUnexpected,
+        Directives_EndOfCodeBlockIsunexpected,
+        Directives_EndOfCodeBlockExpected,
+        Other_DocumentWithNoParentClassIsNotAllowed,
+        Other_InstructionsInRootOfDocumentIsNotAllowed,
     }
 }

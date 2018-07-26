@@ -60,6 +60,7 @@
     <Compile Include="Parser\SourceParsing\ParseTasks\OptimizeReferencesTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTaskStatus.cs" />
+    <Compile Include="Parser\SourceParsing\ParseTasks\StructureTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\PrepareTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\PreprocessorTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTaskRunner.cs" />
@@ -98,10 +99,14 @@
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorDefine.cs" />
     <Compile Include="Parser\SyntaxTokens\SourceLine.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorIfdef.cs" />
+    <Compile Include="Parser\SyntaxTokens\SourceLines\SourceLineCodeBlockLimiter.cs" />
     <Compile Include="Parser\SyntaxTokens\SourceLines\SourceLineDirective.cs" />
     <Compile Include="Parser\SyntaxTokens\SourceLines\SourceLineInstruction.cs" />
     <Compile Include="Parser\SyntaxTokens\PreprocessorDirective.cs" />
     <Compile Include="Parser\SourceParsing\InnerTypes\UnknownLabelNameError.cs" />
+    <Compile Include="Parser\SyntaxTokens\Structure\SourceLineDirectiveFunction.cs" />
+    <Compile Include="Parser\SyntaxTokens\Structure\SourceLineDirectiveClass.cs" />
+    <Compile Include="Parser\SyntaxTokens\Structure\CodeBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\MemZone.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstant.cs" />
@@ -121,6 +126,11 @@
     <Compile Include="Runtime\IOStream.cs" />
     <Compile Include="Runtime\RuntimeMachine.cs" />
     <Compile Include="Runtime\RuntimeOutputCode.cs" />
+    <Compile Include="Runtime\Structures\AccessModifier.cs" />
+    <Compile Include="Runtime\Structures\BaseStructure.cs" />
+    <Compile Include="Runtime\Structures\Class.cs" />
+    <Compile Include="Runtime\Structures\Function.cs" />
+    <Compile Include="Runtime\Structures\Object.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

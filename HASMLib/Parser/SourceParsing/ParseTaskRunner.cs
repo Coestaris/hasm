@@ -16,8 +16,9 @@ namespace HASMLib.Parser.SourceParsing
         {
             new PrepareTask(),
             new PreprocessorTask(),
-            new InstructionsTask(),
-            new OptimizeReferencesTask()
+            new StructureTask(),
+            //new InstructionsTask(),
+           // new OptimizeReferencesTask()
         };
 
         public delegate void AsyncParseEndDelegate(ParseTaskRunner runner, HASMSource Source);

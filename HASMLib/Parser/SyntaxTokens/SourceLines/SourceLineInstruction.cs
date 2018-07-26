@@ -32,7 +32,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
             }
             else if (Instruction == null && string.IsNullOrEmpty(Label) && string.IsNullOrEmpty(Comment))
             {
-                return $"Empty line";
+                return $"EL: {input}";
             }
             else return $"No instruction line.{(string.IsNullOrEmpty(Label) ? "" : " [has label]")} {(Comment == null ? "" : " [has comment]")}";
         }
@@ -58,12 +58,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         }
 
-        public SourceLineInstruction(string input, int index = -1, string filename = null)
-        {
-            this.input = input;
-            LineIndex = index;
-            FileName = filename;
-        }
+        public SourceLineInstruction(string input, int index = -1, string filename = null) : base(input, index, filename) { }
 
         private void FindAndDeleteLabel(ref string input)
         {
