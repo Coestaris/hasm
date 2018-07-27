@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Parser.SyntaxTokens.Structure;
+using HASMLib.Runtime.Structures;
 
 namespace HASMLib
 {
@@ -20,6 +21,7 @@ namespace HASMLib
         internal int _varIndex;
         internal int _instructionIndex;
         internal CodeBlock _parentBlock;
+        internal List<BaseStructure> _structures;
 
         public string Source { get; set; }
         public string BaseFilename { get; set; }

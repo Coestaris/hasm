@@ -1,7 +1,4 @@
-﻿using HASMLib.Core.BaseTypes;
-using HASMLib.Core.MemoryZone;
-using HASMLib.Parser.SyntaxTokens;
-using HASMLib.Parser.SyntaxTokens.Structure;
+﻿using HASMLib.Parser.SyntaxTokens.Structure;
 using HASMLib.Runtime.Structures;
 using System;
 using System.Collections.Generic;
@@ -17,7 +14,6 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         {
             new StructureRule()
             {
-                AssignedType = typeof(SourceLineDirectiveClass),
                 Target = RuleTarget.Class,
                 AvailableAccsessModifiers = new List<AccessModifier>()
                 {
@@ -34,13 +30,12 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 AllowedInnerInstructions = false,
                 Modifiers = new List<Modifier>()
                 {
-                    new Modifier(false, false, Class.Abstract),
-                    new Modifier(false, false, Class.Sealed),
+                    new Modifier(false, false, Class.AbstractKeyword),
+                    new Modifier(false, false, Class.SealedKeyword),
                 }
             },
             new StructureRule()
             {
-                AssignedType = typeof(SourceLineDirectiveFunction),
                 Target = RuleTarget.Method,
                 AvailableAccsessModifiers = new List<AccessModifier>()
                 {
@@ -53,9 +48,26 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 AllowedInnerInstructions = true,
                 Modifiers = new List<Modifier>()
                 {
-                    new Modifier(true, true, Function.Return),
-                    new Modifier(false, true, Function.Parameter)
+                    new Modifier(true, true, Function.ReturnKeyword),
+                    new Modifier(false, true, Function.ParameterKeyword)
                 },
+            },
+            new StructureRule()
+            {
+                Target = RuleTarget.Field,
+                AvailableAccsessModifiers = new List<AccessModifier>()
+                {
+                    AccessModifier.Private,
+                    AccessModifier.Default,
+                    AccessModifier.Inner,
+                    AccessModifier.Public
+                },
+                AllowedChilds = null,
+                AllowedInnerInstructions = false,
+                Modifiers = new List<Modifier>()
+                {
+                    new Modifier(true, true, Field.TypeKeyword)
+                }
             }
         };
 
@@ -170,6 +182,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 }
             }
 
+            source._parentBlock = null;
+            source._structures = structures;
             InnerEnd(false, null);
         }
     }

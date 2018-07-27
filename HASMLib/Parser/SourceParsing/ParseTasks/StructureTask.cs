@@ -48,6 +48,10 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         sourceLineDirective = directive;
                         startRequired = true;
                     }
+                    else
+                    {
+                        block.ChildBlocks.Add(new CodeBlock(directive));
+                    }
                 }
                 else if (SourceLineCodeBlockLimiter.IsCodeBlockLimiter(lines[i].Input))
                 {

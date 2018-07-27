@@ -1,28 +1,39 @@
 ﻿using HASMLib.Parser.SyntaxTokens.Structure;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Runtime.Structures
 {
     public class Class : BaseStructure
     {
-        public const string Abstract = "abstract";
-        public const string Sealed = "sealed";
+        public const string NameSeparator = ".";
 
-        private static string GetName(Class _class, string separator, string result)
+        public const string AbstractKeyword = "abstract";
+        public const string SealedKeyword = "sealed";
+
+        private string _fullName;
+
+        private static void GetName(Class _class, string separator, ref string result)
         {
+            result = _class.Name + (result == null ? "" : separator + result);
             if (_class.IsInner)
-            {
-                result = GetName(_class.InnerParent, separator, result + separator + _class.Name);
-                return result;
-            }
-            else return _class.Name;
+                GetName(_class.InnerParent, separator, ref result);
         }
 
-        public string FullName => GetName(this, ".", "");
+        public override string FullName
+        {
+            get
+            {
+                if (_fullName == null)
+                    GetName(this, NameSeparator, ref _fullName);
+                return _fullName;
+            }
+        }
+
+        public override string Signature
+        {
+            get => $"class({AccessModifier.ToString().ToLower()}) {FullName}";
+        }
+
         public bool IsInner { get; private set; }
         public Class InnerParent { get; private set; }
 
@@ -31,6 +42,7 @@ namespace HASMLib.Runtime.Structures
             Target = RuleTarget.Class;
             InnerClasses = new List<Class>();
             Functions = new List<Function>();
+            Fields = new List<Field>();
 
             foreach (var child in Base.Childs)
             {
@@ -46,18 +58,21 @@ namespace HASMLib.Runtime.Structures
                     (child as Function).BaseClass = this;
                     Functions.Add(child as Function);
                 }
+
+                if (child.Target == RuleTarget.Field)
+                {
+                    (child as Field).BaseClass = this;
+                    Fields.Add(child as Field);
+                }
             }
         }
 
-        public override string ToString()
-        {
-            return $"class({AccessModifier.ToString().ToLower()}) {FullName}";
-        }
-
-        public bool IsSealed => Modifiers.Exists(p => p.Name == Abstract);
-        public bool IsAbstact => Modifiers.Exists(p => p.Name == Sealed);
+        public bool IsSealed => Modifiers.Exists(p => p.Name == AbstractKeyword);
+        public bool IsAbstact => Modifiers.Exists(p => p.Name == SealedKeyword);
 
         public List<Class> InnerClasses { get; private set; }
         public List<Function> Functions { get; private set; }
+        public List<Field> Fields { get; private set; }
+
     }
 }

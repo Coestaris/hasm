@@ -22,19 +22,23 @@ namespace HASMLib.Runtime.Structures
 
     public class Function : BaseStructure
     {
-        public const string Return = "ret";
-        public const string Parameter = "param";
-        public const string NoReturnableValue = "_none_";
+        public const string ReturnKeyword = "ret";
+        public const string ParameterKeyword = "param";
+        public const string NoReturnableValueKeyword = "_none_";
 
         public Class BaseClass;
-
         public bool HasNoRetValue { get; private set; }
         public string RetType { get; private set; }
         public List<Parameter> Parameters { get; private set; }
 
-        public override string ToString()
+        public override string FullName
         {
-            return $"{(HasNoRetValue ? NoReturnableValue : RetType)} {BaseClass.FullName}.{Name}" +
+            get => BaseClass.FullName + Class.NameSeparator + Name;
+        }
+
+        public override string Signature
+        {
+            get => $"{(HasNoRetValue ? NoReturnableValueKeyword : RetType)} {FullName}" +
                 (Parameters.Count == 0 ? "" : "(" + string.Join(", ", Parameters.Select(p => p.Type + " " + p.Name)) + ")");
         }
 
@@ -42,13 +46,13 @@ namespace HASMLib.Runtime.Structures
         {
             Target = RuleTarget.Method;
             Parameters = new List<Parameter>();
-            Modifier retModifier = Modifiers.Find(p => p.Name == Return);
-            if (retModifier.Value == NoReturnableValue)
+            Modifier retModifier = GetModifier(ReturnKeyword);
+            if (retModifier.Value == NoReturnableValueKeyword)
             {
                 HasNoRetValue = true;
             } else RetType = retModifier.Value;
 
-            foreach (var parameter in Modifiers.FindAll(p => p.Name == Parameter))
+            foreach (var parameter in Modifiers.FindAll(p => p.Name == ParameterKeyword))
             {
                 var parts = parameter.Value.Split(':');
 

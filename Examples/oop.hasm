@@ -1,5 +1,5 @@
 ;
-; Пример работы со строками
+; Пример работы с ООП
 ;
 
 #include "lib/ide.hasm"
@@ -10,7 +10,16 @@
 
 .class(public, sealed) TestClass
 {
-    
+    .field(public, type:uint32) SomeField
+
+    .class(public, sealed) InnerClass
+    {
+        .function(ret:void) SomveVoidFunc
+        {
+            ret
+        }
+    }
+
     .function(public, ret:void, param:uint32:a, param:uint32:b) AddValues
     {
         mov R1, 0

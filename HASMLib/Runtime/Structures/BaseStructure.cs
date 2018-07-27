@@ -1,15 +1,19 @@
 ﻿using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Parser.SyntaxTokens.Structure;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Runtime.Structures
 {
     public class BaseStructure
     {
+        public virtual string FullName => "";
+        public virtual string Signature => "";
+
+        public override string ToString()
+        {
+            return Signature;
+        }
+
         public RuleTarget Target;
         public List<SourceLine> RawLines;
 
@@ -40,9 +44,15 @@ namespace HASMLib.Runtime.Structures
                         RawLines = RawLines
                     };
                 case RuleTarget.Field:
+                    return new Field(this);
                 default:
                     return null;
             }
+        }
+
+        protected Modifier GetModifier(string name)
+        {
+            return Modifiers.Find(p => p.Name == name);
         }
     }
 }

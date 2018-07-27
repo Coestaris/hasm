@@ -23,7 +23,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
         }
 
         public const char DirectiveStartChar = '.';
-        private static Regex DirectiveRegex = new Regex(@"^\.\w+(\((([^,]+?,\s?)+[^,]+)?\))?\s+\w+$");
+        private static Regex DirectiveRegex = new Regex(@"^\.\w+(\([^,]+(,([^,]+,)*[^,]+)?\))\s+\w+$");
 
         private static List<SourceLineDirectiveType> _sourceLineTypes;
 
