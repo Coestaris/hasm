@@ -57,6 +57,9 @@
     <Compile Include="Parser\SourceParsing\InnerTypes\NamedConstant.cs" />
     <Compile Include="Parser\SourceParsing\ObjectReference.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\InstructionsTask.cs" />
+    <Compile Include="Parser\SourceParsing\ParseTasks\LinkingTask.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionRET.cs" />
+    <Compile Include="Parser\SyntaxTokens\SourceLines\SourceLineDirectiveAssembly.cs" />
     <Compile Include="Parser\SyntaxTokens\Structure\Modifier.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\ResolveStructureTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\OptimizeReferencesTask.cs" />
@@ -132,11 +135,13 @@
     <Compile Include="Runtime\RuntimeMachine.cs" />
     <Compile Include="Runtime\RuntimeOutputCode.cs" />
     <Compile Include="Runtime\Structures\AccessModifier.cs" />
-    <Compile Include="Runtime\Structures\BaseStructure.cs" />
-    <Compile Include="Runtime\Structures\Field.cs" />
-    <Compile Include="Runtime\Structures\Class.cs" />
-    <Compile Include="Runtime\Structures\Function.cs" />
+    <Compile Include="Runtime\Structures\Type.cs" />
+    <Compile Include="Runtime\Structures\Units\BaseStructure.cs" />
+    <Compile Include="Runtime\Structures\Units\Field.cs" />
+    <Compile Include="Runtime\Structures\Units\Class.cs" />
+    <Compile Include="Runtime\Structures\Units\Function.cs" />
     <Compile Include="Runtime\Structures\Object.cs" />
+    <Compile Include="Runtime\Structures\FunctionParameter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

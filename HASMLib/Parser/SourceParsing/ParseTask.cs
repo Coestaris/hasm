@@ -43,19 +43,19 @@ namespace HASMLib.Parser.SourceParsing
             InnerRun();
         }
 
-        protected void InnerEnd(bool isFailed, ParseError error)
+        protected void InnerEnd()
         {
             EndTime = DateTime.Now;
             Length = TimeSpan.FromMilliseconds((EndTime - StartTime).TotalMilliseconds);
-            if (isFailed)
-            {
-                Status = ParseTaskStatus.Failed;
-                Error = error;
-            }
-            else
-            {
-                Status = ParseTaskStatus.Ok;
-            }
+            Status = ParseTaskStatus.Ok;
+        }
+
+        protected void InnerEnd(ParseError error)
+        {
+            EndTime = DateTime.Now;
+            Length = TimeSpan.FromMilliseconds((EndTime - StartTime).TotalMilliseconds);
+            Status = ParseTaskStatus.Failed;
+            Error = error;
         }
 
         public virtual void Abort()

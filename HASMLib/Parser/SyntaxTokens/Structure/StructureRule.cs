@@ -8,6 +8,9 @@ namespace HASMLib.Parser.SyntaxTokens.Structure
     public class StructureRule
     {
         private List<AccessModifier> _availableAccsessModifiers;
+        private List<Modifier> _modifiers;
+        private List<RuleTarget> _targets;
+
 
         public Type AssignedType;
         public List<AccessModifier> AvailableAccsessModifiers
@@ -19,9 +22,28 @@ namespace HASMLib.Parser.SyntaxTokens.Structure
             }
             get => _availableAccsessModifiers;
         }
-        public List<Modifier> Modifiers;
         public RuleTarget Target;
-        public List<RuleTarget> AllowedChilds;
+
+        public List<Modifier> Modifiers
+        {
+            set
+            {
+                if (value == null) _modifiers = new List<Modifier>();
+                else _modifiers = value;
+            }
+            get => _modifiers;
+        }
+
+        public List<RuleTarget> AllowedChilds
+        {
+            set
+            {
+                if (value == null) _targets = new List<RuleTarget>();
+                else _targets = value;
+            }
+            get => _targets;
+        }
+
         public bool AllowedInnerInstructions;
 
         public List<string> AvailableAccsessModifiersStrings;

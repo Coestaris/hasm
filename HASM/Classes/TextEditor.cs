@@ -13,7 +13,19 @@ namespace HASM
         private static Regex LabelRegex = new Regex(@"^\w{1,100}:", RegexOptions.Multiline);
         private static Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
         private static Regex RegisterRegex = new Regex(@"R\d{1,2}", RegexOptions.Multiline);
-        
+
+        private static Regex AssemblyRegex = new Regex(@"(?<=\.assembly\s)\w*");
+        private static Regex FullClassRegex = new Regex(@".(class|function|field)\(.*\)\s+\w*");
+        private static Regex PartialClassRegex = new Regex(@".(class|function|field)\([^()]*?\)");
+
+        private static List<Regex> KeywordRegexes = new List<Regex>()
+        {
+            new Regex(@"(?<=\.)assembly"),
+            new Regex(@"(?<=\.)class"),
+            new Regex(@"(?<=\.)function"),
+            new Regex(@"(?<=\.)field"),
+        };
+
         private static Regex BinRegex = new Regex(@"0[bB][0-1]{1,100}(_[sdq]){0,1}");
         private static Regex DecRegex = new Regex(@"\d{1,30}(_[sdq]){0,1}");
         private static Regex HexRegex = new Regex(@"0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
@@ -114,31 +126,39 @@ namespace HASM
                     }
                 };
 
+                TextBox.SyntaxHighlighter.InitStyleSchema(Language.CSharp);
+
                 TextBox.VisibleRangeChanged += (obj, args) =>
                 {
                     TextBox.VisibleRange.ClearStyle(StyleIndex.All);
 
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.CommentStyle, CommentRegex);
 
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GreenStyle, CommentRegex);
+                    foreach (var item in KeywordRegexes)
+                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.KeywordStyle, item);
 
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BrownStyle, String1Regex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BrownStyle, String2Regex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, PartialClassRegex);
+
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.ClassNameStyle, AssemblyRegex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, FullClassRegex);
+
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.StringStyle, String1Regex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.StringStyle, String2Regex);
                     
                     TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, LabelRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.MaroonStyle, RegisterRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, BinRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, DecRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, HexRegex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.VariableStyle, RegisterRegex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.NumberStyle, BinRegex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.NumberStyle, DecRegex);
+                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.NumberStyle, HexRegex);
 
                     foreach (var item in InstructionRegexes)
-                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueStyle, item);
+                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.FunctionsStyle, item);
 
                     foreach (var item in PreprocessorRegexes)
                         TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, item);
 
                     foreach (var item in FunctionRegexes)
-                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlueBoldStyle, item);
-
+                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.FunctionsStyle, item);
                 };
             }
 

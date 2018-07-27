@@ -14,7 +14,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         public override string Name => "Parsing instruction";
 
         protected override void InnerReset() { }
-
+        
         private ParseError NewParseError(ParseErrorType error, SourceLineInstruction line, int argIndex)
         {
             return new ParseError(
@@ -24,21 +24,21 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 line.FileName);
         }
 
-        private MemZoneFlashElementConstant RegisterConstant(string name, ulong value)
+        private MemZoneFlashElementConstant RegisterConstant(HASMLib.Runtime.Structures.Units.Function function, string name, ulong value)
         {
-            if (source._unknownLabelNameErrorList.Exists(p => p.Name == name))
+            if (function._unknownLabelNameErrorList.Exists(p => p.Name == name))
             {
-                var info = source._unknownLabelNameErrorList.Find(p => p.Name == name);
+                var info = function._unknownLabelNameErrorList.Find(p => p.Name == name);
 
                 info.namedConstant.Constant = new Constant(value);
                 info.memZoneFlashElementConstant.UpdateValue((Integer)value, info.ConstIndex);
                 return null;
             }
 
-            int constIndex = ++source._constIndex;
+            int constIndex = ++function._constIndex;
 
             var constant = new MemZoneFlashElementConstant((Integer)value, (Integer)constIndex);
-            source._namedConsts.Add(new NamedConstant(name, (Integer)constIndex, new Constant(value))
+            function._namedConsts.Add(new NamedConstant(name, (Integer)constIndex, new Constant(value))
             {
                 FEReference = constant
             });
@@ -46,15 +46,15 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             return constant;
         }
 
-        private List<MemZoneFlashElement> ProceedInstruction(SourceLineInstruction line, out ParseError error)
+        private List<MemZoneFlashElement> ProceedInstruction(HASMLib.Runtime.Structures.Units.Function function, SourceLineInstruction line, out ParseError error)
         {
-            if (line.Parameters == null) return GetFlashElementsNoArguents(line, out error);
-            else return GetFlashElementsWithArguents(line, out error);
+            if (line.Parameters == null) return GetFlashElementsNoArguents(function, line, out error);
+            else return GetFlashElementsWithArguents(function, line, out error);
         }
 
-        private List<MemZoneFlashElement> GetFlashElementsNoArguents(SourceLineInstruction line, out ParseError error)
+        private List<MemZoneFlashElement> GetFlashElementsNoArguents(HASMLib.Runtime.Structures.Units.Function function, SourceLineInstruction line, out ParseError error)
         {
-            Integer currentInstructionProgramIndex = (Integer)source._instructionIndex++;
+            Integer currentInstructionProgramIndex = (Integer)function._instructionIndex++;
 
             var result = new List<MemZoneFlashElement>();
             error = null;
@@ -71,16 +71,16 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             if (!string.IsNullOrEmpty(line.Label))
             {
-                RegisterConstant(line.Label, (ulong)currentInstructionProgramIndex);
+                RegisterConstant(function, line.Label, (ulong)currentInstructionProgramIndex);
             }
 
             result.Add(new MemZoneFlashElementInstruction(line.Instruction, null, currentInstructionProgramIndex));
             return result;
         }
 
-        private List<MemZoneFlashElement> GetFlashElementsWithArguents(SourceLineInstruction line, out ParseError error)
+        private List<MemZoneFlashElement> GetFlashElementsWithArguents(HASMLib.Runtime.Structures.Units.Function function, SourceLineInstruction line, out ParseError error)
         {
-            Integer currentInstructionProgramIndex = (Integer)(source._instructionIndex++);
+            Integer currentInstructionProgramIndex = (Integer)(function._instructionIndex++);
             var result = new List<MemZoneFlashElement>();
 
             if (line.Parameters.Length != line.Instruction.ParameterCount)
@@ -95,7 +95,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             if (!string.IsNullOrEmpty(line.Label))
             {
-                RegisterConstant(line.Label, (ulong)currentInstructionProgramIndex);
+                RegisterConstant(function, line.Label, (ulong)currentInstructionProgramIndex);
             }
 
             int argIndex = 0;
@@ -111,7 +111,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                 //Грубое определние типа нашего аргумента
                 bool isConst = constant != null;
-                bool isVar = source._variables.Select(p => p.Name).Contains(argument);
+                bool isVar = function._variables.Select(p => p.Name).Contains(argument);
 
                 //Если допустимо выражение и если это не просто выражение
                 if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Expression) &&
@@ -124,27 +124,27 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             (token) =>
                             {
 
-                                var variable = source._variables.Find(p => p.Name == token.RawValue);
+                                var variable = function._variables.Find(p => p.Name == token.RawValue);
                                 if (variable != null)
                                 {
 
-                                    int varIndex = source._variables.Select(p => p.Name).ToList().IndexOf(token.RawValue);
+                                    int varIndex = function._variables.Select(p => p.Name).ToList().IndexOf(token.RawValue);
                                     return new ObjectReference((Integer)varIndex, ReferenceType.Variable)
                                     {
-                                        Object = source._variables[varIndex].FEReference
+                                        Object = function._variables[varIndex].FEReference
                                     };
 
                                 }
 
                                 //То, возможно, это именная константа...
-                                if (source._namedConsts.Select(p => p.Name).Contains(token.RawValue))
+                                if (function._namedConsts.Select(p => p.Name).Contains(token.RawValue))
                                 {
                                     //Получения индекса константы со списка
-                                    int constantIndex = source._namedConsts.Select(p => p.Name).ToList().IndexOf(token.RawValue);
+                                    int constantIndex = function._namedConsts.Select(p => p.Name).ToList().IndexOf(token.RawValue);
 
-                                    return new ObjectReference(source._namedConsts[constantIndex].Index, ReferenceType.Constant)
+                                    return new ObjectReference(function._namedConsts[constantIndex].Index, ReferenceType.Constant)
                                     {
-                                        Object = source._namedConsts[constantIndex].FEReference
+                                        Object = function._namedConsts[constantIndex].FEReference
                                     };
                                 }
                                 else
@@ -157,32 +157,32 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
 
                                     //Елси на эту неведомую херню уже ссылались, то сошлемся на нее же
-                                    if (source._unknownLabelNameErrorList.Exists(p => p.Name == token.RawValue))
+                                    if (function._unknownLabelNameErrorList.Exists(p => p.Name == token.RawValue))
                                     {
-                                        var item = source._unknownLabelNameErrorList.Find(p => p.Name == token.RawValue);
+                                        var item = function._unknownLabelNameErrorList.Find(p => p.Name == token.RawValue);
                                         //После такой "грязной" хуйни мне хочется сходить с душ!
                                         return new ObjectReference((Integer)item.ConstIndex, ReferenceType.Constant)
                                         {
-                                            Object = source._unknownLabelNameErrorList.Find(p => p.Name == token.RawValue).memZoneFlashElementConstant
+                                            Object = function._unknownLabelNameErrorList.Find(p => p.Name == token.RawValue).memZoneFlashElementConstant
                                         };
                                     }
                                     else
                                     {
 
-                                        int constIndex = ++source._constIndex;
+                                        int constIndex = ++function._constIndex;
                                         MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy((Integer)constIndex);
                                         NamedConstant dummyNamedConstant = new NamedConstant(token.RawValue, (Integer)constIndex, new Constant())
                                         {
                                             FEReference = dummyConstant
                                         };
 
-                                        source._unknownLabelNameErrorList.Add(new UnknownLabelNameError(
+                                        function._unknownLabelNameErrorList.Add(new UnknownLabelNameError(
                                             token.RawValue,
                                             NewParseError(ParseErrorType.Syntax_UnknownConstName, line, argIndex),
                                             (Integer)constIndex,
                                             dummyNamedConstant, dummyConstant));
 
-                                        source._namedConsts.Add(dummyNamedConstant);
+                                        function._namedConsts.Add(dummyNamedConstant);
                                         //Записываем его во флеш память
                                         result.Add(dummyConstant);
 
@@ -209,7 +209,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                             }*/);
 
-                        Integer index = (Integer)(++source._expressionIndex);
+                        Integer index = (Integer)(++function._expressionIndex);
                         result.Add(new MemZoneFlashElementExpression(expression, index));
                         usedIndexes.Add(new ObjectReference(index, ReferenceType.Expression));
                     }
@@ -241,9 +241,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
                         {
                             //Запоминаем индекс константы
-                            usedIndexes.Add(new ObjectReference((Integer)(++source._constIndex), ReferenceType.Constant));
+                            usedIndexes.Add(new ObjectReference((Integer)(++function._constIndex), ReferenceType.Constant));
                             //Записываем во флеш константу
-                            result.Add(constant.ToFlashElement((Integer)source._constIndex));
+                            result.Add(constant.ToFlashElement((Integer)function._constIndex));
                         };
 
                         //Если необходима переменная, а не константа
@@ -251,7 +251,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                         {
                             //Получаем индекс переменной со списка переменных
-                            int varIndex = source._variables.Select(p => p.Name).ToList().IndexOf(argument);
+                            int varIndex = function._variables.Select(p => p.Name).ToList().IndexOf(argument);
                             //Запоминаем индекс переменной
                             usedIndexes.Add(new ObjectReference((Integer)varIndex, ReferenceType.Variable));
                         }
@@ -279,9 +279,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         }
 
                         //Запоминаем индекс константы
-                        usedIndexes.Add(new ObjectReference((Integer)(++source._constIndex), ReferenceType.Constant));
+                        usedIndexes.Add(new ObjectReference((Integer)(++function._constIndex), ReferenceType.Constant));
                         //Заносим константу во флеш
-                        result.Add(constant.ToFlashElement((Integer)source._constIndex));
+                        result.Add(constant.ToFlashElement((Integer)function._constIndex));
                     }
                     else
 
@@ -298,7 +298,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             }
 
                             //Получаем индекс переменной со списка переменных 
-                            int varIndex = source._variables.Select(p => p.Name).ToList().IndexOf(argument);
+                            int varIndex = function._variables.Select(p => p.Name).ToList().IndexOf(argument);
                             //Запоминаем индекс переменной
                             usedIndexes.Add(new ObjectReference((Integer)varIndex, ReferenceType.Variable));
                         }
@@ -308,14 +308,14 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                         {
                             //То, возможно, это именная константа...
-                            if (source._namedConsts.Select(p => p.Name).Contains(argument))
+                            if (function._namedConsts.Select(p => p.Name).Contains(argument))
                             {
                                 //Получения индекса константы со списка
-                                int constantIndex = source._namedConsts.Select(p => p.Name).ToList().IndexOf(argument);
+                                int constantIndex = function._namedConsts.Select(p => p.Name).ToList().IndexOf(argument);
                                 //Запоминания индекса
-                                usedIndexes.Add(new ObjectReference(source._namedConsts[constantIndex].Index, ReferenceType.Constant));
+                                usedIndexes.Add(new ObjectReference(function._namedConsts[constantIndex].Index, ReferenceType.Constant));
                                 //Запись константы во флеш
-                                result.Add(source._namedConsts[constantIndex].Constant.ToFlashElement(source._namedConsts[constantIndex].Index));
+                                result.Add(function._namedConsts[constantIndex].Constant.ToFlashElement(function._namedConsts[constantIndex].Index));
                             }
                             else
                             {
@@ -327,9 +327,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
 
                                 //Елси на эту неведомую херню уже ссылались, то сослемся на нее же
-                                if (source._unknownLabelNameErrorList.Exists(p => p.Name == argument))
+                                if (function._unknownLabelNameErrorList.Exists(p => p.Name == argument))
                                 {
-                                    var item = source._unknownLabelNameErrorList.Find(p => p.Name == argument);
+                                    var item = function._unknownLabelNameErrorList.Find(p => p.Name == argument);
 
                                     //После такой "грязной" хуйни мне хочется сходить с душ!
                                     usedIndexes.Add(new ObjectReference((Integer)item.ConstIndex, ReferenceType.Constant));
@@ -337,20 +337,20 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                                 else
                                 {
 
-                                    int constIndex = ++source._constIndex;
+                                    int constIndex = ++function._constIndex;
                                     MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy((Integer)constIndex);
                                     NamedConstant dummyNamedConstant = new NamedConstant(argument, (Integer)constIndex, new Constant())
                                     {
                                         FEReference = dummyConstant
                                     };
 
-                                    source._unknownLabelNameErrorList.Add(new UnknownLabelNameError(
+                                    function._unknownLabelNameErrorList.Add(new UnknownLabelNameError(
                                         argument,
                                         NewParseError(expressionError == null ? ParseErrorType.Syntax_UnknownConstName : expressionError.Type, line, argIndex),
                                         (Integer)constIndex,
                                         dummyNamedConstant, dummyConstant));
 
-                                    source._namedConsts.Add(dummyNamedConstant);
+                                    function._namedConsts.Add(dummyNamedConstant);
                                     //Записываем его во флеш память
                                     result.Add(dummyConstant);
 
@@ -396,48 +396,65 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             return result;
         }
 
-        protected override void InnerRun()
+        private ParseError ParseFunction(Runtime.Structures.Units.Function function)
         {
-            foreach (SourceLine line in source._lines)
+            function.Compiled = new List<MemZoneFlashElement>();
+            for (int i = 0; i < function.RawLines.Count; i++)
             {
-                if (line.GetType() == typeof(SourceLineInstruction))
+                SourceLineInstruction instruction = new SourceLineInstruction(
+                    function.RawLines[i].Input,
+                    function.RawLines[i].LineIndex,
+                    function.RawLines[i].FileName);
+                ParseError error = instruction.Parse();
+
+                function.RawLines[i] = instruction;
+
+                if (error != null)
                 {
-                    ParseError error = (line as SourceLineInstruction).Parse();
-                    if (error != null)
-                    {
-                        InnerEnd(true, error);
-                        return;
-                    }
+                    return error;
                 }
             }
 
             //Разбираем логику типов и пр.
-            foreach (SourceLineInstruction line in source._lines)
+            foreach (SourceLineInstruction line in function.RawLines)
             {
                 if (line.IsEmpty) continue;
 
-                var res = ProceedInstruction(line, out ParseError parseError);
+                var res = ProceedInstruction(function, line, out ParseError parseError);
                 if (parseError != null)
                 {
-                    InnerEnd(true, parseError);
-                    return;
+                    return parseError;
                 }
 
-                source.ParseResult.AddRange(res);
+                function.Compiled.AddRange(res);
             }
 
             //Просматриваем все наши "отложенные" константы
             //Если среди них есть пустые, то бьем тревогу!
-            foreach (var item in source._unknownLabelNameErrorList)
+            foreach (var item in function._unknownLabelNameErrorList)
             {
                 if (item.memZoneFlashElementConstant.isEmpty)
                 {
-                    InnerEnd(true, item.ParseError);
+                    return item.ParseError;
+                }
+            }
+
+            return null;
+        }
+
+        protected override void InnerRun()
+        {
+            foreach (var function in source._functions)
+            {
+                var error = ParseFunction(function);
+                if (error != null)
+                {
+                    InnerEnd(error);
                     return;
                 }
             }
 
-            InnerEnd(false, null);
+            InnerEnd();
         }
     }
 }

@@ -59,7 +59,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                 if (flashElement.Expression.TokenTree.Value != null)
                 {
-                    Integer constIndex = (Integer)(++source._constIndex);
+                    //Integer constIndex = (Integer)(++source._constIndex);
+
+                    Integer constIndex = (Integer)0;
 
                     source.ParseResult.Add(new MemZoneFlashElementConstant(
                         flashElement.Expression.TokenTree.Value.Value,
@@ -136,7 +138,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             if (totalFlashSize > source.Machine.Flash)
             {
                 var parseError = new ParseError(ParseErrorType.Other_OutOfFlash);
-                InnerEnd(true, parseError);
+                InnerEnd(parseError);
                 return;
             }
         }
@@ -150,7 +152,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             Other();
 
-            InnerEnd(false, null);
+            InnerEnd();
         }
     }
 }

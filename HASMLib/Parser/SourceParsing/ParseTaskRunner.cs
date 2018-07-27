@@ -18,7 +18,8 @@ namespace HASMLib.Parser.SourceParsing
             new PreprocessorTask(),
             new StructureTask(),
             new ResolveStructureTask(),
-            //new InstructionsTask(),
+            new LinkingTask(),
+            new InstructionsTask(),
            // new OptimizeReferencesTask()
         };
 

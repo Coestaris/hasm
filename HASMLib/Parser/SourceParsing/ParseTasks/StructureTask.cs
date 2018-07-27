@@ -174,12 +174,12 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             var a = ResolveStructures(lines, out ParseError error);
             if (error != null)
             {
-                InnerEnd(true, error);
+                InnerEnd(error);
                 return;
             }
 
             source._parentBlock = a;
-            InnerEnd(false, null);
+            InnerEnd();
         }
     }
 }

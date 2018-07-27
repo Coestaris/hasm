@@ -1,19 +1,21 @@
 ﻿using HASMLib.Parser.SyntaxTokens.Structure;
 
-namespace HASMLib.Runtime.Structures
+namespace HASMLib.Runtime.Structures.Units
 {
     public class Field : BaseStructure
     {
         public const string TypeKeyword = "type";
 
         public Class BaseClass;
-        public string Type;
+        public TypeReference Type;
 
         public Field(BaseStructure Base) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
         {
             Target = RuleTarget.Field;
+            Directive = Base.Directive;
+
             Modifier type = GetModifier(TypeKeyword);
-            Type = type.Value;
+            Type = new TypeReference(type.Value);
         }
 
         public override string FullName

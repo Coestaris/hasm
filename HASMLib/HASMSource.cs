@@ -7,21 +7,16 @@ using System;
 using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Parser.SyntaxTokens.Structure;
 using HASMLib.Runtime.Structures;
+using HASMLib.Runtime.Structures.Units;
 
 namespace HASMLib
 {
     public class HASMSource
     {
         internal List<SourceLine> _lines;
-        internal List<UnknownLabelNameError> _unknownLabelNameErrorList;
-        internal List<Variable> _variables;
-        internal List<NamedConstant> _namedConsts;
-        internal int _constIndex;
-        internal int _expressionIndex;
-        internal int _varIndex;
-        internal int _instructionIndex;
         internal CodeBlock _parentBlock;
         internal List<BaseStructure> _structures;
+        internal List<Function> _functions;
 
         public string Source { get; set; }
         public string BaseFilename { get; set; }

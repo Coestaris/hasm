@@ -35,8 +35,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             source._lines = lines;
 
             if (parseError != null)
-                InnerEnd(true, parseError);
-            else InnerEnd(false, null);
+                InnerEnd(parseError);
+            else InnerEnd();
         }
     }
 }

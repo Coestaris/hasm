@@ -20,9 +20,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
         public string Label { get; private set; }
         public Instruction Instruction { get; private set; }
         public string[] Parameters { get; private set; }
-        public bool IsEmpty => Instruction == null;
-
-        private string input;
+        public override bool IsEmpty => Instruction == null;
 
         public override string ToString()
         {
@@ -32,7 +30,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
             }
             else if (Instruction == null && string.IsNullOrEmpty(Label) && string.IsNullOrEmpty(Comment))
             {
-                return $"EL: {input}";
+                return $"EL: {Input}";
             }
             else return $"No instruction line.{(string.IsNullOrEmpty(Label) ? "" : " [has label]")} {(Comment == null ? "" : " [has comment]")}";
         }
@@ -98,11 +96,11 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         public ParseError Parse()
         {
-            FindAndDeleteComment(ref input);
-            FindAndDeleteLabel(ref input);
-            CleanUpLine(ref input);
+            FindAndDeleteComment(ref Input);
+            FindAndDeleteLabel(ref Input);
+            CleanUpLine(ref Input);
 
-            if (string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(Input))
                 return null;
 
             foreach (var instruction in Instructions)
@@ -110,10 +108,10 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
                 //Если регулярка инструкции присутсвует в строке
                 //Все обязаны иметь в себе "^" (начало строки), чтобы
                 //избегать некоректный поиск в строке!
-                if (instruction.Name.Match(input).Success)
+                if (instruction.Name.Match(Input).Success)
                 {
                     //Делим строку спейсом, молясь о том, что это сработает!
-                    string[] stringParts = GetStringParts(input);
+                    string[] stringParts = GetStringParts(Input);
 
                     //Если слишком много частей строки
                     if (stringParts.Length > 2)

@@ -1,5 +1,6 @@
 ﻿using HASMLib.Parser.SyntaxTokens.Structure;
 using HASMLib.Runtime.Structures;
+using HASMLib.Runtime.Structures.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,6 +69,17 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 {
                     new Modifier(true, true, Field.TypeKeyword)
                 }
+            },
+            new StructureRule()
+            {
+                Target = RuleTarget.Assembly,
+                AllowedChilds = new List<RuleTarget>()
+                {
+                    RuleTarget.Class,
+                },
+                AllowedInnerInstructions = true,
+                AvailableAccsessModifiers = null,
+                Modifiers = null,
             }
         };
 
@@ -161,7 +173,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 Modifiers = modifiers,
                 Childs = childs,
                 RawLines = block.RawLines,
-                Target = rule.Target
+                Target = rule.Target,
+                Directive = block.ParentDirective
             }.Cast();
         }
 
@@ -177,14 +190,14 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 structures.Add(GetStructures(child, out ParseError error));
                 if(error != null)
                 {
-                    InnerEnd(true, error);
+                    InnerEnd(error);
                     return;
                 }
             }
 
             source._parentBlock = null;
             source._structures = structures;
-            InnerEnd(false, null);
+            InnerEnd();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using HASMLib.Parser.SyntaxTokens.Structure;
 using System.Collections.Generic;
 
-namespace HASMLib.Runtime.Structures
+namespace HASMLib.Runtime.Structures.Units
 {
     public class Class : BaseStructure
     {
@@ -40,6 +40,8 @@ namespace HASMLib.Runtime.Structures
         public Class(BaseStructure Base) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
         {
             Target = RuleTarget.Class;
+            Directive = Base.Directive;
+
             InnerClasses = new List<Class>();
             Functions = new List<Function>();
             Fields = new List<Field>();

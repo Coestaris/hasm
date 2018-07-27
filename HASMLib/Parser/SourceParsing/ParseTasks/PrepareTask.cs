@@ -14,7 +14,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         private List<MemZoneFlashElement> SetupRegisters()
         {
-            var result = new List<MemZoneFlashElement>();
+            /*var result = new List<MemZoneFlashElement>();
             source.Machine.GetRegisterNames().ForEach(p =>
             {
                 var a = new MemZoneFlashElementVariable((Integer)(source._varIndex++));
@@ -24,20 +24,21 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 });
                 result.Add(a);
             });
-            return result;
+            return result;*/
+            return new List<MemZoneFlashElement>();
         }
 
         protected override void InnerRun()
         {
-            source._lines = new List<SourceLine>();
-            source._unknownLabelNameErrorList = new List<UnknownLabelNameError>();
-            source._variables = new List<Variable>();
-            source._namedConsts = new List<NamedConstant>();
+            //source._lines = new List<SourceLine>();
+            //source._unknownLabelNameErrorList = new List<UnknownLabelNameError>();
+            //source._variables = new List<Variable>();
+            //source._namedConsts = new List<NamedConstant>();
 
             if (!File.Exists(source.BaseFilename))
             {
                 var parseError = new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile);
-                InnerEnd(true, parseError);
+                InnerEnd(parseError);
                 return;
             }
 
@@ -51,7 +52,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 if (!Directory.Exists(source.WorkingDirectory))
                 {
                     var parseError = new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedWorkingDirectory);
-                    InnerEnd(true, parseError);
+                    InnerEnd(parseError);
                     return;
                 }
             }
@@ -61,7 +62,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             //Заносим регистры в список переменных
             source.ParseResult.AddRange(SetupRegisters());
 
-            InnerEnd(false, null);
+            InnerEnd();
         }
     }
 }

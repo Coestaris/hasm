@@ -56,5 +56,6 @@
         Directives_ModifierValueRequired,
         Directives_SomeRequiredModifiersAreMissing,
         Directives_WrongChildTarget,
+        Directives_ClassWithThatNameAlreadyExists,
     }
 }

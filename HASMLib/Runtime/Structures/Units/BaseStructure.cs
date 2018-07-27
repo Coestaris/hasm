@@ -1,8 +1,9 @@
 ﻿using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Parser.SyntaxTokens.SourceLines;
 using HASMLib.Parser.SyntaxTokens.Structure;
 using System.Collections.Generic;
 
-namespace HASMLib.Runtime.Structures
+namespace HASMLib.Runtime.Structures.Units
 {
     public class BaseStructure
     {
@@ -18,9 +19,11 @@ namespace HASMLib.Runtime.Structures
         public List<SourceLine> RawLines;
 
         public string Name;
-        public List<Modifier> Modifiers;
         public AccessModifier AccessModifier;
-        public List<BaseStructure> Childs;
+
+        internal SourceLineDirective Directive;
+        internal List<Modifier> Modifiers;
+        internal List<BaseStructure> Childs;
 
         public BaseStructure() { }
 
