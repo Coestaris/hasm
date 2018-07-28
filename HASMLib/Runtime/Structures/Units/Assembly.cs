@@ -8,7 +8,6 @@ namespace HASMLib.Runtime.Structures.Units
         internal Function _entryPoint;
 
         public List<Class> Classes;
-        public List<Function> AllFunctions { get; internal set; }
 
         public Function GetEntryPointFunction()
         {
@@ -52,6 +51,10 @@ namespace HASMLib.Runtime.Structures.Units
         {
             get => $"Assembly: {FullName}";
         }
+
+        public List<Field> AllFields { get; internal set; }
         public List<Class> AllClasses { get; internal set; }
+        public List<Function> AllFunctions { get; internal set; }
+
     }
 }

@@ -4,6 +4,8 @@ using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
+using HASMLib.Runtime.Structures;
+using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,7 +26,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 line.FileName);
         }
 
-        private MemZoneFlashElementConstant RegisterConstant(HASMLib.Runtime.Structures.Units.Function function, string name, ulong value)
+        private MemZoneFlashElementConstant RegisterConstant(Runtime.Structures.Units.Function function, string name, ulong value)
         {
             if (function._unknownLabelNameErrorList.Exists(p => p.Name == name))
             {
@@ -78,7 +80,28 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             return result;
         }
 
-        private List<MemZoneFlashElement> GetFlashElementsWithArguents(HASMLib.Runtime.Structures.Units.Function function, SourceLineInstruction line, out ParseError error)
+        private TypeReference ParseType(string type, out ParseError error)
+        {
+            TypeReference Type = new TypeReference(type);
+            error = null;
+
+            if (Type.IsVoid) return Type;
+            if (Type.IsBaseInteger) return Type;
+            if (Type.IsClass) return Type;
+
+            Class Class = source.Assembly.AllClasses.Find(p => p.FullName == source.Assembly.Name + Class.NameSeparator + Type.Name);
+            if (Class == null) 
+            {
+                error = new ParseError(ParseErrorType.Syntax_Instruction_UnknownType);
+                return null;
+            }
+
+            Type.IsClass = true;
+            Type.ClassType = Class;
+            return Type;
+        }
+
+        private List<MemZoneFlashElement> GetFlashElementsWithArguents(Runtime.Structures.Units.Function function, SourceLineInstruction line, out ParseError error)
         {
             Integer currentInstructionProgramIndex = (Integer)(function._instructionIndex++);
             var result = new List<MemZoneFlashElement>();
@@ -98,11 +121,13 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 RegisterConstant(function, line.Label, (ulong)currentInstructionProgramIndex);
             }
 
-            int argIndex = 0;
+            int argIndex = -1;
             var usedIndexes = new List<ObjectReference>();
 
             foreach (var argument in line.Parameters)
             {
+                argIndex++;
+                
                 //Попытка пропарсить константу
                 ParseError constError = Constant.Parse(argument, out Constant constant);
 
@@ -114,8 +139,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 bool isVar = function._variables.Select(p => p.Name).Contains(argument);
 
                 //Если допустимо выражение и если это не просто выражение
-                if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Expression) &&
-                    expressionError == null &&
+                if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Expression) && expressionError == null &&
                     (!expression.TokenTree.IsSimple || expression.TokenTree.UnaryFunction != null || expression.TokenTree.UnaryOperator != null))
                 {
                     try
@@ -221,11 +245,48 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 }
                 else
                 {
-                    //Если это не выражение, то просто разбираем его дальше по типам...
+                    if(line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.NewVariable)
+                    {
+                        function._variables.Add(new Variable(argument));
+                        function._varIndex++;
+                        usedIndexes.Add(new ObjectReference((Integer)function._varIndex, ReferenceType.Variable));
+                        continue;
+                    }
 
+                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.ClassName)
+                    {
+                        TypeReference type = ParseType(argument, out error);
+                        if (error != null)
+                        {
+                            error = NewParseError(error.Type, line, argIndex);
+                            return null;
+                        }
+
+                        var _const = RegisterConstant(function, $"__classReference{type.UinqueID}_", (ulong)type.UinqueID);
+                        result.Add(_const);                        
+                        usedIndexes.Add(new ObjectReference(_const.Index, ReferenceType.Type));
+                        continue;
+                    }
+
+                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FieldName)
+                    {
+                        TypeReference type = ParseType(argument, out error);
+                        if (error != null)
+                        {
+                            error = NewParseError(error.Type, line, argIndex);
+                            return null;
+                        }
+
+                        var _const = RegisterConstant(function, $"__classReference{type.UinqueID}_", (ulong)type.UinqueID);
+                        result.Add(_const);
+                        usedIndexes.Add(new ObjectReference(_const.Index, ReferenceType.Type));
+                        continue;
+                    }
+
+                    //Если это не выражение, то просто разбираем его дальше по типам...
                     //Если допустимо и константа и переменная, то выходит неоднозначность
-                    if (isVar && isConst &&
-                        line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register) &&
+                    /*if (isVar && isConst &&
+                        line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Variable) &&
                         line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                     {
                         error = NewParseError(ParseErrorType.Syntax_AmbiguityBetweenVarAndConst, line, argIndex);
@@ -238,7 +299,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                     {
                         //Если необходима коснтанта, а не переменная
                         if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant) &&
-                            !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
+                            !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Variable))
                         {
                             //Запоминаем индекс константы
                             usedIndexes.Add(new ObjectReference((Integer)(++function._constIndex), ReferenceType.Constant));
@@ -247,7 +308,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         };
 
                         //Если необходима переменная, а не константа
-                        if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register) &&
+                        if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Variable) &&
                             !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                         {
                             //Получаем индекс переменной со списка переменных
@@ -291,7 +352,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         if (isVar)
                         {
                             //А ожидалась не переменная, то ошибка
-                            if (!line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Register))
+                            if (!line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Variable))
                             {
                                 error = NewParseError(ParseErrorType.Syntax_ExpectedСonst, line, argIndex);
                                 return null;
@@ -386,9 +447,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             error = NewParseError(ParseErrorType.Syntax_UnknownVariableName, line, argIndex);
                             return null;
                         }
-                    }
+                    }*/
                 }
-                argIndex++;
             }
 
             result.Add(new MemZoneFlashElementInstruction(line.Instruction, usedIndexes, currentInstructionProgramIndex));

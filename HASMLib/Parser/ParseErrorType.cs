@@ -61,5 +61,7 @@
         Directives_NoEntryPointFound,
         Directives_WrongTypeReference,
         Directives_FunctionWithThatNameAlreadyExists,
+        Syntax_Instruction_UnknownType,
+        Directives_FieldWithThatNameAlreadyExists,
     }
 }

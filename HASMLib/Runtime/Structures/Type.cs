@@ -1,15 +1,20 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Runtime.Structures.Units;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Runtime.Structures
 {
     public class TypeReference
     {
+        public int UinqueID 
+        {
+            get
+            {
+                if (IsVoid) return 0;
+                if (IsBaseInteger) return IntegerType.UniqueID;
+                else return ClassType.UniqueID;
+            }
+        }
+
         public string Name;
 
         public bool IsBaseInteger;

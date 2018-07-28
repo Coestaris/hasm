@@ -1,4 +1,4 @@
-;
+ ;
 ; Пример работы с ООП
 ;
 
@@ -30,14 +30,14 @@
         
         .constructor(public, param:int:a, param:int:b) SomeConstructor
         {
-            alloc tmp, uint32
+            alloc tmp, int
             ldi tmp, 0
         }
 
         
         .function(public, ret:void, param:int:a, param:int:b) AddValues
         {
-            alloc tmp, uint32
+            alloc tmp, int
             ldi tmp, 0
         }
         
@@ -48,9 +48,8 @@
             getv TestClass.SomeField
             popr local
             
-            pusha local + 10
             pusho self
-            setv TestClass.SomeField
+            setv TestClass.SomeField, local + 10
             
             ret
         }
@@ -62,11 +61,11 @@
             call TestClass._ctor
             popr local
             
-            pusha 10, uint32
-            pusha 20, uint32
+            pusha 10, int
+            pusha 20, int
             pusho local
             call TestClass.AddValuesWithResult
-            alloc result, uint32
+            alloc result, int
             popr result
             
             out result

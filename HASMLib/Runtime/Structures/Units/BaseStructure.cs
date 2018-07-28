@@ -12,6 +12,7 @@ namespace HASMLib.Runtime.Structures.Units
         public Assembly ParentAssembly;
         public virtual string FullName => "";
         public virtual string Signature => "";
+        public int UniqueID;
 
         public override string ToString()
         {

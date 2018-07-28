@@ -58,7 +58,14 @@
     <Compile Include="Parser\SourceParsing\ObjectReference.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\InstructionsTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\LinkingTask.cs" />
-    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionRET.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionGETV.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionSETV.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionCALL.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionPOPR.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionPUSHO.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionPUSHA.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionALLOC.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\OOP\InstructionRET.cs" />
     <Compile Include="Parser\SyntaxTokens\SourceLines\SourceLineDirectiveAssembly.cs" />
     <Compile Include="Parser\SyntaxTokens\SourceLines\SourceLineDirectiveConstructor.cs" />
     <Compile Include="Parser\SyntaxTokens\Structure\Modifier.cs" />
@@ -92,8 +99,8 @@
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionPOP.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionPUSH.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionLDI.cs" />
-    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionCMP.cs" />
-    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionOUT.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\BR\InstructionCMP.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\IO\InstructionOUT.cs" />
     <Compile Include="Parser\SyntaxTokens\ParametricDefine.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorInclude.cs" />
     <Compile Include="Parser\SyntaxTokens\Preprocessor\PreprocessorMessage.cs" />
@@ -126,7 +133,7 @@
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantFormat.cs" />
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantHexFormat.cs" />
     <Compile Include="Parser\SyntaxTokens\Instruction.cs" />
-    <Compile Include="Parser\SyntaxTokens\Instructions\InstructionADD.cs" />
+    <Compile Include="Parser\SyntaxTokens\Instructions\Arithmetic\InstructionADD.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionJMP.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionMOV.cs" />
     <Compile Include="Parser\SyntaxTokens\Instructions\InstructionNOP.cs" />

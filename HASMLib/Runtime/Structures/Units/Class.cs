@@ -7,9 +7,8 @@ namespace HASMLib.Runtime.Structures.Units
     {
         public const string AbstractKeyword = "abstract";
         public const string SealedKeyword = "sealed";
-
         internal string _fullName;
-
+        
         private static void GetName(Class _class, string separator, ref string result)
         {
             result = _class.Name + (result == null ? "" : separator + result);

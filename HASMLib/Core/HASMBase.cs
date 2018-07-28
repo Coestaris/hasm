@@ -29,14 +29,14 @@ namespace HASMLib.Core
                     case (8):
                         BaseIntegerType.Types = new List<BaseIntegerType>()
                         {
-                            new BaseIntegerType(64, false, "ulong"),
-                            new BaseIntegerType(64, true , "long"),
-                            new BaseIntegerType(32, false, "uint"),
-                            new BaseIntegerType(32, true , "int"),
-                            new BaseIntegerType(16, false, "ushort"),
-                            new BaseIntegerType(16, true , "short"),
-                            new BaseIntegerType(8, false,  "byte"),
-                            new BaseIntegerType(8, true,   "sbyte")
+                            new BaseIntegerType(-8, 64, false, "ulong"),
+                            new BaseIntegerType(-7, 64, true , "long"),
+                            new BaseIntegerType(-6, 32, false, "uint"),
+                            new BaseIntegerType(-5, 32, true , "int"),
+                            new BaseIntegerType(-4, 16, false, "ushort"),
+                            new BaseIntegerType(-3, 16, true , "short"),
+                            new BaseIntegerType(-2,  8, false, "byte"),
+                            new BaseIntegerType(-1,  8, true , "sbyte")
                         };
                         BaseIntegerType.PrimitiveType = BaseIntegerType.Types.Find(p => p.Name == "byte");
                         break;

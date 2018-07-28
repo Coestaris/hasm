@@ -10,6 +10,7 @@ namespace HASMLib.Core.BaseTypes
         public static BaseIntegerType CommonType;
         public static BaseIntegerType CommonSignedType;
 
+        public int UniqueID;
         public int Base;
         public long MinValue;
         public ulong MaxValue;
@@ -17,8 +18,9 @@ namespace HASMLib.Core.BaseTypes
         public bool IsSigned;
         public string Name;
 
-        public BaseIntegerType(int _base, bool isSigned, string name)
+        public BaseIntegerType(int uniqueID, int _base, bool isSigned, string name)
         {
+            UniqueID = uniqueID;
             Base = _base;
 
             if (_base >= 64 && !isSigned)

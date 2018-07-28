@@ -15,7 +15,12 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         protected override void InnerReset() { }
 
         private List<Class> PlainClassesList;
+        private List<Field> PlainFiledsList;
         private List<Function> PlainFunctionsList;
+        private int classID = 0;
+        private int fieldID = 0;
+        private int functionID = 0;
+
 
         private bool IsTypeOk(TypeReference Type)
         {
@@ -48,69 +53,89 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             return null;
         }
 
-        private ParseError RecursiveAdd(Class baseClass)
+        private ParseError CheckNames()
         {
-            PlainClassesList.Add(baseClass);
-            List<string> Names = new List<string>();
-            foreach (var function in baseClass.Functions)
+            List<string> funcNames = new List<string>();
+            List<string> fieldNames = new List<string>();
+            List<string> classNames = new List<string>();
+
+
+            foreach (var function in PlainFunctionsList)
             {
-                if (Names.Contains(function.Signature))
+                PlainFunctionsList.Add(function);
+                if (funcNames.Contains(function.Signature))
                 {
                     return new ParseError(ParseErrorType.Directives_FunctionWithThatNameAlreadyExists,
                         function.Directive.LineIndex, function.Directive.FileName);
                 }
-                Names.Add(function.Signature);
+                funcNames.Add(function.Signature);
 
-                if(function.IsEntryPoint)
+                if (function.IsEntryPoint)
                 {
-                    if(source.Assembly._entryPoint != null)
+                    if (source.Assembly._entryPoint != null)
                         return new ParseError(ParseErrorType.Directives_MoreThanOneEntryPointDeclared,
                         function.Directive.LineIndex, function.Directive.FileName);
 
                     source.Assembly._entryPoint = function;
                 }
-
-                PlainFunctionsList.Add(function);
             }
 
-            Names = new List<string>();
-            foreach (var innerClass in baseClass.InnerClasses)
+            foreach (var field in PlainFiledsList)
             {
-                if (Names.Contains(innerClass.Name))
+                if (fieldNames.Contains(field.Signature))
+                {
+                    return new ParseError(ParseErrorType.Directives_FieldWithThatNameAlreadyExists,
+                        field.Directive.LineIndex, field.Directive.FileName);
+                }
+                fieldNames.Add(field.Signature);
+            }
+
+            foreach (var Class in PlainClassesList)
+            {
+                if (classNames.Contains(Class.FullName))
                 {
                     return new ParseError(ParseErrorType.Directives_ClassWithThatNameAlreadyExists,
-                        innerClass.Directive.LineIndex, innerClass.Directive.FileName);
+                        Class.Directive.LineIndex, Class.Directive.FileName);
                 }
-
-                Names.Add(innerClass.Name);
-                var error = RecursiveAdd(innerClass);
-                if (error != null) return error;
+                classNames.Add(Class.FullName);
             }
+
             return null;
+        }
+
+        private void BuildPlainLists(Class baseClass)
+        {
+            PlainClassesList.Add(baseClass);
+            baseClass.UniqueID = classID++;
+
+            foreach (var function in baseClass.Functions)
+            {
+                PlainFunctionsList.Add(function);
+                function.UniqueID = functionID++;
+            }
+
+            foreach (var field in baseClass.Fields)
+            {
+                PlainFiledsList.Add(field);
+                field.UniqueID = fieldID++;
+            }
+
+            foreach (var innerClass in baseClass.InnerClasses)
+            {
+                BuildPlainLists(innerClass);
+            }
         }
 
         protected override void InnerRun()
         {
+            classID = 1;
+            fieldID = 0;
+            functionID = 0;
             PlainClassesList = new List<Class>();
+            PlainFiledsList = new List<Field>();
             PlainFunctionsList = new List<Function>();
-            List<string> Names = new List<string>();
             foreach (var item in source.Assembly.Classes)
-            {
-                if(Names.Contains(item.Name))
-                {
-                    InnerEnd(new ParseError(ParseErrorType.Directives_ClassWithThatNameAlreadyExists,
-                        item.Directive.LineIndex, item.Directive.FileName));
-                    return;
-                }
-
-                Names.Add(item.Name);
-                var error = RecursiveAdd(item as Class);
-                if(error != null)
-                {
-                    InnerEnd(error);
-                    return;
-                }
-            }
+                BuildPlainLists(item as Class);
 
             var parseError = ReferenceCheck();
             if (parseError != null)

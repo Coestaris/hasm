@@ -5,7 +5,8 @@
         Constant,
         Variable,
         Expression,
-        Define
+        Define,
+        Type
     }
 }
 

@@ -6,29 +6,23 @@ using System.Text.RegularExpressions;
 
 namespace HASMLib.Parser.SyntaxTokens.Instructions
 {
-    public class InstructionLDI : Instruction
+    public class InstructionPOPR : Instruction
     {
-        public InstructionLDI(int index)
+        public InstructionPOPR(int index)
         {
             Index = index;
 
-            NameString = "ldi";
-            Name = new Regex("^ldi", RegexOptions.IgnoreCase);
-            ParameterCount = 2;
+            NameString = "popr";
+            Name = new Regex("^popr", RegexOptions.IgnoreCase);
+            ParameterCount = 1;
             ParameterTypes = new List<InstructionParameterType>()
             {
-                InstructionParameterType.Variable,
-                InstructionParameterType.Constant | InstructionParameterType.Expression
+                InstructionParameterType.Variable
             };
         }
 
         public override RuntimeOutputCode Apply(MemZone memZone, List<NamedConstant> constants, List<MemZoneFlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
         {
-            var dest = GetVar(memZone, parameters[0].Index);
-            var source = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine);
-
-            dest.Value = source.Value;
-
             return RuntimeOutputCode.OK;
         }
     }

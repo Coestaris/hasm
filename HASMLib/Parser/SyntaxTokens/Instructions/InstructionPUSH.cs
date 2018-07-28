@@ -17,7 +17,7 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             ParameterCount = 1;
             ParameterTypes = new List<InstructionParameterType>()
             {
-                InstructionParameterType.Register | InstructionParameterType.Constant | InstructionParameterType.Expression
+                InstructionParameterType.Variable | InstructionParameterType.Constant | InstructionParameterType.Expression
             };
         }
 
