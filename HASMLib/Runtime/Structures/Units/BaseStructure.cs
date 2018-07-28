@@ -7,6 +7,9 @@ namespace HASMLib.Runtime.Structures.Units
 {
     public class BaseStructure
     {
+        public const string NameSeparator = ".";
+
+        public Assembly ParentAssembly;
         public virtual string FullName => "";
         public virtual string Signature => "";
 
@@ -39,6 +42,8 @@ namespace HASMLib.Runtime.Structures.Units
         {
             switch (Target)
             {
+                case RuleTarget.Constructor:
+                    return new Function(this, true);
                 case RuleTarget.Class:
                     return new Class(this);
                 case RuleTarget.Method:
@@ -46,6 +51,8 @@ namespace HASMLib.Runtime.Structures.Units
                     {
                         RawLines = RawLines
                     };
+                case RuleTarget.Assembly:
+                    return new Assembly(this);
                 case RuleTarget.Field:
                     return new Field(this);
                 default:

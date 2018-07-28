@@ -12,7 +12,7 @@
 {
     .class(public, sealed) TestClass
     {
-        .field(public, type:uint32) SomeField
+        .field(public, type:int) SomeField
 
         .class(public, sealed) InnerClass
         {
@@ -22,22 +22,54 @@
                 ret
             }
         
-            .function(ret:123) SomveVoidFunc
+            .function(ret:int) SomveVoidFunc
             {
                 ret
             }
         }
         
-        .function(public, ret:void, param:uint32:a, param:uint32:b) AddValues
+        .constructor(public, param:int:a, param:int:b) SomeConstructor
         {
-            out 12
+            alloc tmp, uint32
+            ldi tmp, 0
+        }
+
+        
+        .function(public, ret:void, param:int:a, param:int:b) AddValues
+        {
+            alloc tmp, uint32
+            ldi tmp, 0
+        }
+        
+        .function(public, ret:int, param:TestClass:a) AddToField
+        {
+            alloc local, int
+            pusho a
+            getv TestClass.SomeField
+            popr local
+            
+            pusha local + 10
+            pusho self
+            setv TestClass.SomeField
+            
             ret
         }
         
-        .function(public, ret:uint32, param:uint32:a, param:uint32:b) AddValuesWithResult
+        ; Main Function with EnryPoint
+        .function(public, static, entrypoint, ret:void) Main
         {
-            out 12
-            ret
-        }
+            alloc local, TestClass
+            call TestClass._ctor
+            popr local
+            
+            pusha 10, uint32
+            pusha 20, uint32
+            pusho local
+            call TestClass.AddValuesWithResult
+            alloc result, uint32
+            popr result
+            
+            out result
+         }
     }
 }

@@ -444,7 +444,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerRun()
         {
-            foreach (var function in source._functions)
+            foreach (var function in source.Assembly.AllFunctions)
             {
                 var error = ParseFunction(function);
                 if (error != null)

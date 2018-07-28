@@ -6,5 +6,6 @@
         Method,
         Field,
         Assembly,
+        Constructor,
     }
 }

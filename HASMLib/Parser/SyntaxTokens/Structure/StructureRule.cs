@@ -17,8 +17,10 @@ namespace HASMLib.Parser.SyntaxTokens.Structure
         {
             set
             {
-                AvailableAccsessModifiersStrings = value.Select(p => p.ToString().ToLower()).ToList();
-                _availableAccsessModifiers = value;
+                if (value == null) _availableAccsessModifiers = new List<AccessModifier>();
+                else  _availableAccsessModifiers = value;
+
+                AvailableAccsessModifiersStrings = _availableAccsessModifiers.Select(p => p.ToString().ToLower()).ToList();
             }
             get => _availableAccsessModifiers;
         }

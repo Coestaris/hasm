@@ -1,4 +1,5 @@
 ﻿using FastColoredTextBoxNS;
+using HASMLib.Parser.SyntaxTokens;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -10,25 +11,50 @@ namespace HASM
 {
     public class TextEditor : TabPage
     {
-        private static Regex LabelRegex = new Regex(@"^\w{1,100}:", RegexOptions.Multiline);
+        private static Style CommentStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
+        private static Style KeywordStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular);
+        private static Style RegularStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular);
+
+        private static Style AssemblyNameStyle = new TextStyle(Brushes.DarkGreen, null, FontStyle.Regular);
+        private static Style UnitsNameStyle = new TextStyle(Brushes.DarkViolet, null, FontStyle.Regular);
+        private static Style ClassNameStyle = new TextStyle(Brushes.DarkSlateBlue, null, FontStyle.Regular);
+
+        private static Style StringStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular);
+        private static Style LabelStyle = new TextStyle(Brushes.Coral, null, FontStyle.Regular);
+        private static Style VariableStyle = new TextStyle(Brushes.DarkBlue, null, FontStyle.Regular);
+        private static Style BinNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
+        private static Style DecNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
+        private static Style HexNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
+
+        private static Style InstructionStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular);
+        private static Style PreprocessorStyle = new TextStyle(Brushes.Gray, null, FontStyle.Regular);
+        private static Style BuiltinFunctionsStyle = new TextStyle(Brushes.Blue, null, FontStyle.Bold);
+
+
+        private static Regex LabelRegex = new Regex(@"(?<=\W){1,100}:", RegexOptions.Multiline);
         private static Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
-        private static Regex RegisterRegex = new Regex(@"R\d{1,2}", RegexOptions.Multiline);
+        private static Regex RegisterRegex = new Regex(@"(?<=\W)R\d{1,2}", RegexOptions.Multiline);
 
         private static Regex AssemblyRegex = new Regex(@"(?<=\.assembly\s)\w*");
-        private static Regex FullClassRegex = new Regex(@".(class|function|field)\(.*\)\s+\w*");
-        private static Regex PartialClassRegex = new Regex(@".(class|function|field)\([^()]*?\)");
+        private static Regex FullUnitsRegex = new Regex(@".(function|field|constructor)\(.*\)\s+\w*");
+        private static Regex PartialUnitsRegex = new Regex(@".(function|field|constructor)\([^()]*?\)");
+
+        private static Regex FullClassRegex = new Regex(@".class\(.*\)\s+\w*");
+        private static Regex PartialClassRegex = new Regex(@".class\([^()]*?\)");
+
 
         private static List<Regex> KeywordRegexes = new List<Regex>()
         {
             new Regex(@"(?<=\.)assembly"),
             new Regex(@"(?<=\.)class"),
+            new Regex(@"(?<=\.)constructor"),
             new Regex(@"(?<=\.)function"),
             new Regex(@"(?<=\.)field"),
         };
 
-        private static Regex BinRegex = new Regex(@"0[bB][0-1]{1,100}(_[sdq]){0,1}");
-        private static Regex DecRegex = new Regex(@"\d{1,30}(_[sdq]){0,1}");
-        private static Regex HexRegex = new Regex(@"0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
+        private static Regex BinRegex = new Regex(@"(?<=\W)0[bB][0-1]{1,100}(_[sdq]){0,1}");
+        private static Regex DecRegex = new Regex(@"(?<=\W)\d{1,30}(_[sdq]){0,1}");
+        private static Regex HexRegex = new Regex(@"(?<=\W)0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
 
         private static Regex String1Regex = new Regex("\\\".*\\\"");
         private static Regex String2Regex = new Regex(@"<.*>");
@@ -115,7 +141,6 @@ namespace HASM
                 foreach (var item in HASMLib.Parser.SyntaxTokens.PreprocessorDirective.PreprocessorDirectives)
                     PreprocessorRegexes.Add(new Regex($"#{item.Name}\\s"));
 
-
                 TextBox.TextChanged += (obj, args) =>
                 {
                     if(HighlightedLine != -1)
@@ -132,33 +157,39 @@ namespace HASM
                 {
                     TextBox.VisibleRange.ClearStyle(StyleIndex.All);
 
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.CommentStyle, CommentRegex);
+                    TextBox.VisibleRange.SetFoldingMarkers(
+                        HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockOpened,
+                        HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockClosed);
+
+                    TextBox.VisibleRange.SetStyle(CommentStyle, CommentRegex);
 
                     foreach (var item in KeywordRegexes)
-                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.KeywordStyle, item);
+                        TextBox.VisibleRange.SetStyle(KeywordStyle, item);
 
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, PartialClassRegex);
+                    TextBox.VisibleRange.SetStyle(RegularStyle, PartialClassRegex);
+                    TextBox.VisibleRange.SetStyle(RegularStyle, PartialUnitsRegex);
 
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.ClassNameStyle, AssemblyRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, FullClassRegex);
+                    TextBox.VisibleRange.SetStyle(AssemblyNameStyle, AssemblyRegex);
+                    TextBox.VisibleRange.SetStyle(ClassNameStyle, FullClassRegex);
+                    TextBox.VisibleRange.SetStyle(UnitsNameStyle, FullUnitsRegex);
 
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.StringStyle, String1Regex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.StringStyle, String2Regex);
+                    TextBox.VisibleRange.SetStyle(StringStyle, String1Regex);
+                    TextBox.VisibleRange.SetStyle(StringStyle, String2Regex);
                     
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.BlackStyle, LabelRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.VariableStyle, RegisterRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.NumberStyle, BinRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.NumberStyle, DecRegex);
-                    TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.NumberStyle, HexRegex);
+                    TextBox.VisibleRange.SetStyle(LabelStyle, LabelRegex);
+                    TextBox.VisibleRange.SetStyle(VariableStyle, RegisterRegex);
+                    TextBox.VisibleRange.SetStyle(BinNumberStyle, BinRegex);
+                    TextBox.VisibleRange.SetStyle(DecNumberStyle, DecRegex);
+                    TextBox.VisibleRange.SetStyle(HexNumberStyle, HexRegex);
 
                     foreach (var item in InstructionRegexes)
-                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.FunctionsStyle, item);
+                        TextBox.VisibleRange.SetStyle(InstructionStyle, item);
 
                     foreach (var item in PreprocessorRegexes)
-                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.GrayStyle, item);
+                        TextBox.VisibleRange.SetStyle(PreprocessorStyle, item);
 
                     foreach (var item in FunctionRegexes)
-                        TextBox.VisibleRange.SetStyle(TextBox.SyntaxHighlighter.FunctionsStyle, item);
+                        TextBox.VisibleRange.SetStyle(BuiltinFunctionsStyle, item);
                 };
             }
 

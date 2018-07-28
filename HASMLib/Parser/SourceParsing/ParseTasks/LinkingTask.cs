@@ -1,6 +1,7 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Runtime.Structures;
 using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
 using System.IO;
@@ -16,19 +17,58 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         private List<Class> PlainClassesList;
         private List<Function> PlainFunctionsList;
 
+        private bool IsTypeOk(TypeReference Type)
+        {
+            if (Type.IsVoid) return true;
+            if (Type.IsBaseInteger) return true;
+            if (Type.IsClass) return true;
+
+            Class Class = PlainClassesList.Find(p => p.FullName == source.Assembly.Name + Class.NameSeparator + Type.Name);
+            if (Class == null) return false;
+
+            Type.IsClass = true;
+            Type.ClassType = Class;
+            return true;
+        }
+
+        private ParseError ReferenceCheck()
+        {
+            foreach (var function in PlainFunctionsList)
+            {
+                foreach (var parameter in function.Parameters)
+                    if (!IsTypeOk(parameter.Type))
+                        return new ParseError(ParseErrorType.Directives_WrongTypeReference,
+                            function.Directive.LineIndex, function.Directive.FileName);
+
+                if (!IsTypeOk(function.RetType))
+                    return new ParseError(ParseErrorType.Directives_WrongTypeReference,
+                        function.Directive.LineIndex, function.Directive.FileName);
+            }
+
+            return null;
+        }
+
         private ParseError RecursiveAdd(Class baseClass)
         {
-            //PlainClassesList.Add(baseClass);
-
+            PlainClassesList.Add(baseClass);
             List<string> Names = new List<string>();
             foreach (var function in baseClass.Functions)
             {
                 if (Names.Contains(function.Signature))
                 {
-                    return new ParseError(ParseErrorType.Directives_ClassWithThatNameAlreadyExists,
+                    return new ParseError(ParseErrorType.Directives_FunctionWithThatNameAlreadyExists,
                         function.Directive.LineIndex, function.Directive.FileName);
                 }
                 Names.Add(function.Signature);
+
+                if(function.IsEntryPoint)
+                {
+                    if(source.Assembly._entryPoint != null)
+                        return new ParseError(ParseErrorType.Directives_MoreThanOneEntryPointDeclared,
+                        function.Directive.LineIndex, function.Directive.FileName);
+
+                    source.Assembly._entryPoint = function;
+                }
 
                 PlainFunctionsList.Add(function);
             }
@@ -51,9 +91,10 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerRun()
         {
+            PlainClassesList = new List<Class>();
             PlainFunctionsList = new List<Function>();
             List<string> Names = new List<string>();
-            foreach (var item in source._structures)
+            foreach (var item in source.Assembly.Classes)
             {
                 if(Names.Contains(item.Name))
                 {
@@ -71,7 +112,22 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 }
             }
 
-            source._functions = PlainFunctionsList;
+            var parseError = ReferenceCheck();
+            if (parseError != null)
+            {
+                InnerEnd(parseError);
+                return;
+            }
+
+            if (source.Assembly._entryPoint == null)
+            {
+                InnerEnd(new ParseError(ParseErrorType.Directives_NoEntryPointFound,
+                        source.Assembly.Directive.LineIndex, source.Assembly.Directive.FileName));
+                return;
+            }
+
+            source.Assembly.AllClasses = PlainClassesList;
+            source.Assembly.AllFunctions = PlainFunctionsList;
             InnerEnd();
         }
     }

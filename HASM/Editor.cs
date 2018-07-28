@@ -132,7 +132,7 @@ namespace HASM
 
                             if (maxLinesInScreen < maxLines)
                             {
-                                currentLine = Math.Max(currentLine - (int)(maxLinesInScreen / 2), 0);
+                                currentLine = Math.Max(Math.Abs((int)(maxLinesInScreen / 2) - currentLine) + 1, 1);
                                 int position = (int)((currentLine - minLines) * (max - min) / (float)(maxLines - minLines) + min);
                                 tb.VerticalScroll.Value = position - 1;
                                 tb.VerticalScroll.Value = position;
@@ -143,7 +143,7 @@ namespace HASM
                 }
                 else
                 {
-                    IOStream iostream = new IOStream();
+                    /*IOStream iostream = new IOStream();
                     var runtime = source.Machine.CreateRuntimeMachine(source, iostream);
 
                     runThread = new Thread(p =>
@@ -156,6 +156,11 @@ namespace HASM
                     });
 
                     runThread.Start();
+                    */
+                    IOStream iostream = new IOStream();
+                    var runtime = source.Machine.CreateRuntimeMachine(source, iostream);
+
+                    RunEnd(iostream, runtime, source);
                 }
             }
         }

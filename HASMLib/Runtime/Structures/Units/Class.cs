@@ -5,12 +5,10 @@ namespace HASMLib.Runtime.Structures.Units
 {
     public class Class : BaseStructure
     {
-        public const string NameSeparator = ".";
-
         public const string AbstractKeyword = "abstract";
         public const string SealedKeyword = "sealed";
 
-        private string _fullName;
+        internal string _fullName;
 
         private static void GetName(Class _class, string separator, ref string result)
         {
@@ -24,7 +22,11 @@ namespace HASMLib.Runtime.Structures.Units
             get
             {
                 if (_fullName == null)
+                {
                     GetName(this, NameSeparator, ref _fullName);
+                    if(ParentAssembly != null)
+                        _fullName = ParentAssembly.Name + NameSeparator + _fullName;
+                }
                 return _fullName;
             }
         }
@@ -48,23 +50,27 @@ namespace HASMLib.Runtime.Structures.Units
 
             foreach (var child in Base.Childs)
             {
-                if (child.Target == RuleTarget.Class)
+                switch (child.Target)
                 {
-                    (child as Class).IsInner = true;
-                    (child as Class).InnerParent = this;
-                    InnerClasses.Add(child as Class);
-                }
-
-                if (child.Target == RuleTarget.Method)
-                {
-                    (child as Function).BaseClass = this;
-                    Functions.Add(child as Function);
-                }
-
-                if (child.Target == RuleTarget.Field)
-                {
-                    (child as Field).BaseClass = this;
-                    Fields.Add(child as Field);
+                    case RuleTarget.Class:
+                        (child as Class).IsInner = true;
+                        (child as Class).InnerParent = this;
+                        InnerClasses.Add(child as Class);
+                        break;
+                    case RuleTarget.Method:
+                        (child as Function).BaseClass = this;
+                        Functions.Add(child as Function);
+                        break;
+                    case RuleTarget.Field:
+                        (child as Field).BaseClass = this;
+                        Fields.Add(child as Field);
+                        break;
+                    case RuleTarget.Constructor:
+                        (child as Function).BaseClass = this;
+                        (child as Function).RetType = new TypeReference(this);
+                        break;
+                    default:
+                        break;
                 }
             }
         }

@@ -57,5 +57,9 @@
         Directives_SomeRequiredModifiersAreMissing,
         Directives_WrongChildTarget,
         Directives_ClassWithThatNameAlreadyExists,
+        Directives_MoreThanOneEntryPointDeclared,
+        Directives_NoEntryPointFound,
+        Directives_WrongTypeReference,
+        Directives_FunctionWithThatNameAlreadyExists,
     }
 }

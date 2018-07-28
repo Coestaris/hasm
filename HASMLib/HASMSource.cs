@@ -15,8 +15,6 @@ namespace HASMLib
     {
         internal List<SourceLine> _lines;
         internal CodeBlock _parentBlock;
-        internal List<BaseStructure> _structures;
-        internal List<Function> _functions;
 
         public string Source { get; set; }
         public string BaseFilename { get; set; }
@@ -53,6 +51,8 @@ namespace HASMLib
                 return ParseResult.Sum(p => p.FixedSize);
             }
         }
+
+        public Assembly Assembly { get; internal set; }
 
         public byte[] OutputCompiled()
         {

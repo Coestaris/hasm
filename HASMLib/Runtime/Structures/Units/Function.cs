@@ -8,9 +8,12 @@ namespace HASMLib.Runtime.Structures.Units
 {
     public class Function : BaseStructure
     {
+        public const string StaticKeyword = "static";
+        public const string EntryPointKeyword = "entrypoint";
+
         public const string ReturnKeyword = "ret";
         public const string ParameterKeyword = "param";
-        public const string NoReturnableValueKeyword = "_none_";
+        public const string NoReturnableValueKeyword = "void";
 
         internal List<UnknownLabelNameError> _unknownLabelNameErrorList;
         internal List<Variable> _variables;
@@ -22,8 +25,12 @@ namespace HASMLib.Runtime.Structures.Units
 
         public Class BaseClass;
         public bool HasNoRetValue { get; private set; }
-        public string RetType { get; private set; }
+        public TypeReference RetType { get; internal set; }
         public List<FunctionParameter> Parameters { get; private set; }
+
+        public bool IsConstuctor { get; private set; }
+        public bool IsStatic { get; private set; }
+        public bool IsEntryPoint { get; private set; }
 
         public List<MemZoneFlashElement> Compiled;
 
@@ -34,25 +41,40 @@ namespace HASMLib.Runtime.Structures.Units
 
         public override string Signature
         {
-            get => $"{(HasNoRetValue ? NoReturnableValueKeyword : RetType)} {FullName}" +
+            get => $"{(HasNoRetValue ? NoReturnableValueKeyword : RetType.ToString())} {FullName}" +
                 (Parameters.Count == 0 ? "" : "(" + string.Join(", ", Parameters.Select(p => p.Type + " " + p.Name)) + ")");
         }
 
-        public Function(BaseStructure Base) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
+        public Function(BaseStructure Base, bool asConstructor) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
         {
+            Directive = Base.Directive;
+
             _unknownLabelNameErrorList = new List<UnknownLabelNameError>();
             _variables = new List<Variable>();
             _namedConsts = new List<NamedConstant>();
-
-            Target = RuleTarget.Method;
-            Directive = Base.Directive;
-
             Parameters = new List<FunctionParameter>();
-            Modifier retModifier = GetModifier(ReturnKeyword);
-            if (retModifier.Value == NoReturnableValueKeyword)
+
+            if(asConstructor)
             {
-                HasNoRetValue = true;
-            } else RetType = retModifier.Value;
+                Target = RuleTarget.Constructor;
+                IsConstuctor = true;
+
+            }
+            else
+            {
+                Target = RuleTarget.Method;
+
+                Modifier retModifier = GetModifier(ReturnKeyword);
+                if (retModifier.Value == NoReturnableValueKeyword)
+                {
+                    RetType = TypeReference.Void;
+                    HasNoRetValue = true;
+                }
+                else RetType = new TypeReference(retModifier.Value);
+
+                if (GetModifier(StaticKeyword) != null) IsStatic = true;
+                if (GetModifier(EntryPointKeyword) != null) IsEntryPoint = true;
+            }
 
             foreach (var parameter in Modifiers.FindAll(p => p.Name == ParameterKeyword))
             {
@@ -64,6 +86,11 @@ namespace HASMLib.Runtime.Structures.Units
                 Parameters.Add(new FunctionParameter(
                     new TypeReference(type), name));
             }
+        }
+
+        public Function(BaseStructure Base) : this(Base, false)
+        {
+            
         }
     }
 }
