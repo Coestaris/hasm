@@ -63,5 +63,7 @@
         Directives_FunctionWithThatNameAlreadyExists,
         Syntax_Instruction_UnknownType,
         Directives_FieldWithThatNameAlreadyExists,
+        Syntax_Instruction_UnknownFieldName,
+        Syntax_Instruction_UnknownFuncName,
     }
 }

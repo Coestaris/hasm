@@ -5,7 +5,7 @@ namespace HASMLib.Runtime.Structures
 {
     public class TypeReference
     {
-        public int UinqueID 
+        public int UniqueID 
         {
             get
             {

@@ -1,5 +1,6 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
+using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,26 +30,26 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         private List<MemZoneFlashElementExpression> Expressions;
         private List<ConstnantGrouping> Constnants;
 
-        private void GetComponents()
+        private void GetComponents(Runtime.Structures.Units.Function function)
         {
-            Instructions = source.ParseResult
+            Instructions = function.Compiled
                 .FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
                 .Select(p => p as MemZoneFlashElementInstruction)
                 .ToList();
 
-            Expressions = source.ParseResult
+            Expressions = function.Compiled
                 .FindAll(p => p.Type == MemZoneFlashElementType.Expression)
                 .Select(p => p as MemZoneFlashElementExpression)
                 .ToList();
 
             //Удаляем их из коллекции
-            source.ParseResult.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
+            function.Compiled.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
 
             //Удаляем их из коллекции
-            source.ParseResult.RemoveAll(p => p.Type == MemZoneFlashElementType.Instruction);
+            function.Compiled.RemoveAll(p => p.Type == MemZoneFlashElementType.Instruction);
         }
 
-        private void ResolveExpressions()
+        private void ResolveExpressions(Runtime.Structures.Units.Function function)
         {
             Dictionary<Integer, Integer> plainExpIndexes = new Dictionary<Integer, Integer>();
 
@@ -63,7 +64,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                     Integer constIndex = (Integer)0;
 
-                    source.ParseResult.Add(new MemZoneFlashElementConstant(
+                    function.Compiled.Add(new MemZoneFlashElementConstant(
                         flashElement.Expression.TokenTree.Value.Value,
                         constIndex));
 
@@ -74,22 +75,23 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             }
 
             foreach (MemZoneFlashElementInstruction instruction in Instructions)
-                foreach (ObjectReference reference in instruction.Parameters)
-                    if (reference.Type == ReferenceType.Expression && plainExpIndexes.ContainsKey(reference.Index))
-                    {
-                        reference.Index = plainExpIndexes[reference.Index];
-                        reference.Type = ReferenceType.Constant;
-                    }
+                if(instruction.Parameters != null)
+                    foreach (ObjectReference reference in instruction.Parameters)
+                        if (reference.Type == ReferenceType.Expression && plainExpIndexes.ContainsKey(reference.Index))
+                        {
+                            reference.Index = plainExpIndexes[reference.Index];
+                            reference.Type = ReferenceType.Constant;
+                        }
         }
 
-        private void ResolveConsts()
+        private void ResolveConsts(Runtime.Structures.Units.Function function)
         {
             Dictionary<Integer, Integer> plainConstIndexes = new Dictionary<Integer, Integer>();
             Integer ind = (Integer)0;
 
             //Помещаем все константы в начало флеша для удобства дебага
             //Выбираем с массива константы
-            Constnants = source.ParseResult
+            Constnants = function.Compiled
                 .FindAll(p => p.Type == MemZoneFlashElementType.Constant)
                 .Select(p => p as MemZoneFlashElementConstant)
                 .GroupBy(p => p.Value)
@@ -111,30 +113,31 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 .ToList();
 
             //Удаляем их из коллекции
-            source.ParseResult.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
+            function.Compiled.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
 
             foreach (MemZoneFlashElementInstruction instruction in Instructions)
-                foreach (ObjectReference reference in instruction.Parameters)
-                    if (reference.Type == ReferenceType.Constant)
-                        reference.Index = plainConstIndexes[reference.Index];
+                if (instruction.Parameters != null)
+                    foreach (ObjectReference reference in instruction.Parameters)
+                        if (reference.Type == ReferenceType.Constant)
+                            reference.Index = plainConstIndexes[reference.Index];
         }
 
-        private void JoinComponents()
+        private void JoinComponents(Runtime.Structures.Units.Function function)
         {
             //Пихаем в ее начало
-            source.ParseResult.InsertRange(0, Constnants.Select(
+            function.Compiled.InsertRange(0, Constnants.Select(
                 p => new MemZoneFlashElementConstant(p.Value, p.NewIndex)));
 
             //Пихаем в ее начало
-            source.ParseResult.InsertRange(0, Expressions);
+            function.Compiled.InsertRange(0, Expressions);
 
-            source.ParseResult.AddRange(Instructions);
+            function.Compiled.AddRange(Instructions);
         }
 
-        private void Other()
+        private void Other(Runtime.Structures.Units.Function function)
         {
             //Если размер программы превышает максимально допустимый для этой машины
-            int totalFlashSize = source.ParseResult.Sum(p => p.FixedSize);
+            int totalFlashSize = function.Compiled.Sum(p => p.FixedSize);
             if (totalFlashSize > source.Machine.Flash)
             {
                 var parseError = new ParseError(ParseErrorType.Other_OutOfFlash);
@@ -145,12 +148,14 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerRun()
         {
-            GetComponents();
-            ResolveExpressions();
-            ResolveConsts();
-            JoinComponents();
-
-            Other();
+            foreach (var function in source.Assembly.AllFunctions)
+            {
+                GetComponents(function);
+                ResolveExpressions(function);
+                ResolveConsts(function);
+                JoinComponents(function);
+                Other(function);
+            }
 
             InnerEnd();
         }

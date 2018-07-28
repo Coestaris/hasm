@@ -6,7 +6,9 @@
         Variable,
         Expression,
         Define,
-        Type
+        Type,
+        Function,
+        Field
     }
 }
 

@@ -44,7 +44,10 @@ namespace HASMLib.Runtime.Structures.Units
             switch (Target)
             {
                 case RuleTarget.Constructor:
-                    return new Function(this, true);
+                    return new Function(this, true)
+                    {
+                        RawLines = RawLines
+                    };
                 case RuleTarget.Class:
                     return new Class(this);
                 case RuleTarget.Method:

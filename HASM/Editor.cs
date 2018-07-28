@@ -181,7 +181,7 @@ namespace HASM
                 else
                 {
                     Output = iostream.ReadAll();
-                    int size = source.ParseResult.Sum(p => p.FixedSize);
+                    int size = 0;//source.ParseResult.Sum(p => p.FixedSize);
                     toolStripLabel1.Text =
                         $"Parsed in: {Formatter.ToPrettyFormat(source.ParseTime)}" +
                         $" | Byte code size: {size} {(HASMBase.IsSTD ? "byte" : "fbn")}{(size == 1 ? "" : "s")}" +

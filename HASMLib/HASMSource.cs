@@ -22,7 +22,6 @@ namespace HASMLib
         public HASMMachine Machine { get; set; }
 
         public TimeSpan ParseTime { get; internal set; }
-        public List<MemZoneFlashElement> ParseResult { get; internal set; }
 
         public HASMSource(HASMMachine machine, string fileName, string workingDirectory = null)
         {
@@ -48,7 +47,8 @@ namespace HASMLib
         {
             get
             {
-                return ParseResult.Sum(p => p.FixedSize);
+                throw new NotImplementedException();
+                // ParseResult.Sum(p => p.FixedSize);
             }
         }
 
@@ -56,12 +56,15 @@ namespace HASMLib
 
         public byte[] OutputCompiled()
         {
+            /*
             List<byte> bytes = new List<byte>();
             foreach (var item in ParseResult)
             {
                 bytes.AddRange(item.ToBytes());
             }
             return bytes.ToArray();
+            */
+            throw new NotImplementedException();
         }
 
         public void OutputCompiled(string fileName)

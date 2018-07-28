@@ -59,10 +59,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             List<string> fieldNames = new List<string>();
             List<string> classNames = new List<string>();
 
-
             foreach (var function in PlainFunctionsList)
             {
-                PlainFunctionsList.Add(function);
                 if (funcNames.Contains(function.Signature))
                 {
                     return new ParseError(ParseErrorType.Directives_FunctionWithThatNameAlreadyExists,
@@ -108,6 +106,12 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             PlainClassesList.Add(baseClass);
             baseClass.UniqueID = classID++;
 
+            foreach (var function in baseClass.Constructors)
+            {
+                PlainFunctionsList.Add(function);
+                function.UniqueID = functionID++;
+            }
+
             foreach (var function in baseClass.Functions)
             {
                 PlainFunctionsList.Add(function);
@@ -137,7 +141,14 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             foreach (var item in source.Assembly.Classes)
                 BuildPlainLists(item as Class);
 
-            var parseError = ReferenceCheck();
+            var parseError = CheckNames();
+            if (parseError != null)
+            {
+                InnerEnd(parseError);
+                return;
+            }
+
+            parseError = ReferenceCheck();
             if (parseError != null)
             {
                 InnerEnd(parseError);
@@ -151,6 +162,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 return;
             }
 
+            source.Assembly.AllFields = PlainFiledsList;
             source.Assembly.AllClasses = PlainClassesList;
             source.Assembly.AllFunctions = PlainFunctionsList;
             InnerEnd();

@@ -57,10 +57,10 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 }
             }
 
-            source.ParseResult = new List<MemZoneFlashElement>();
+            //source.ParseResult = new List<MemZoneFlashElement>();
 
             //Заносим регистры в список переменных
-            source.ParseResult.AddRange(SetupRegisters());
+            //source.ParseResult.AddRange(SetupRegisters());
 
             InnerEnd();
         }

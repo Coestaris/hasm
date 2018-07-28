@@ -10,6 +10,7 @@ namespace HASMLib.Runtime.Structures.Units
     {
         public const string StaticKeyword = "static";
         public const string EntryPointKeyword = "entrypoint";
+        public const string SelfParameter = "self";
 
         public const string ReturnKeyword = "ret";
         public const string ParameterKeyword = "param";

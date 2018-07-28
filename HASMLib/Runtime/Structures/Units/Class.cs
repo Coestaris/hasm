@@ -43,6 +43,7 @@ namespace HASMLib.Runtime.Structures.Units
             Target = RuleTarget.Class;
             Directive = Base.Directive;
 
+            Constructors = new List<Function>();    
             InnerClasses = new List<Class>();
             Functions = new List<Function>();
             Fields = new List<Field>();
@@ -67,6 +68,7 @@ namespace HASMLib.Runtime.Structures.Units
                     case RuleTarget.Constructor:
                         (child as Function).BaseClass = this;
                         (child as Function).RetType = new TypeReference(this);
+                        Constructors.Add(child as Function);
                         break;
                     default:
                         break;
@@ -80,6 +82,6 @@ namespace HASMLib.Runtime.Structures.Units
         public List<Class> InnerClasses { get; private set; }
         public List<Function> Functions { get; private set; }
         public List<Field> Fields { get; private set; }
-
+        public List<Function> Constructors { get; private set; }
     }
 }

@@ -49,9 +49,10 @@ namespace HASMLib.Runtime
 
         internal Integer GetGlobalInstructionIndexByLocalOne(Integer localIndex)
         {
-            return _source.ParseResult.FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
+            throw new NotImplementedException();
+            /*return _source.ParseResult.FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
                 .Select(p => (MemZoneFlashElementInstruction)p)
-                .First(p => p.ProgramIndex == localIndex).RuntimeAbsoluteIndex;
+                .First(p => p.ProgramIndex == localIndex).RuntimeAbsoluteIndex;*/
         }
 
         public RuntimeOutputCode Run()
@@ -80,7 +81,9 @@ namespace HASMLib.Runtime
             ProgramCounter = (Integer)0;
 
             List<MemZoneFlashElement> data = new List<MemZoneFlashElement>();
-            data.AddRange(_source.ParseResult);
+            
+            throw new NotImplementedException();
+            //data.AddRange(_source.ParseResult);
 
             List<NamedConstant> constants = data.FindAll(p => p.Type == MemZoneFlashElementType.Constant).Select(p =>
             {

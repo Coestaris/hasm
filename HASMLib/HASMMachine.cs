@@ -58,7 +58,7 @@ namespace HASMLib
         {
             var rm = new RuntimeMachine(this, source);
             MemZone.Clear();
-            MemZone.Flash = source.ParseResult;
+            //MemZone.Flash = source.ParseResult;
 
             if (iostream != null)
                 iostream.Init(rm);

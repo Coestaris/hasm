@@ -41,7 +41,7 @@
             ldi tmp, 0
         }
         
-        .function(public, ret:int, param:TestClass:a) AddToField
+        .function(public, ret:void, param:TestClass:a) AddToField
         {
             alloc local, int
             pusho a
@@ -57,18 +57,28 @@
         ; Main Function with EnryPoint
         .function(public, static, entrypoint, ret:void) Main
         {
-            alloc local, TestClass
-            call TestClass._ctor
-            popr local
+            alloc local1, TestClass
+            call TestClass.SomeConstructor
+            popr local1
             
-            pusha 10, int
-            pusha 20, int
-            pusho local
-            call TestClass.AddValuesWithResult
-            alloc result, int
-            popr result
+            alloc local2, TestClass
+            call TestClass.SomeConstructor
+            popr local2
             
-            out result
-         }
+            pusho local2
+            setv TestClass.SomeField, 123
+            
+            pusha local2
+            pusho local1
+            call TestClass.AddToField
+            
+            alloc value, int
+            getv TestClass.SomeField
+            popr value
+            
+            out value
+     
+
+        }
     }
 }

@@ -262,30 +262,52 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             return null;
                         }
 
-                        var _const = RegisterConstant(function, $"__classReference{type.UinqueID}_", (ulong)type.UinqueID);
-                        result.Add(_const);                        
-                        usedIndexes.Add(new ObjectReference(_const.Index, ReferenceType.Type));
+                        //var _const = RegisterConstant(function, $"__classReference{type.UniqueID}_", (ulong)type.UniqueID);
+                        //result.Add(_const);                        
+                        usedIndexes.Add(new ObjectReference((Integer)type.UniqueID, ReferenceType.Type));
                         continue;
                     }
 
                     if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FieldName)
                     {
-                        TypeReference type = ParseType(argument, out error);
-                        if (error != null)
+                        Field field = source.Assembly.AllFields.Find(p => p.FullName == 
+                            source.Assembly.Name + BaseStructure.NameSeparator + argument);
+
+                        if(field == null)
                         {
-                            error = NewParseError(error.Type, line, argIndex);
+                            error = NewParseError(ParseErrorType.Syntax_Instruction_UnknownFieldName,
+                                line, argIndex);
                             return null;
                         }
 
-                        var _const = RegisterConstant(function, $"__classReference{type.UinqueID}_", (ulong)type.UinqueID);
-                        result.Add(_const);
-                        usedIndexes.Add(new ObjectReference(_const.Index, ReferenceType.Type));
+                        //var _const = RegisterConstant(function, $"__fieldRference{field.UniqueID}_", (ulong)field.UniqueID);
+                        //result.Add(_const);
+                        usedIndexes.Add(new ObjectReference((Integer)field.UniqueID, ReferenceType.Field));
                         continue;
                     }
 
+                    if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FunctionName)
+                    {
+                        Runtime.Structures.Units.Function func = source.Assembly.AllFunctions.Find(p => p.FullName ==
+                            source.Assembly.Name + BaseStructure.NameSeparator + argument);
+
+                        if (func == null)
+                        {
+                            error = NewParseError(ParseErrorType.Syntax_Instruction_UnknownFuncName,
+                                line, argIndex);
+                            return null;
+                        }
+
+                        //var _const = RegisterConstant(function, $"__funcRference{func.UniqueID}_", (ulong)func.UniqueID);
+                        //result.Add(_const);
+                        usedIndexes.Add(new ObjectReference((Integer)func.UniqueID, ReferenceType.Function));
+                        continue;
+                    }
+
+
                     //Если это не выражение, то просто разбираем его дальше по типам...
                     //Если допустимо и константа и переменная, то выходит неоднозначность
-                    /*if (isVar && isConst &&
+                    if (isVar && isConst &&
                         line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Variable) &&
                         line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                     {
@@ -316,8 +338,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             //Запоминаем индекс переменной
                             usedIndexes.Add(new ObjectReference((Integer)varIndex, ReferenceType.Variable));
                         }
+                        continue;
                     }
-                    else
 
                     //Если это однозначно константа, не переменная
                     if (isConst)
@@ -343,111 +365,104 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         usedIndexes.Add(new ObjectReference((Integer)(++function._constIndex), ReferenceType.Constant));
                         //Заносим константу во флеш
                         result.Add(constant.ToFlashElement((Integer)function._constIndex));
+                        continue;
                     }
-                    else
 
                     //Если это не константа... 
-                    {
                         //Если это однозначно переменная...
-                        if (isVar)
+                    if (isVar)
+                    {
+                        //А ожидалась не переменная, то ошибка
+                        if (!line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Variable))
                         {
-                            //А ожидалась не переменная, то ошибка
-                            if (!line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Variable))
-                            {
-                                error = NewParseError(ParseErrorType.Syntax_ExpectedСonst, line, argIndex);
-                                return null;
-                            }
+                            error = NewParseError(ParseErrorType.Syntax_ExpectedСonst, line, argIndex);
+                            return null;
+                        }
 
-                            //Получаем индекс переменной со списка переменных 
-                            int varIndex = function._variables.Select(p => p.Name).ToList().IndexOf(argument);
-                            //Запоминаем индекс переменной
-                            usedIndexes.Add(new ObjectReference((Integer)varIndex, ReferenceType.Variable));
+                        //Получаем индекс переменной со списка переменных 
+                        int varIndex = function._variables.Select(p => p.Name).ToList().IndexOf(argument);
+                        //Запоминаем индекс переменной
+                        usedIndexes.Add(new ObjectReference((Integer)varIndex, ReferenceType.Variable));
+                        continue;
+                    }
+
+                    //Если это не переменная, а просили константу, не переменную
+                    if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
+                    {
+                        //То, возможно, это именная константа...
+                        if (function._namedConsts.Select(p => p.Name).Contains(argument))
+                        {
+                            //Получения индекса константы со списка
+                            int constantIndex = function._namedConsts.Select(p => p.Name).ToList().IndexOf(argument);
+                            //Запоминания индекса
+                            usedIndexes.Add(new ObjectReference(function._namedConsts[constantIndex].Index, ReferenceType.Constant));
+                            //Запись константы во флеш
+                            result.Add(function._namedConsts[constantIndex].Constant.ToFlashElement(function._namedConsts[constantIndex].Index));
                         }
                         else
-
-                        //Если это не переменная, а просили константу, не переменную
-                        if (line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                         {
-                            //То, возможно, это именная константа...
-                            if (function._namedConsts.Select(p => p.Name).Contains(argument))
+
+                            //Константа не найдена! Логично было бы выкинуть ошику
+                            //Но жива еще надежда на то, что она будет объявлена чуть позже.
+                            //Потому сейчас внесем ее сюда. Создадим новую "пустую" константу во флеше,
+                            //И если она таки будет найдена, то подменим ее настоящим значением
+
+
+                            //Елси на эту неведомую херню уже ссылались, то сослемся на нее же
+                            if (function._unknownLabelNameErrorList.Exists(p => p.Name == argument))
                             {
-                                //Получения индекса константы со списка
-                                int constantIndex = function._namedConsts.Select(p => p.Name).ToList().IndexOf(argument);
-                                //Запоминания индекса
-                                usedIndexes.Add(new ObjectReference(function._namedConsts[constantIndex].Index, ReferenceType.Constant));
-                                //Запись константы во флеш
-                                result.Add(function._namedConsts[constantIndex].Constant.ToFlashElement(function._namedConsts[constantIndex].Index));
+                                var item = function._unknownLabelNameErrorList.Find(p => p.Name == argument);
+
+                                //После такой "грязной" хуйни мне хочется сходить с душ!
+                                usedIndexes.Add(new ObjectReference((Integer)item.ConstIndex, ReferenceType.Constant));
                             }
                             else
                             {
 
-                                //Константа не найдена! Логично было бы выкинуть ошику
-                                //Но жива еще надежда на то, что она будет объявлена чуть позже.
-                                //Потому сейчас внесем ее сюда. Создадим новую "пустую" константу во флеше,
-                                //И если она таки будет найдена, то подменим ее настоящим значением
-
-
-                                //Елси на эту неведомую херню уже ссылались, то сослемся на нее же
-                                if (function._unknownLabelNameErrorList.Exists(p => p.Name == argument))
+                                int constIndex = ++function._constIndex;
+                                MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy((Integer)constIndex);
+                                NamedConstant dummyNamedConstant = new NamedConstant(argument, (Integer)constIndex, new Constant())
                                 {
-                                    var item = function._unknownLabelNameErrorList.Find(p => p.Name == argument);
+                                    FEReference = dummyConstant
+                                };
 
-                                    //После такой "грязной" хуйни мне хочется сходить с душ!
-                                    usedIndexes.Add(new ObjectReference((Integer)item.ConstIndex, ReferenceType.Constant));
-                                }
-                                else
-                                {
+                                function._unknownLabelNameErrorList.Add(new UnknownLabelNameError(
+                                    argument,
+                                    NewParseError(expressionError == null ? ParseErrorType.Syntax_UnknownConstName : expressionError.Type, line, argIndex),
+                                    (Integer)constIndex,
+                                    dummyNamedConstant, dummyConstant));
 
-                                    int constIndex = ++function._constIndex;
-                                    MemZoneFlashElementConstantDummy dummyConstant = new MemZoneFlashElementConstantDummy((Integer)constIndex);
-                                    NamedConstant dummyNamedConstant = new NamedConstant(argument, (Integer)constIndex, new Constant())
-                                    {
-                                        FEReference = dummyConstant
-                                    };
+                                function._namedConsts.Add(dummyNamedConstant);
+                                //Записываем его во флеш память
+                                result.Add(dummyConstant);
 
-                                    function._unknownLabelNameErrorList.Add(new UnknownLabelNameError(
-                                        argument,
-                                        NewParseError(expressionError == null ? ParseErrorType.Syntax_UnknownConstName : expressionError.Type, line, argIndex),
-                                        (Integer)constIndex,
-                                        dummyNamedConstant, dummyConstant));
-
-                                    function._namedConsts.Add(dummyNamedConstant);
-                                    //Записываем его во флеш память
-                                    result.Add(dummyConstant);
-
-                                    usedIndexes.Add(new ObjectReference((Integer)constIndex, ReferenceType.Constant));
-                                }
-
-                                //error = NewParseError (ParseErrorType.Syntax_UnknownConstName, label, stringParts, argIndex, index);
-
-
-                            }
-                        }
-                        else
-
-                        //Если удалось частично пропарсить константу, но были переполнения и тд...
-                        if (constError.Type == ParseErrorType.Syntax_Constant_BaseOverflow ||
-                            constError.Type == ParseErrorType.Syntax_Constant_WrongType ||
-                            constError.Type == ParseErrorType.Syntax_Constant_TooLong)
-                        {
-                            //Вернуть новую ошибку с типо старой
-                            error = NewParseError(constError.Type, line, argIndex);
-                            return null;
-                        }
-                        else
-
-                        //Если ничего не известно, то вернем что неизвестное имя переменной
-                        {
-                            if (expressionError != null && line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Expression))
-                            {
-                                error = NewParseError(expressionError.Type, line, argIndex);
-                                return null;
+                                usedIndexes.Add(new ObjectReference((Integer)constIndex, ReferenceType.Constant));
                             }
 
-                            error = NewParseError(ParseErrorType.Syntax_UnknownVariableName, line, argIndex);
-                            return null;
+                            //error = NewParseError (ParseErrorType.Syntax_UnknownConstName, label, stringParts, argIndex, index);
                         }
-                    }*/
+                        continue;
+                    }
+
+                    //Если удалось частично пропарсить константу, но были переполнения и тд...
+                    if (constError.Type == ParseErrorType.Syntax_Constant_BaseOverflow ||
+                        constError.Type == ParseErrorType.Syntax_Constant_WrongType ||
+                        constError.Type == ParseErrorType.Syntax_Constant_TooLong)
+                    {
+                        //Вернуть новую ошибку с типо старой
+                        error = NewParseError(constError.Type, line, argIndex);
+                        return null;
+                    }
+
+                    //Если ничего не известно, то вернем что неизвестное имя переменной
+                    if (expressionError != null && line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Expression))
+                    {
+                        error = NewParseError(expressionError.Type, line, argIndex);
+                        return null;
+                    }
+
+                    error = NewParseError(ParseErrorType.Syntax_UnknownVariableName, line, argIndex);
+                    return null;
                 }
             }
 
@@ -500,12 +515,26 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             }
 
             return null;
+
         }
 
         protected override void InnerRun()
         {
             foreach (var function in source.Assembly.AllFunctions)
             {
+                if (!function.IsStatic)
+                {
+                    function._varIndex++;
+                    function._variables.Add(new Variable(Runtime.Structures.Units.Function.SelfParameter,
+                        new TypeReference(function.BaseClass)));
+                }
+
+                foreach (var parameter in function.Parameters)
+                {
+                    function._varIndex++;
+                    function._variables.Add(new Variable(parameter.Name, parameter.Type));
+                } 
+
                 var error = ParseFunction(function);
                 if (error != null)
                 {
