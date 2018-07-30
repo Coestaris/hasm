@@ -1,6 +1,7 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -27,7 +28,9 @@ namespace HASMLib.Parser.SyntaxTokens.Instructions
             var dest = GetVar(memZone, parameters[0].Index);
             var source = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine);
 
-            dest.Value = source.Value;
+            throw new NotImplementedException();
+
+            //dest.Value = source.Value;
 
             return RuntimeOutputCode.OK;
         }

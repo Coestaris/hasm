@@ -30,6 +30,11 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         function.Directive.LineIndex, function.Directive.FileName);
             }
 
+            foreach (var field in PlainFiledsList)
+                if (!field.Type.CheckClassType(PlainClassesList, source.Assembly))
+                    return new ParseError(ParseErrorType.Directives_WrongTypeReference,
+                        field.Directive.LineIndex, field.Directive.FileName);
+
             return null;
         }
 

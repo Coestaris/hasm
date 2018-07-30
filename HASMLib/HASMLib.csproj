@@ -51,6 +51,7 @@
     <Compile Include="Core\MemZone\MemZoneFlashElementExpression.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementInstruction.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementType.cs" />
+    <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
     <Compile Include="Core\MemZone\MemZoneVariable.cs" />
     <Compile Include="HASMMachine.cs" />
     <Compile Include="HASMMachineBannedFeatures.cs" />
@@ -127,7 +128,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\MemZone.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstant.cs" />
-    <Compile Include="Core\MemZone\MemZoneFlashElementVariable.cs" />
     <Compile Include="Parser\SyntaxTokens\Constant.cs" />
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantBinFormat.cs" />
     <Compile Include="Parser\SyntaxTokens\Constants\ConstantDecFormat.cs" />

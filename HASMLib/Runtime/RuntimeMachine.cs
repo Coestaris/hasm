@@ -145,7 +145,10 @@ namespace HASMLib.Runtime
                 if (data[(int)ProgramCounter].Type == MemZoneFlashElementType.Variable)
                 {
                     var var = ((MemZoneFlashElementVariable)data[(int)ProgramCounter]);
-                    _machine.MemZone.RAM.Add(new MemZoneVariable(var.VariableType, var.Index));
+
+                    throw new NotImplementedException();
+
+                    //_machine.MemZone.RAM.Add(new MemZoneVariable(var.Type, var.Index));
                     continue;
                 }
 

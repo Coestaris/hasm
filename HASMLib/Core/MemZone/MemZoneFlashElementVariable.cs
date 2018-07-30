@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core.BaseTypes;
+using HASMLib.Runtime.Structures;
 using System.Collections.Generic;
 
 namespace HASMLib.Core.MemoryZone
@@ -6,7 +7,7 @@ namespace HASMLib.Core.MemoryZone
     public class MemZoneFlashElementVariable : MemZoneFlashElement
     {
         public Integer Index { get; private set; }
-        public BaseIntegerType VariableType { get; private set; }
+        public TypeReference VariableType { get; private set; }
 
         public override MemZoneFlashElementType Type => MemZoneFlashElementType.Variable;
         public override int FixedSize => 2 * 8 / BaseIntegerType.PrimitiveType.Base + HASMBase.PrimitiveTypesInCommon;
@@ -19,14 +20,14 @@ namespace HASMLib.Core.MemoryZone
             List<byte> bytes = new List<byte>();
             bytes.Add(Element_Var);                 //Its a var
             bytes.AddRange(Index.ToBytes());        //variable index
-            bytes.Add((byte)VariableType.Base);         //variable type
+            //bytes.Add((byte)VariableType.Base);         //variable type
             return bytes.ToArray();
         }
 
-        public MemZoneFlashElementVariable(Integer index)
+        public MemZoneFlashElementVariable(Integer index, TypeReference type)
         {
             Index = index;
-            VariableType = index.Type;
+            VariableType = type;
         }
 
         public override string ToString()

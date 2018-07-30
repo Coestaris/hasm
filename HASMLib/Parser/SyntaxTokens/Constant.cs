@@ -1,4 +1,5 @@
-﻿using HASMLib.Core.BaseTypes;
+﻿using System;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens.Constants;
 using System.Collections.Generic;
@@ -20,7 +21,8 @@ namespace HASMLib.Parser.SyntaxTokens
 
         internal Constant(MemZoneVariable variable)
         {
-            Value = variable.Value;
+            throw new NotImplementedException();
+            //Value = variable.Value;
         }
 
         internal Constant(ulong value)

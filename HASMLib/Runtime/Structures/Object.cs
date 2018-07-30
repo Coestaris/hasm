@@ -9,6 +9,11 @@ namespace HASMLib.Runtime.Structures
 {
     public class Object
     {
-        public Class Type;
+        public TypeReference Type;
+
+        public Object(TypeReference type)
+        {
+            type = Type;
+        }
     }
 }

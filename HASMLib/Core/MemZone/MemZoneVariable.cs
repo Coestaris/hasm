@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core.BaseTypes;
+using HASMLib.Runtime.Structures;
 
 namespace HASMLib.Core.MemoryZone
 {
@@ -6,12 +7,12 @@ namespace HASMLib.Core.MemoryZone
     {
         public string Name { get; protected set; }
         public Integer Index { get; protected set; }
-        public Integer Value { get; set; }
+        public Object Value { get; set; }
 
-        public MemZoneVariable(BaseIntegerType type, Integer index) : this(new Integer(0, type), index)
+        public MemZoneVariable(TypeReference type, Integer index) : this(new Object(type), index)
         { }
 
-        public MemZoneVariable(Integer value, Integer index)
+        public MemZoneVariable(Object value, Integer index)
         {
             Value = value;
             Index = index;
@@ -19,7 +20,7 @@ namespace HASMLib.Core.MemoryZone
 
         public void AddValue(MemZoneVariable value)
         {
-            Value += value.Value;
+            //Value += value.Value;
         }
 
         public void SetValue(MemZoneVariable value)
@@ -29,12 +30,12 @@ namespace HASMLib.Core.MemoryZone
 
         public void SetValue(ulong value)
         {
-            Value = new Integer(value, Value.Type);
+            //Value = new Integer(value, Value.Type);
         }
 
         public void AddValue(ulong value)
         {
-            Value = new Integer(Value.Value + value, Value.Type);
+            //Value = new Integer(Value.Value + value, Value.Type);
         }
     }
 }

@@ -504,8 +504,13 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 if (!function.IsStatic)
                 {
                     function._varIndex++;
-                    function._variables.Add(new Variable(Runtime.Structures.Units.Function.SelfParameter,
-                        new TypeReference(function.BaseClass, source.Assembly)));
+
+                    TypeReference type = new TypeReference(function.BaseClass, source.Assembly);
+                    type.CheckClassType(source.Assembly.AllClasses, source.Assembly);
+
+                    function._variables.Add(
+                        new Variable(Runtime.Structures.Units.Function.SelfParameter,
+                        type));
                 }
 
                 foreach (var parameter in function.Parameters)
