@@ -26,7 +26,11 @@ namespace HASMLib.Runtime.Instructions.Instructions
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
             var value = GetNumericValue(parameters[0], package);
-            //runtimeMachine.OutBytes(value.ToPrimitive());
+
+            if (value == null)
+                return RuntimeOutputCode.ExpectedIntegerVariable;
+
+            package.RuntimeMachine.OutBytes("stdout", value.ToPrimitive());
             return RuntimeOutputCode.OK;
         }
     }

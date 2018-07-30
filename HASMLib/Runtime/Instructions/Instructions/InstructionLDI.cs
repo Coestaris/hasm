@@ -27,11 +27,12 @@ namespace HASMLib.Runtime.Instructions.Instructions
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
             var dest = GetVar(parameters[0].Index, package);
-            var source = GetNumericValue(parameters[0], package);
+            var source = GetNumericValue(parameters[1], package);
 
-            throw new NotImplementedException();
+            if (dest.Value.Type.Type != Structures.TypeReferenceType.Integer)
+                return RuntimeOutputCode.ExpectedIntegerVariable;
 
-            //dest.Value = source.Value;
+            dest.Value.IntegerValue = source.Value;
 
             return RuntimeOutputCode.OK;
         }

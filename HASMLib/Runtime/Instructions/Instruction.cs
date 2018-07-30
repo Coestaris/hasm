@@ -43,7 +43,13 @@ namespace HASMLib.Runtime.Instructions
                 case (ReferenceType.Constant):
                     return GetConst(reference.Index, package).Constant;
                 case (ReferenceType.Variable):
-                    return new Constant(GetVar(reference.Index, package));
+                    {
+                        var var = GetVar(reference.Index, package);
+                        if (var.Value.Type.Type != Structures.TypeReferenceType.Integer)
+                            return null;
+
+                        return new Constant(var);
+                    }
                 case (ReferenceType.Expression):
                     {
                         Expression expression = package.Expressions.Find(p => p.Index == reference.Index).Expression;

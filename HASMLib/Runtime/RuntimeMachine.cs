@@ -57,7 +57,7 @@ namespace HASMLib.Runtime
 
         private List<CallStackItem> CallStack;
 
-        public RuntimeOutputCode Run()
+        public RuntimeError Run()
         {
             DateTime startTime = DateTime.Now;
             IsRunning = true;
@@ -115,14 +115,23 @@ namespace HASMLib.Runtime
             return result;
         }
 
-        private RuntimeOutputCode CallFunction(Function function)
+        private RuntimeError CallFunction(Function function)
         {
-            var csi = new CallStackItem(function, (Integer)0);
+            CallStackItem csi = new CallStackItem(function, (Integer)0);
+            RuntimeDataPackage package = new RuntimeDataPackage()
+            {
+                Constants = function.RuntimeCache.Constants,
+                Expressions = function.RuntimeCache.Expressions,
+                MemZone = _machine.MemZone,
+                RuntimeMachine = this,
+                Assembly = _source.Assembly
+            };
+
             CallStack.Add(csi);
 
             foreach (var variable in function.RuntimeCache.Variables)
             {
-                _machine.MemZone.RAM.Add(new Core.MemoryZone.Variable(variable.VariableType, variable.Index));
+                _machine.MemZone.RAM.Add(new Variable(variable.VariableType, variable.Index));
             }
 
             for (; (int)csi.ProgramCounter < function.RuntimeCache.Instructions.Count; csi.ProgramCounter += (Integer)1)
@@ -132,21 +141,16 @@ namespace HASMLib.Runtime
                 var instruction = function.RuntimeCache.Instructions[(int)csi.ProgramCounter];
 
                 if (Ticks == int.MaxValue)
-                    return RuntimeOutputCode.StackOverFlow;
+                    return new RuntimeError(RuntimeOutputCode.StackOverFlow);
 
                 //Если все ОК, то запускаем нашу инструкцию
-                RuntimeOutputCode output = SourceLineInstruction.Instructions[(int)instruction.InstructionNumber].Apply(
-                    _machine.MemZone, 
-                    function.RuntimeCache.Constants, 
-                    function.RuntimeCache.Expressions, 
-                    instruction.Parameters, 
-                    this);
+                RuntimeOutputCode output = SourceLineInstruction.Instructions[(int)instruction.InstructionNumber].Apply(package, instruction.Parameters);
 
                 if (output != RuntimeOutputCode.OK)
-                    return output;
+                    return new RuntimeError(output, instruction.Line);
             }
 
-            return RuntimeOutputCode.OK;
+            return null;
         }
     }
 }

@@ -7,5 +7,6 @@
         UnknownVariableReference,
         StackOverFlow,
         OK,
+        ExpectedIntegerVariable,
     }
 }

@@ -1,6 +1,5 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
-using HASMLib.Parser.SyntaxTokens;
 using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
@@ -447,7 +446,10 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 }
             }
 
-            result.Add(new FlashElementInstruction(line.Instruction, usedIndexes, currentInstructionProgramIndex));
+            result.Add(new FlashElementInstruction(line.Instruction, usedIndexes, currentInstructionProgramIndex)
+            {
+                Line = line
+            });
             error = null;
             return result;
         }

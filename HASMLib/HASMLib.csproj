@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\BaseTypes\Array.cs" />
     <Compile Include="Core\BaseTypes\ArrayType.cs" />
     <Compile Include="Core\BaseTypes\BaseIntegerType.cs" />
     <Compile Include="Core\BaseTypes\Integer.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Runtime\CallStackItem.cs" />
     <Compile Include="Runtime\IOStream.cs" />
     <Compile Include="Runtime\RuntimeDataPackage.cs" />
+    <Compile Include="Runtime\RuntimeError.cs" />
     <Compile Include="Runtime\RuntimeMachine.cs" />
     <Compile Include="Runtime\RuntimeOutputCode.cs" />
     <Compile Include="Runtime\StreamDirection.cs" />

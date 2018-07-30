@@ -21,8 +21,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
 
         internal Constant(Variable variable)
         {
-            throw new NotImplementedException();
-            //Value = variable.Value;
+            Value = variable.Value.IntegerValue;
         }
 
         internal Constant(ulong value)

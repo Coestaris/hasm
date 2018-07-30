@@ -155,8 +155,8 @@ namespace HASM
                     runThread = new Thread(p =>
                     {
                         var result = runtime.Run();
-                        if (result != RuntimeOutputCode.OK)
-                            MessageBox.Show($"Runtime error: {result}", "Runtime error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (result != null)
+                            MessageBox.Show(result.ToString(), "Runtime error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         RunEnd(stdOut, runtime, source);
                     });

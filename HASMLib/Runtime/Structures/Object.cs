@@ -1,9 +1,5 @@
-﻿using HASMLib.Runtime.Structures.Units;
-using System;
+﻿using HASMLib.Core.BaseTypes;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HASMLib.Runtime.Structures
 {
@@ -11,9 +7,44 @@ namespace HASMLib.Runtime.Structures
     {
         public TypeReference Type;
 
+        public Integer IntegerValue;
+        public Array ArrayValue;
+
+        public Dictionary<int, Object> ClassFields;
+        public bool IsNull;
+
+        public void InitClassObject()
+        {
+            foreach (var field in Type.ClassType.Fields)
+            {
+                ClassFields.Add(field.UniqueID, new Object(field.Type));
+            }
+            IsNull = false;
+        }
+
+        public Object GetClassField(int UniqueID)
+        {
+            return ClassFields[UniqueID];
+        }
+
         public Object(TypeReference type)
         {
-            type = Type;
+            Type = type;
+            if (Type.Type == TypeReferenceType.Integer)
+            {
+                IntegerValue = new Integer(0, type.IntegerType);
+                IsNull = false;
+            }
+            else if (Type.Type == TypeReferenceType.Array)
+            {
+                ArrayValue = new Array(Type.ArrayType);
+                IsNull = false;
+            }
+            else if (Type.Type == TypeReferenceType.Class)
+            {
+                IsNull = true;
+            }
+            else throw new System.ArgumentException();
         }
     }
 }

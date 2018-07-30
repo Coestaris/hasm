@@ -15,6 +15,7 @@ namespace HASMLib.Core.MemoryZone
         public List<ObjectReference> Parameters { get; private set; }
         public Integer ProgramIndex { get; private set; }
         public Integer RuntimeAbsoluteIndex { get; internal set; }
+        public SourceLine Line { get; internal set; }
 
         public override FlashElementType Type => FlashElementType.Instruction;
 

@@ -1,4 +1,4 @@
-;
+﻿;
 ; Пример работы с ООП
 ;
 
@@ -43,29 +43,24 @@
         ; Main Function with EnryPoint
         .function(public, static, entrypoint, ret:void) Main
         {
-            ;alloc local1, TestClass
-            ;call TestClass.SomeConstructor
-            ;popr local1
+            alloc local1, TestClass
+            call TestClass.SomeConstructor
+            popr local1
             
-            ;alloc local2, TestClass
-            ;call TestClass.SomeConstructor
-            ;popr local2
+            alloc local2, TestClass
+            call TestClass.SomeConstructor
+            popr local2
             
-            ;pusho local2
-            ;setv TestClass.SomeField, 123
+            pusho local2
+            setv TestClass.SomeField, 123
             
-            ;pusha local2
-            ;pusho local1
-            ;call TestClass.AddToField
-            
-            ;alloc value, int
-            ;getv TestClass.SomeField
-            ;popr value
+            pusha local2
+            pusho local1
+            call TestClass.AddToField
             
             alloc value, int
-            ldi value, 10
-            add value, 10
-            out value
+            getv TestClass.SomeField
+            popr value
         }
     }
 }
