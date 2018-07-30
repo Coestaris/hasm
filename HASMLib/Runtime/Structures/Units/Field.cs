@@ -7,7 +7,7 @@ namespace HASMLib.Runtime.Structures.Units
         public const string TypeKeyword = "type";
 
         public Class BaseClass;
-        public TypeReference Type;
+        internal TypeReference Type;
 
         public Field(BaseStructure Base) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
         {
@@ -15,12 +15,12 @@ namespace HASMLib.Runtime.Structures.Units
             Directive = Base.Directive;
 
             Modifier type = GetModifier(TypeKeyword);
-            Type = new TypeReference(type.Value);
+            Type = new TypeReference(type.Value, null);
         }
 
         public override string FullName
         {
-            get => BaseClass.FullName + Class.NameSeparator + Name;
+            get => BaseClass.ToAbsoluteName(Name);
         }
 
         public override string Signature

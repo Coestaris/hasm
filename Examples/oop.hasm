@@ -14,20 +14,6 @@
     {
         .field(public, type:int) SomeField
 
-        .class(public, sealed) InnerClass
-        {
-
-            .function(ret:void) SomveVoidFunc
-            {
-                ret
-            }
-        
-            .function(ret:int) SomveVoidFunc
-            {
-                ret
-            }
-        }
-        
         .constructor(public, param:int:a, param:int:b) SomeConstructor
         {
             alloc tmp, int

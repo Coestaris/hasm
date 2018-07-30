@@ -24,7 +24,7 @@ namespace HASMLib.Runtime.Structures.Units
                 {
                     GetName(this, NameSeparator, ref _fullName);
                     if(ParentAssembly != null)
-                        _fullName = ParentAssembly.Name + NameSeparator + _fullName;
+                        _fullName = ParentAssembly.ToAbsoluteName(_fullName);
                 }
                 return _fullName;
             }
@@ -67,7 +67,7 @@ namespace HASMLib.Runtime.Structures.Units
                         break;
                     case RuleTarget.Constructor:
                         (child as Function).BaseClass = this;
-                        (child as Function).RetType = new TypeReference(this);
+                        (child as Function).RetType = new TypeReference(this, null);
                         Constructors.Add(child as Function);
                         break;
                     default:

@@ -41,9 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\BaseTypes\Array.cs" />
+    <Compile Include="Core\BaseTypes\ArrayType.cs" />
     <Compile Include="Core\BaseTypes\BaseIntegerType.cs" />
     <Compile Include="Core\BaseTypes\Integer.cs" />
+    <Compile Include="Core\BaseTypes\StringType.cs" />
     <Compile Include="Core\HASMBase.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElement.cs" />
     <Compile Include="Core\MemZone\MemZoneFlashElementConstantDummy.cs" />
@@ -143,7 +144,8 @@
     <Compile Include="Runtime\RuntimeMachine.cs" />
     <Compile Include="Runtime\RuntimeOutputCode.cs" />
     <Compile Include="Runtime\Structures\AccessModifier.cs" />
-    <Compile Include="Runtime\Structures\Type.cs" />
+    <Compile Include="Runtime\Structures\TypeReference.cs" />
+    <Compile Include="Runtime\Structures\TypeReferenceType.cs" />
     <Compile Include="Runtime\Structures\Units\BaseStructure.cs" />
     <Compile Include="Runtime\Structures\Units\Assembly.cs" />
     <Compile Include="Runtime\Structures\Units\Field.cs" />

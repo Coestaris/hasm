@@ -7,6 +7,13 @@ namespace HASMLib.Runtime.Structures.Units
 {
     public class BaseStructure
     {
+        public string ToAbsoluteName(string baseName)
+        {
+            return baseName.StartsWith(FullName) ? 
+                baseName :
+                FullName + NameSeparator + baseName;
+        }
+        
         public const string NameSeparator = ".";
 
         public Assembly ParentAssembly;

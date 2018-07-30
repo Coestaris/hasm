@@ -16,6 +16,7 @@ namespace HASMLib.Runtime.Structures.Units
 
         public Assembly(BaseStructure Base) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
         {
+            UsedTypes = new List<TypeReference>();
             Classes = new List<Class>();
             ParentAssembly = null;
             Target = RuleTarget.Assembly;
@@ -56,5 +57,31 @@ namespace HASMLib.Runtime.Structures.Units
         public List<Class> AllClasses { get; internal set; }
         public List<Function> AllFunctions { get; internal set; }
 
+        internal List<TypeReference> UsedTypes;
+        private int _usedTypesCounter;
+
+        internal int RegisterType(TypeReference reference)
+        {
+            string searchName = reference.Name;
+
+            if (reference.Type == TypeReferenceType.Class && !reference.Name.StartsWith(Name))
+                searchName = ToAbsoluteName(searchName);
+
+            TypeReference type = UsedTypes.Find(p => p.Name == searchName);
+            if(type != null)
+            {
+                reference.UniqueID = type.UniqueID;
+                reference.Registered = true;
+                reference.Name = searchName;
+                return type.UniqueID;
+            }
+
+            UsedTypes.Add(reference);
+            reference.Name = searchName;
+            reference.Registered = true;
+            reference.UniqueID = _usedTypesCounter++;
+
+            return reference.UniqueID;
+        }
     }
 }

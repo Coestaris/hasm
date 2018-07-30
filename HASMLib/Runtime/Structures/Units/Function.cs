@@ -37,7 +37,7 @@ namespace HASMLib.Runtime.Structures.Units
 
         public override string FullName
         {
-            get => BaseClass.FullName + Class.NameSeparator + Name;
+            get => BaseClass.ToAbsoluteName(Name);
         }
 
         public override string Signature
@@ -71,7 +71,7 @@ namespace HASMLib.Runtime.Structures.Units
                     RetType = TypeReference.Void;
                     HasNoRetValue = true;
                 }
-                else RetType = new TypeReference(retModifier.Value);
+                else RetType = new TypeReference(retModifier.Value, null);
 
                 if (GetModifier(StaticKeyword) != null) IsStatic = true;
                 if (GetModifier(EntryPointKeyword) != null) IsEntryPoint = true;
@@ -85,7 +85,7 @@ namespace HASMLib.Runtime.Structures.Units
                 var name = parts[1];
 
                 Parameters.Add(new FunctionParameter(
-                    new TypeReference(type), name));
+                    new TypeReference(type, null), name));
             }
         }
 

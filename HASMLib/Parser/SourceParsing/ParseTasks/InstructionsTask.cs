@@ -80,27 +80,6 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             return result;
         }
 
-        private TypeReference ParseType(string type, out ParseError error)
-        {
-            TypeReference Type = new TypeReference(type);
-            error = null;
-
-            if (Type.IsVoid) return Type;
-            if (Type.IsBaseInteger) return Type;
-            if (Type.IsClass) return Type;
-
-            Class Class = source.Assembly.AllClasses.Find(p => p.FullName == source.Assembly.Name + Class.NameSeparator + Type.Name);
-            if (Class == null) 
-            {
-                error = new ParseError(ParseErrorType.Syntax_Instruction_UnknownType);
-                return null;
-            }
-
-            Type.IsClass = true;
-            Type.ClassType = Class;
-            return Type;
-        }
-
         private List<MemZoneFlashElement> GetFlashElementsWithArguents(Runtime.Structures.Units.Function function, SourceLineInstruction line, out ParseError error)
         {
             Integer currentInstructionProgramIndex = (Integer)(function._instructionIndex++);
@@ -255,10 +234,10 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                     if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.ClassName)
                     {
-                        TypeReference type = ParseType(argument, out error);
-                        if (error != null)
+                        TypeReference type = new TypeReference(argument, source.Assembly);
+                        if (!type.CheckClassType(source.Assembly.AllClasses, source.Assembly))
                         {
-                            error = NewParseError(error.Type, line, argIndex);
+                            error = NewParseError(ParseErrorType.Syntax_Instruction_UnknownType, line, argIndex);
                             return null;
                         }
 
@@ -271,7 +250,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                     if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FieldName)
                     {
                         Field field = source.Assembly.AllFields.Find(p => p.FullName == 
-                            source.Assembly.Name + BaseStructure.NameSeparator + argument);
+                            source.Assembly.ToAbsoluteName(argument));
 
                         if(field == null)
                         {
@@ -289,7 +268,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                     if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FunctionName)
                     {
                         Runtime.Structures.Units.Function func = source.Assembly.AllFunctions.Find(p => p.FullName ==
-                            source.Assembly.Name + BaseStructure.NameSeparator + argument);
+                            source.Assembly.ToAbsoluteName(argument));
 
                         if (func == null)
                         {
@@ -526,7 +505,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 {
                     function._varIndex++;
                     function._variables.Add(new Variable(Runtime.Structures.Units.Function.SelfParameter,
-                        new TypeReference(function.BaseClass)));
+                        new TypeReference(function.BaseClass, source.Assembly)));
                 }
 
                 foreach (var parameter in function.Parameters)

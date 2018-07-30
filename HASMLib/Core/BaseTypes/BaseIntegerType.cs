@@ -9,6 +9,7 @@ namespace HASMLib.Core.BaseTypes
         public static BaseIntegerType PrimitiveType;
         public static BaseIntegerType CommonType;
         public static BaseIntegerType CommonSignedType;
+        public static BaseIntegerType CommonCharType;
 
         public int UniqueID;
         public int Base;
@@ -18,11 +19,9 @@ namespace HASMLib.Core.BaseTypes
         public bool IsSigned;
         public string Name;
 
-        public BaseIntegerType(int uniqueID, int _base, bool isSigned, string name)
+        public BaseIntegerType(int _base, bool isSigned, string name)
         {
-            UniqueID = uniqueID;
             Base = _base;
-
             if (_base >= 64 && !isSigned)
             {
                 MaxValue = ulong.MaxValue;

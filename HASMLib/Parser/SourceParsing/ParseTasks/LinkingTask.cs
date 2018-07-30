@@ -1,10 +1,5 @@
-﻿using HASMLib.Core.BaseTypes;
-using HASMLib.Core.MemoryZone;
-using HASMLib.Parser.SyntaxTokens;
-using HASMLib.Runtime.Structures;
-using HASMLib.Runtime.Structures.Units;
+﻿using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
-using System.IO;
 
 namespace HASMLib.Parser.SourceParsing.ParseTasks
 {
@@ -21,31 +16,16 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         private int fieldID = 0;
         private int functionID = 0;
 
-
-        private bool IsTypeOk(TypeReference Type)
-        {
-            if (Type.IsVoid) return true;
-            if (Type.IsBaseInteger) return true;
-            if (Type.IsClass) return true;
-
-            Class Class = PlainClassesList.Find(p => p.FullName == source.Assembly.Name + Class.NameSeparator + Type.Name);
-            if (Class == null) return false;
-
-            Type.IsClass = true;
-            Type.ClassType = Class;
-            return true;
-        }
-
         private ParseError ReferenceCheck()
         {
             foreach (var function in PlainFunctionsList)
             {
                 foreach (var parameter in function.Parameters)
-                    if (!IsTypeOk(parameter.Type))
+                    if (!parameter.Type.CheckClassType(PlainClassesList, source.Assembly))
                         return new ParseError(ParseErrorType.Directives_WrongTypeReference,
                             function.Directive.LineIndex, function.Directive.FileName);
 
-                if (!IsTypeOk(function.RetType))
+                if (!function.RetType.CheckClassType(PlainClassesList, source.Assembly))
                     return new ParseError(ParseErrorType.Directives_WrongTypeReference,
                         function.Directive.LineIndex, function.Directive.FileName);
             }
@@ -138,6 +118,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             PlainClassesList = new List<Class>();
             PlainFiledsList = new List<Field>();
             PlainFunctionsList = new List<Function>();
+
             foreach (var item in source.Assembly.Classes)
                 BuildPlainLists(item as Class);
 

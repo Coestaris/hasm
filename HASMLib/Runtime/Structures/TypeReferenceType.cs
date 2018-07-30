@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HASMLib.Core.BaseTypes
+namespace HASMLib.Runtime.Structures
 {
-    class Array
+    public enum TypeReferenceType
     {
+        Class,
+        Integer,
+        Array,
+        Void,
     }
 }
