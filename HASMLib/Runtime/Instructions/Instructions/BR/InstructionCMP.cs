@@ -34,10 +34,10 @@ namespace HASMLib.Runtime.Instructions.Instructions
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<ConstantMark> constants, List<FlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            Integer a = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
-            Integer b = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine).Value;
+            Integer a = GetNumericValue(parameters[0], package).Value;
+            Integer b = GetNumericValue(parameters[1], package).Value;
 
             ComapreResult result = 0;
 
@@ -47,7 +47,7 @@ namespace HASMLib.Runtime.Instructions.Instructions
             if (a > b) result |= ComapreResult.Greater;
             if (a < b) result |= ComapreResult.Less;
 
-            memZone.Stack.Push(BaseIntegerType.PrimitiveType.Cast((Integer)(int)result)[0]);
+            package.MemZone.Stack.Push(BaseIntegerType.PrimitiveType.Cast((Integer)(int)result)[0]);
 
             return RuntimeOutputCode.OK;
         }

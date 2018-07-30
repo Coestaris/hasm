@@ -23,15 +23,15 @@ namespace HASMLib.Runtime.Instructions.Instructions
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<ConstantMark> constants, List<FlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            ComapreResult result = (ComapreResult)(int)memZone.Stack.Pop();
+            ComapreResult result = (ComapreResult)(int)package.MemZone.Stack.Pop();
 
             if (result.HasFlag(ComapreResult.Equal))
             {
-                Integer position = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+                Integer position = GetNumericValue(parameters[0], package).Value;
 
-                RuntimeMachineJump(position, runtimeMachine);
+                RuntimeMachineJump(position, package.RuntimeMachine);
             }
 
             return RuntimeOutputCode.OK;

@@ -23,11 +23,11 @@ namespace HASMLib.Runtime.Instructions.Instructions
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<ConstantMark> constants, List<FlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            Integer position = GetNumericValue(0, memZone, constants, expressions, parameters, runtimeMachine).Value;
+            Integer position = GetNumericValue(parameters[0], package).Value;
 
-            RuntimeMachineJump(position, runtimeMachine);
+            //RuntimeMachineJump(position, runtimeMachine);
 
             return RuntimeOutputCode.OK;
         }

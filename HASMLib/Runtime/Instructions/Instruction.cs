@@ -1,5 +1,4 @@
-﻿using HASMLib.Core;
-using HASMLib.Core.BaseTypes;
+﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser;
 using HASMLib.Parser.SyntaxTokens.Constants;
@@ -18,14 +17,14 @@ namespace HASMLib.Runtime.Instructions
         public int ParameterCount { get; protected set; }
         public List<InstructionParameterType> ParameterTypes { get; protected set; }
 
-        protected Variable GetVar(MemZone mz, Integer index)
+        protected Variable GetVar(Integer index, RuntimeDataPackage package)
         {
-            return mz.RAM[(int)index];
+            return package.MemZone.RAM[(int)index];
         }
 
-        protected ConstantMark GetConst(List<ConstantMark> constants, Integer index)
+        protected ConstantMark GetConst(Integer index, RuntimeDataPackage package)
         {
-            return constants[(int)index];
+            return package.Constants[(int)index];
         }
 
         public void RuntimeMachineJump(Integer position, RuntimeMachine runtimeMachine)
@@ -37,20 +36,20 @@ namespace HASMLib.Runtime.Instructions
             //runtimeMachine.ProgramCounter = globalIndex - (Integer)1;
         }
 
-        public Constant GetNumericValue(int index, MemZone memZone, List<ConstantMark> constants, List<FlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public Constant GetNumericValue(ObjectReference reference, RuntimeDataPackage package)
         {
-            switch (parameters[index].Type)
+            switch (reference.Type)
             {
                 case (ReferenceType.Constant):
-                    return GetConst(constants, parameters[index].Index).Constant;
+                    return GetConst(reference.Index, package).Constant;
                 case (ReferenceType.Variable):
-                    return new Constant(GetVar(memZone, parameters[index].Index));
+                    return new Constant(GetVar(reference.Index, package));
                 case (ReferenceType.Expression):
                     {
-                        Expression expression = expressions.Find(p => p.Index == parameters[index].Index).Expression;
-                        Constant constnant = expression.Calculate(memZone, true);
+                        Expression expression = package.Expressions.Find(p => p.Index == reference.Index).Expression;
+                        Constant constnant = expression.Calculate(package.MemZone, true);
 
-                        runtimeMachine.Ticks += expression.Steps;
+                        package.RuntimeMachine.Ticks += expression.Steps;
                         return constnant;
                     }
             }
@@ -58,6 +57,6 @@ namespace HASMLib.Runtime.Instructions
             return null;
         }
 
-        public abstract RuntimeOutputCode Apply(MemZone memZone, List<ConstantMark> constants, List<FlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine);
+        public abstract RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters);
     }
 }

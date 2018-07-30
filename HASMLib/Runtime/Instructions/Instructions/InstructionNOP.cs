@@ -20,7 +20,7 @@ namespace HASMLib.Runtime.Instructions.Instructions
             ParameterTypes = new List<InstructionParameterType>() { };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<ConstantMark> constants, List<FlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
             return RuntimeOutputCode.OK;
         }

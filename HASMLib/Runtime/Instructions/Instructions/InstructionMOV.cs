@@ -24,10 +24,10 @@ namespace HASMLib.Runtime.Instructions.Instructions
             };
         }
 
-        public override RuntimeOutputCode Apply(MemZone memZone, List<ConstantMark> constants, List<FlashElementExpression> expressions, List<ObjectReference> parameters, RuntimeMachine runtimeMachine)
+        public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            var dest = GetVar(memZone, parameters[0].Index);
-            var source = GetNumericValue(1, memZone, constants, expressions, parameters, runtimeMachine);
+            var dest = GetVar(parameters[0].Index, package);
+            var source = GetNumericValue(parameters[1], package);
 
             throw new NotImplementedException();
 
