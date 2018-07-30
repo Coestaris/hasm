@@ -1,7 +1,8 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.BaseTypes;
+using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
-using HASMLib.Parser.SyntaxTokens.Preprocessor;
+using HASMLib.Parser.SyntaxTokens.Preprocessor.Directives;
 using System;
 using System.Collections.Generic;
 using System.Linq;

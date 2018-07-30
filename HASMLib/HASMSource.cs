@@ -1,13 +1,10 @@
-﻿using HASMLib.Core.MemoryZone;
-using HASMLib.Parser;
+﻿using HASMLib.Parser.SyntaxTokens.SourceLines;
+using HASMLib.Parser.SyntaxTokens.Structure;
+using HASMLib.Runtime.Structures.Units;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System;
-using HASMLib.Parser.SyntaxTokens;
-using HASMLib.Parser.SyntaxTokens.Structure;
-using HASMLib.Runtime.Structures;
-using HASMLib.Runtime.Structures.Units;
 
 namespace HASMLib
 {

@@ -1,5 +1,5 @@
 ﻿using HASMLib.Core;
-using HASMLib.Parser.SyntaxTokens;
+using HASMLib.Parser.SyntaxTokens.Preprocessor;
 using HASMLib.Runtime;
 using System;
 using System.Collections.Generic;
@@ -54,14 +54,15 @@ namespace HASMLib
             return a;
         }
 
-        public RuntimeMachine CreateRuntimeMachine(HASMSource source, IOStream iostream = null)
+        public RuntimeMachine CreateRuntimeMachine(HASMSource source, List<IOStream> streams = null)
         {
             var rm = new RuntimeMachine(this, source);
             MemZone.Clear();
             //MemZone.Flash = source.ParseResult;
 
-            if (iostream != null)
-                iostream.Init(rm);
+            if (streams != null)
+                foreach (var stream in streams)
+                    stream.Init(rm);
 
             return rm;
         }

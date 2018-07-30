@@ -12,7 +12,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerReset() { }
 
-        private List<MemZoneFlashElement> SetupRegisters()
+        private List<FlashElement> SetupRegisters()
         {
             /*var result = new List<MemZoneFlashElement>();
             source.Machine.GetRegisterNames().ForEach(p =>
@@ -25,7 +25,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 result.Add(a);
             });
             return result;*/
-            return new List<MemZoneFlashElement>();
+            return new List<FlashElement>();
         }
 
         protected override void InnerRun()

@@ -43,7 +43,7 @@ namespace HASM
                 BannedFeatures = workingFolder.CompileConfig.BannedFeatures,
                 UserDefinedDefines = workingFolder.CompileConfig.Defines
                     .FindAll(p => !string.IsNullOrEmpty(p.Name))
-                    .Select(p => new HASMLib.Parser.SyntaxTokens.Define(p.Name, p.Value))
+                    .Select(p => new HASMLib.Parser.SyntaxTokens.Preprocessor.Define(p.Name, p.Value))
                     .ToList()
             };
 
@@ -143,8 +143,14 @@ namespace HASM
                 }
                 else
                 {
-                    /*IOStream iostream = new IOStream();
-                    var runtime = source.Machine.CreateRuntimeMachine(source, iostream);
+                    IOStream stdOut = new IOStream("stdout", StreamDirection.Out);
+                    IOStream stdIn = new IOStream("stdin", StreamDirection.In);
+
+                    var runtime = source.Machine.CreateRuntimeMachine(source, new List<IOStream>()
+                    {
+                        stdOut,
+                        stdIn
+                    });
 
                     runThread = new Thread(p =>
                     {
@@ -152,15 +158,10 @@ namespace HASM
                         if (result != RuntimeOutputCode.OK)
                             MessageBox.Show($"Runtime error: {result}", "Runtime error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                        RunEnd(iostream, runtime, source);
+                        RunEnd(stdOut, runtime, source);
                     });
 
                     runThread.Start();
-                    */
-                    IOStream iostream = new IOStream();
-                    var runtime = source.Machine.CreateRuntimeMachine(source, iostream);
-
-                    RunEnd(iostream, runtime, source);
                 }
             }
         }

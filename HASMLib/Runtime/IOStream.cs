@@ -9,17 +9,23 @@ namespace HASMLib.Runtime
     public class IOStream
     {
         private RuntimeMachine _runtimeMachine;
-
+        private bool _isOpened;
+        private bool _isInited;
         private List<Integer> _buffer;
 
-        private void UpdateBuffer(List<Integer> inBuffer)
+        public string StreamName;
+        public StreamDirection Direction;
+
+        private void UpdateBuffer(string streamName, List<Integer> inBuffer)
         {
-            _buffer.AddRange(inBuffer);
+            if(Direction == StreamDirection.Out && streamName == StreamName)
+                _buffer.AddRange(inBuffer);
         }
 
-        public IOStream()
+        public IOStream(string name, StreamDirection direction)
         {
-
+            Direction = direction;
+            StreamName = name;
         }
 
         internal void Init(RuntimeMachine runtimeMachine)
@@ -29,7 +35,6 @@ namespace HASMLib.Runtime
             _runtimeMachine.OutBufferUpdated += UpdateBuffer;
             _runtimeMachine.OnBufferFlushed += Flushed;
             _runtimeMachine.OnBufferClosed += Closed;
-
             Flush();
         }
 
@@ -43,9 +48,6 @@ namespace HASMLib.Runtime
             _isOpened = true;
             Flush();
         }
-
-        private bool _isOpened;
-        private bool _isInited;
 
         public bool IsOpened
         {
@@ -82,6 +84,9 @@ namespace HASMLib.Runtime
 
         public List<Integer> ReadAll()
         {
+            if (Direction != StreamDirection.Out)
+                throw new InvalidOperationException();
+
             Integer[] buffer = new Integer[Length];
             Read(buffer, 0, (int)Length);
             return buffer.ToList();
@@ -89,6 +94,9 @@ namespace HASMLib.Runtime
 
         public int Read(Integer[] buffer, int offset, int count)
         {
+            if (Direction != StreamDirection.Out)
+                throw new InvalidOperationException();
+
             if (count > _buffer.Count)
                 throw new ArgumentException();
 
@@ -109,6 +117,9 @@ namespace HASMLib.Runtime
 
         public void Write(Integer[] buffer, int offset, int count)
         {
+            if (Direction != StreamDirection.In)
+                throw new InvalidOperationException();
+
             List<Integer> inBuffer = buffer.Skip(offset).Take(count).ToList();
             _runtimeMachine.InbufferRecieved(inBuffer);
         }

@@ -1,4 +1,5 @@
-﻿using HASMLib.Parser.SyntaxTokens;
+﻿using HASMLib.Parser.SyntaxTokens.Preprocessor;
+using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

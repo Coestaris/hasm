@@ -26,27 +26,27 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             }
         }
 
-        private List<MemZoneFlashElementInstruction> Instructions;
-        private List<MemZoneFlashElementExpression> Expressions;
+        private List<FlashElementInstruction> Instructions;
+        private List<FlashElementExpression> Expressions;
         private List<ConstnantGrouping> Constnants;
 
         private void GetComponents(Runtime.Structures.Units.Function function)
         {
-            Instructions = function.Compiled
-                .FindAll(p => p.Type == MemZoneFlashElementType.Instruction)
-                .Select(p => p as MemZoneFlashElementInstruction)
+            Instructions = function.CompileCache.Compiled
+                .FindAll(p => p.Type == FlashElementType.Instruction)
+                .Select(p => p as FlashElementInstruction)
                 .ToList();
 
-            Expressions = function.Compiled
-                .FindAll(p => p.Type == MemZoneFlashElementType.Expression)
-                .Select(p => p as MemZoneFlashElementExpression)
+            Expressions = function.CompileCache.Compiled
+                .FindAll(p => p.Type == FlashElementType.Expression)
+                .Select(p => p as FlashElementExpression)
                 .ToList();
 
             //Удаляем их из коллекции
-            function.Compiled.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
+            function.CompileCache.Compiled.RemoveAll(p => p.Type == FlashElementType.Expression);
 
             //Удаляем их из коллекции
-            function.Compiled.RemoveAll(p => p.Type == MemZoneFlashElementType.Instruction);
+            function.CompileCache.Compiled.RemoveAll(p => p.Type == FlashElementType.Instruction);
         }
 
         private void ResolveExpressions(Runtime.Structures.Units.Function function)
@@ -64,7 +64,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                     Integer constIndex = (Integer)0;
 
-                    function.Compiled.Add(new MemZoneFlashElementConstant(
+                    function.CompileCache.Compiled.Add(new FlashElementConstant(
                         flashElement.Expression.TokenTree.Value.Value,
                         constIndex));
 
@@ -74,7 +74,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 }
             }
 
-            foreach (MemZoneFlashElementInstruction instruction in Instructions)
+            foreach (FlashElementInstruction instruction in Instructions)
                 if(instruction.Parameters != null)
                     foreach (ObjectReference reference in instruction.Parameters)
                         if (reference.Type == ReferenceType.Expression && plainExpIndexes.ContainsKey(reference.Index))
@@ -91,9 +91,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             //Помещаем все константы в начало флеша для удобства дебага
             //Выбираем с массива константы
-            Constnants = function.Compiled
-                .FindAll(p => p.Type == MemZoneFlashElementType.Constant)
-                .Select(p => p as MemZoneFlashElementConstant)
+            Constnants = function.CompileCache.Compiled
+                .FindAll(p => p.Type == FlashElementType.Constant)
+                .Select(p => p as FlashElementConstant)
                 .GroupBy(p => p.Value)
                 .Select(p =>
                 {
@@ -113,9 +113,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 .ToList();
 
             //Удаляем их из коллекции
-            function.Compiled.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
+            function.CompileCache.Compiled.RemoveAll(p => p.Type == FlashElementType.Constant);
 
-            foreach (MemZoneFlashElementInstruction instruction in Instructions)
+            foreach (FlashElementInstruction instruction in Instructions)
                 if (instruction.Parameters != null)
                     foreach (ObjectReference reference in instruction.Parameters)
                         if (reference.Type == ReferenceType.Constant)
@@ -125,19 +125,19 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         private void JoinComponents(Runtime.Structures.Units.Function function)
         {
             //Пихаем в ее начало
-            function.Compiled.InsertRange(0, Constnants.Select(
-                p => new MemZoneFlashElementConstant(p.Value, p.NewIndex)));
+            function.CompileCache.Compiled.InsertRange(0, Constnants.Select(
+                p => new FlashElementConstant(p.Value, p.NewIndex)));
 
             //Пихаем в ее начало
-            function.Compiled.InsertRange(0, Expressions);
+            function.CompileCache.Compiled.InsertRange(0, Expressions);
 
-            function.Compiled.AddRange(Instructions);
+            function.CompileCache.Compiled.AddRange(Instructions);
         }
 
         private void Other(Runtime.Structures.Units.Function function)
         {
             //Если размер программы превышает максимально допустимый для этой машины
-            int totalFlashSize = function.Compiled.Sum(p => p.FixedSize);
+            int totalFlashSize = function.CompileCache.Compiled.Sum(p => p.FixedSize);
             if (totalFlashSize > source.Machine.Flash)
             {
                 var parseError = new ParseError(ParseErrorType.Other_OutOfFlash);

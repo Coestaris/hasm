@@ -138,7 +138,7 @@ namespace HASM
                     InstructionRegexes.Add(new Regex($"\\s{item.NameString}\\s"));
 
                 List<Regex> PreprocessorRegexes = new List<Regex>();
-                foreach (var item in HASMLib.Parser.SyntaxTokens.PreprocessorDirective.PreprocessorDirectives)
+                foreach (var item in HASMLib.Parser.SyntaxTokens.Preprocessor.PreprocessorDirective.PreprocessorDirectives)
                     PreprocessorRegexes.Add(new Regex($"#{item.Name}\\s"));
 
                 TextBox.TextChanged += (obj, args) =>

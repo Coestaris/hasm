@@ -8,9 +8,9 @@ namespace HASMLib.Core
     {
         public Stack<Integer> Stack { get; private set; }
 
-        public List<MemZoneVariable> RAM { get; private set; }
+        public List<Variable> RAM { get; private set; }
 
-        public List<MemZoneFlashElement> Flash { get; internal set; }
+        public List<FlashElement> Flash { get; internal set; }
 
         public int FreeRAM => _ram - Stack.Count - RAM.Count;
         public int FreeFlash => _flash - Flash.Count;
@@ -20,12 +20,12 @@ namespace HASMLib.Core
 
         public void Clear()
         {
-            Flash = new List<MemZoneFlashElement>();
-            RAM = new List<MemZoneVariable>();
+            Flash = new List<FlashElement>();
+            RAM = new List<Variable>();
             Stack = new Stack<Integer>();
         }
 
-        public MemZone(int flash_len, int ram, List<MemZoneFlashElement> flash)
+        public MemZone(int flash_len, int ram, List<FlashElement> flash)
         {
             _flash = flash_len;
             _ram = ram;

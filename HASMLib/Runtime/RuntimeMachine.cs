@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HASMLib.Parser;
+using HASMLib.Runtime.Structures.Units;
 
 namespace HASMLib.Runtime
 {
@@ -12,7 +13,7 @@ namespace HASMLib.Runtime
     public class RuntimeMachine
     {
         internal delegate void RuntimeMachineIOHandler();
-        internal delegate void RuntimeMachineIOBufferHandler(List<Integer> data);
+        internal delegate void RuntimeMachineIOBufferHandler(string streamName, List<Integer> data);
 
         private const string _constantFormat = "_constant{0}";
         private const string _variableFormat = "_var{0}";
@@ -22,7 +23,6 @@ namespace HASMLib.Runtime
         public bool IsRunning { get; private set; }
 
         internal List<Integer> InBuffer;
-        internal Integer ProgramCounter;
 
         private HASMMachine _machine;
         private HASMSource _source;
@@ -42,9 +42,9 @@ namespace HASMLib.Runtime
             InBuffer.AddRange(inBuffer);
         }
 
-        internal void OutBytes(List<Integer> bytes)
+        internal void OutBytes(string streamName, List<Integer> bytes)
         {
-            OutBufferUpdated?.Invoke(bytes);
+            OutBufferUpdated?.Invoke(streamName, bytes);
         }
 
         internal Integer GetGlobalInstructionIndexByLocalOne(Integer localIndex)
@@ -55,111 +55,92 @@ namespace HASMLib.Runtime
                 .First(p => p.ProgramIndex == localIndex).RuntimeAbsoluteIndex;*/
         }
 
+        private List<CallStackItem> CallStack;
+
         public RuntimeOutputCode Run()
         {
             DateTime startTime = DateTime.Now;
-
             IsRunning = true;
 
             Ticks = 0;
             InBuffer = new List<Integer>();
+            CallStack = new List<CallStackItem>();
+
             OnBufferFlushed?.Invoke();
 
-            var result = RunInternal();
+            foreach (var function in _source.Assembly.AllFunctions)
+            {
+                List<ConstantMark> constants = function.CompileCache.Compiled.FindAll(p => p.Type == FlashElementType.Constant).Select(p =>
+                {
+                    var constant = (FlashElementConstant)p;
+                    return new ConstantMark(
+                        string.Format(_constantFormat, constant.Index),
+                        constant.Index,
+                        constant.ToConstant());
+                }).ToList();
+
+                List<FlashElementExpression> expressions = function.CompileCache.Compiled
+                    .FindAll(p => p.Type == FlashElementType.Expression)
+                    .Select(p => (FlashElementExpression)p).ToList();
+
+                List<FlashElementInstruction> instructions = function.CompileCache.Compiled
+                    .FindAll(p => p.Type == FlashElementType.Instruction)
+                    .Select(p => (FlashElementInstruction)p).ToList();
+
+                List<FlashElementVariable> variables = function.CompileCache.Compiled
+                    .FindAll(p => p.Type == FlashElementType.Variable)
+                    .Select(p => (FlashElementVariable)p).ToList();
+
+
+                Integer globalIndex = (Integer)0;
+
+                instructions.ForEach(p =>
+                {
+                    p.RuntimeAbsoluteIndex = globalIndex;
+                    globalIndex += (Integer)1;
+                });
+
+                function.RuntimeCache.Constants = constants;
+                function.RuntimeCache.Variables = variables;
+                function.RuntimeCache.Expressions = expressions;
+                function.RuntimeCache.Instructions= instructions;
+
+            }
+
+            var result = CallFunction(_source.Assembly._entryPoint);
 
             OnBufferClosed?.Invoke();
-
             TimeOfRunning = TimeSpan.FromMilliseconds((DateTime.Now - startTime).TotalMilliseconds);
-
             IsRunning = false;
-
             return result;
         }
 
-        private RuntimeOutputCode RunInternal()
+        private RuntimeOutputCode CallFunction(Function function)
         {
-            ProgramCounter = (Integer)0;
+            var csi = new CallStackItem(function, (Integer)0);
+            CallStack.Add(csi);
 
-            List<MemZoneFlashElement> data = new List<MemZoneFlashElement>();
-            
-            throw new NotImplementedException();
-            //data.AddRange(_source.ParseResult);
-
-            List<NamedConstant> constants = data.FindAll(p => p.Type == MemZoneFlashElementType.Constant).Select(p =>
+            foreach (var variable in function.RuntimeCache.Variables)
             {
-                var constant = (MemZoneFlashElementConstant)p;
-                return new NamedConstant(
-                    string.Format(_constantFormat, constant.Index),
-                    constant.Index,
-                    constant.ToConstant());
-            }).ToList();
-
-            List<MemZoneFlashElementExpression> expressions = data.FindAll(p => p.Type == MemZoneFlashElementType.Expression).Select(p => (MemZoneFlashElementExpression)p).ToList();
-
-            //Удаляем их из коллекции
-            data.RemoveAll(p => p.Type == MemZoneFlashElementType.Constant);
-
-            //Удаляем их из коллекции
-            data.RemoveAll(p => p.Type == MemZoneFlashElementType.Expression);
-
-            Integer globalIndex = (Integer)0;
-
-            data.ForEach(p =>
-            {
-                if (p.Type == MemZoneFlashElementType.Instruction)
-                {
-                    ((MemZoneFlashElementInstruction)p).RuntimeAbsoluteIndex = globalIndex;
-                }
-                globalIndex += (Integer)1;
-            });
-
-            //Проверяем валидность ссылок
-            foreach (MemZoneFlashElementInstruction instruction in data.FindAll(p => p.Type == MemZoneFlashElementType.Instruction))
-            {
-                //Проверяем валидность ссылок
-                foreach (var parameter in instruction.Parameters)
-                {
-                    switch (parameter.Type)
-                    {
-                        case ReferenceType.Constant:
-                            if (!constants.Exists(p => p.Index == parameter.Index))
-                                return RuntimeOutputCode.UnknownConstantReference;
-                            break;
-
-                        /*case ReferenceType.Variable:
-                            if (!_machine.MemZone.RAM.Exists(p => p.Index == parameter.Index))
-                                return RuntimeOutputCode.UnknownConstantReference;
-                            break;*/
-
-                        case ReferenceType.Expression:
-                            if (!expressions.Exists(p => p.Index == parameter.Index))
-                                return RuntimeOutputCode.UnknownExpressionReference;
-                            break;
-                    }
-                }
+                _machine.MemZone.RAM.Add(new Core.MemoryZone.Variable(variable.VariableType, variable.Index));
             }
 
-            for (; (int)ProgramCounter < data.Count; ProgramCounter += (Integer)1)
+            for (; (int)csi.ProgramCounter < function.RuntimeCache.Instructions.Count; csi.ProgramCounter += (Integer)1)
             {
                 Ticks++;
-                if (data[(int)ProgramCounter].Type == MemZoneFlashElementType.Variable)
-                {
-                    var var = ((MemZoneFlashElementVariable)data[(int)ProgramCounter]);
-
-                    throw new NotImplementedException();
-
-                    //_machine.MemZone.RAM.Add(new MemZoneVariable(var.Type, var.Index));
-                    continue;
-                }
-
-                var instruction = (MemZoneFlashElementInstruction)data[(int)ProgramCounter];
+                
+                var instruction = function.RuntimeCache.Instructions[(int)csi.ProgramCounter];
 
                 if (Ticks == int.MaxValue)
                     return RuntimeOutputCode.StackOverFlow;
 
                 //Если все ОК, то запускаем нашу инструкцию
                 RuntimeOutputCode output = SourceLineInstruction.Instructions[(int)instruction.InstructionNumber].Apply(
-                    _machine.MemZone, constants, expressions, instruction.Parameters, this);
+                    _machine.MemZone, 
+                    function.RuntimeCache.Constants, 
+                    function.RuntimeCache.Expressions, 
+                    instruction.Parameters, 
+                    this);
 
                 if (output != RuntimeOutputCode.OK)
                     return output;

@@ -16,14 +16,6 @@ namespace HASMLib.Runtime.Structures.Units
         public const string ParameterKeyword = "param";
         public const string NoReturnableValueKeyword = "void";
 
-        internal List<UnknownLabelNameError> _unknownLabelNameErrorList;
-        internal List<Variable> _variables;
-        internal List<NamedConstant> _namedConsts;
-        internal int _constIndex;
-        internal int _expressionIndex;
-        internal int _varIndex;
-        internal int _instructionIndex;
-
         public Class BaseClass;
         public bool HasNoRetValue { get; private set; }
         public TypeReference RetType { get; internal set; }
@@ -33,7 +25,8 @@ namespace HASMLib.Runtime.Structures.Units
         public bool IsStatic { get; private set; }
         public bool IsEntryPoint { get; private set; }
 
-        public List<MemZoneFlashElement> Compiled;
+        internal FunctionCompileCache CompileCache;
+        internal FunctionRuntimeCache RuntimeCache;
 
         public override string FullName
         {
@@ -50,9 +43,9 @@ namespace HASMLib.Runtime.Structures.Units
         {
             Directive = Base.Directive;
 
-            _unknownLabelNameErrorList = new List<UnknownLabelNameError>();
-            _variables = new List<Variable>();
-            _namedConsts = new List<NamedConstant>();
+            CompileCache.UnknownLabelNameErrorList = new List<ConstantErrorMark>();
+            CompileCache.Variables = new List<VariableMark>();
+            CompileCache.NamedConsts = new List<ConstantMark>();
             Parameters = new List<FunctionParameter>();
 
             if(asConstructor)

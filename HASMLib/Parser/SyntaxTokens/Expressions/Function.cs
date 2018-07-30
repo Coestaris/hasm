@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HASMLib.Parser.SyntaxTokens.Constants;
+using System;
 
 namespace HASMLib.Parser.SyntaxTokens.Expressions
 {

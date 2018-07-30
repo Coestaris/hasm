@@ -1,7 +1,9 @@
 ﻿using HASMLib.Core;
 using HASMLib.Core.MemoryZone;
+using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using HASMLib.Parser.SyntaxTokens.Preprocessor;
+using HASMLib.Parser.SyntaxTokens.Preprocessor.Directives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -371,13 +373,13 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             {
                 switch (Reference.Object.Type)
                 {
-                    case MemZoneFlashElementType.Variable:
-                        return new Constant(zone.RAM.Find(p => p.Index == (Reference.Object as MemZoneFlashElementVariable).Index));
-                    case MemZoneFlashElementType.Constant:
-                        return (Reference.Object as MemZoneFlashElementConstant).ToConstant();
-                    case MemZoneFlashElementType.Instruction:
-                    case MemZoneFlashElementType.Expression:
-                    case MemZoneFlashElementType.Undefined:
+                    case FlashElementType.Variable:
+                        return new Constant(zone.RAM.Find(p => p.Index == (Reference.Object as FlashElementVariable).Index));
+                    case FlashElementType.Constant:
+                        return (Reference.Object as FlashElementConstant).ToConstant();
+                    case FlashElementType.Instruction:
+                    case FlashElementType.Expression:
+                    case FlashElementType.Undefined:
                     default:
                         throw new Exception("Wrong reference object!");
                 }
