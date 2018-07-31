@@ -1,8 +1,14 @@
 ﻿using FastColoredTextBoxNS;
-using HASMLib.Parser.SyntaxTokens;
+using HASMLib;
+using HASMLib.Core.BaseTypes;
+using HASMLib.Parser;
+using HASMLib.Parser.SourceParsing;
+using HASMLib.Runtime.Structures;
+using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static System.Windows.Forms.TabControl;
@@ -11,55 +17,111 @@ namespace HASM
 {
     public class TextEditor : TabPage
     {
-        private static Style CommentStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
-        private static Style KeywordStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular);
-        private static Style RegularStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular);
-
-        private static Style AssemblyNameStyle = new TextStyle(Brushes.DarkGreen, null, FontStyle.Regular);
-        private static Style UnitsNameStyle = new TextStyle(Brushes.DarkViolet, null, FontStyle.Regular);
-        private static Style ClassNameStyle = new TextStyle(Brushes.DarkSlateBlue, null, FontStyle.Regular);
-
-        private static Style StringStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular);
-        private static Style LabelStyle = new TextStyle(Brushes.Coral, null, FontStyle.Regular);
-        private static Style VariableStyle = new TextStyle(Brushes.DarkBlue, null, FontStyle.Regular);
-        private static Style BinNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
-        private static Style DecNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
-        private static Style HexNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
-
-        private static Style InstructionStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular);
-        private static Style PreprocessorStyle = new TextStyle(Brushes.Gray, null, FontStyle.Regular);
-        private static Style BuiltinFunctionsStyle = new TextStyle(Brushes.Blue, null, FontStyle.Bold);
-
-
-        private static Regex LabelRegex = new Regex(@"(?<=\W){1,100}:", RegexOptions.Multiline);
-        private static Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
-        private static Regex RegisterRegex = new Regex(@"(?<=\W)R\d{1,2}", RegexOptions.Multiline);
-
-        private static Regex AssemblyRegex = new Regex(@"(?<=\.assembly\s)\w*");
-        private static Regex FullUnitsRegex = new Regex(@".(function|field|constructor)\(.*\)\s+\w*");
-        private static Regex PartialUnitsRegex = new Regex(@".(function|field|constructor)\([^()]*?\)");
-
-        private static Regex FullClassRegex = new Regex(@".class\(.*\)\s+\w*");
-        private static Regex PartialClassRegex = new Regex(@".class\([^()]*?\)");
-
-
-        private static List<Regex> KeywordRegexes = new List<Regex>()
+        private static readonly List<string> Keywords = new List<string>()
         {
-            new Regex(@"(?<=\.)assembly"),
-            new Regex(@"(?<=\.)class"),
-            new Regex(@"(?<=\.)constructor"),
-            new Regex(@"(?<=\.)function"),
-            new Regex(@"(?<=\.)field"),
+            Function.EntryPointKeyword,
+            Function.ParameterKeyword,
+            Function.ReturnKeyword,
+            Function.SelfParameter,
+            Function.StaticKeyword,
+            Class.AbstractKeyword,
+            Class.SealedKeyword,
+            Field.TypeKeyword,
+
+            AccessModifier.Default.ToString().ToLower(),
+            AccessModifier.Inner.ToString().ToLower(),
+            AccessModifier.Private.ToString().ToLower(),
+            AccessModifier.Public.ToString().ToLower(),
         };
 
-        private static Regex BinRegex = new Regex(@"(?<=\W)0[bB][0-1]{1,100}(_[sdq]){0,1}");
-        private static Regex DecRegex = new Regex(@"(?<=\W)\d{1,30}(_[sdq]){0,1}");
-        private static Regex HexRegex = new Regex(@"(?<=\W)0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
+        private static readonly string KeywordRegexTemplate = @"(?<=[,\.\s:()])({0})(?=[,\.\s:()])";
 
-        private static Regex String1Regex = new Regex("\\\".*\\\"");
-        private static Regex String2Regex = new Regex(@"<.*>");
+        private static readonly Style ErrorStyle = new WavyLineStyle(255, Color.Red);
 
+        private static readonly Style CommentStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
+        private static readonly Style DirectiveKeywordStyle = new TextStyle(Brushes.Blue, null, FontStyle.Bold);
+        private static readonly Style KeywordStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular);
+        private static readonly Style RegularStyle = new TextStyle(Brushes.Black, null, FontStyle.Regular);
+        private static readonly Style BaseTypesNameStyle = new TextStyle(Brushes.DarkGreen, null, FontStyle.Regular);
+        private static readonly Style AssemblyNameStyle = new TextStyle(Brushes.DarkGreen, null, FontStyle.Regular);
+
+        private static readonly Style FunctionNameStyle = new TextStyle(new SolidBrush(Color.FromArgb(167, 60, 193)), null, FontStyle.Regular);
+        private static readonly Style FieldNameStyle = new TextStyle(new SolidBrush(Color.FromArgb(140, 19, 19)), null, FontStyle.Regular);
+        private static readonly Style ClassNameStyle = new TextStyle(new SolidBrush(Color.FromArgb(50, 109, 102)), null, FontStyle.Regular);
+
+        private static readonly Style StringStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular);
+        private static readonly Style LabelStyle = new TextStyle(Brushes.Coral, null, FontStyle.Regular);
+        private static readonly Style VariableStyle = new TextStyle(Brushes.DarkBlue, null, FontStyle.Regular);
+        private static readonly Style BinNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
+        private static readonly Style DecNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
+        private static readonly Style HexNumberStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
+        private static readonly Style InstructionStyle = new TextStyle(Brushes.Blue, null, FontStyle.Regular);
+        private static readonly Style PreprocessorStyle = new TextStyle(Brushes.Gray, null, FontStyle.Regular);
+        private static readonly Style BuiltinFunctionsStyle = new TextStyle(Brushes.Blue, null, FontStyle.Bold);
+
+
+        private static readonly Regex LabelRegex = new Regex(@"(?<=\W){1,100}:", RegexOptions.Multiline);
+        private static readonly Regex CommentRegex = new Regex(@";.{0,}$", RegexOptions.Multiline);
+        private static readonly Regex RegisterRegex = new Regex(@"(?<=\W)R\d{1,2}", RegexOptions.Multiline);
+        private static readonly Regex DirectiveKeywordRegex = new Regex(@"(?<=\.)assembly|function|field|class|constructor(?=[\s(])");
+        private static readonly Regex KeywordRegex = CreateRegex(Keywords);
+
+        private static readonly Regex BinRegex = new Regex(@"(?<=\W)0[bB][0-1]{1,100}(_[sdq]){0,1}");
+        private static readonly Regex DecRegex = new Regex(@"(?<=\W)\d{1,30}(_[sdq]){0,1}");
+        private static readonly Regex HexRegex = new Regex(@"(?<=\W)0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
+        private static readonly Regex String1Regex = new Regex("\\\".*\\\"");
+        private static readonly Regex String2Regex = new Regex(@"<.*>");
+
+        private static Regex BaseTypeRegex;
+        private static List<Regex> FunctionRegexes;
+        private static List<Regex> InstructionRegexes;
+        private static List<Regex> PreprocessorRegexes;
+
+        private string ErrorString;
+        private ParseError ParseError;
+        private string Directory;
+        private ParseTaskRunner TaskRunner;
+        private HASMMachine Machine;
+
+        public bool IsChanged = false;
+        public string DisplayName;
+        public string Path;
+        public FastColoredTextBox TextBox;
         public int HighlightedLine = -1;
+
+        private static void InitPlatformSpecificRegexes()
+        {
+            if (BaseTypeRegex != null) return;
+
+            List<string> baseTypeNames = new List<string>();
+            baseTypeNames.AddRange(BaseIntegerType.Types.Select(p => p.Name));
+            baseTypeNames.AddRange(new List<string>()
+            {
+                "array",
+                "string",
+                "void"
+            });
+
+
+            BaseTypeRegex = CreateRegex(baseTypeNames);
+            FunctionRegexes = new List<Regex>();
+            foreach (var item in HASMLib.Parser.SyntaxTokens.Expressions.Expression.Functions)
+                FunctionRegexes.Add(new Regex($"{item.FunctionString}"));
+
+            InstructionRegexes = new List<Regex>();
+            foreach (var item in HASMLib.Parser.SyntaxTokens.SourceLines.SourceLineInstruction.Instructions)
+                InstructionRegexes.Add(new Regex($"\\s{item.NameString}\\s"));
+
+            PreprocessorRegexes = new List<Regex>();
+            foreach (var item in HASMLib.Parser.SyntaxTokens.Preprocessor.PreprocessorDirective.PreprocessorDirectives)
+                PreprocessorRegexes.Add(new Regex($"#{item.Name}\\s"));
+
+        }
+
+        private static Regex CreateRegex(IEnumerable<string> collection)
+        {
+            return new Regex(string.Format(KeywordRegexTemplate, string.Join("|", collection)));
+        }
 
         public bool Close()
         {
@@ -93,10 +155,10 @@ namespace HASM
                 return true;
             }
         }
-
+        
         public TextEditor(string path)
         {
-            if(!File.Exists(path))
+            if (!File.Exists(path))
             {
                 MessageBox.Show($"Unable to find file {path}");
                 return;
@@ -114,8 +176,14 @@ namespace HASM
                 
             };
 
-            DisplayName = path.Remove(0, path.Replace('\\', '/').LastIndexOf('/') + 1) + "  [x]";
+            Machine = new HASMMachine(0xFFFF, 0xFFFF, 0xFFFF);
+            HASMSource source = new HASMSource(Machine, TextBox.Text);
+            TaskRunner = new ParseTaskRunner(source);
 
+            InitPlatformSpecificRegexes();
+
+            Directory = new FileInfo(path).Directory.FullName;
+            DisplayName = path.Remove(0, path.Replace('\\', '/').LastIndexOf('/') + 1) + "  [x]";
             Text = DisplayName;
 
             if (DisplayName.Contains(".cfg"))
@@ -129,94 +197,118 @@ namespace HASM
             }
             else
             {
-                List<Regex> FunctionRegexes = new List<Regex>();
-                foreach (var item in HASMLib.Parser.SyntaxTokens.Expressions.Expression.Functions)
-                    FunctionRegexes.Add(new Regex($"{item.FunctionString}"));
-
-                List<Regex> InstructionRegexes = new List<Regex>();
-                foreach (var item in HASMLib.Parser.SyntaxTokens.SourceLines.SourceLineInstruction.Instructions)
-                    InstructionRegexes.Add(new Regex($"\\s{item.NameString}\\s"));
-
-                List<Regex> PreprocessorRegexes = new List<Regex>();
-                foreach (var item in HASMLib.Parser.SyntaxTokens.Preprocessor.PreprocessorDirective.PreprocessorDirectives)
-                    PreprocessorRegexes.Add(new Regex($"#{item.Name}\\s"));
-
-                TextBox.TextChanged += (obj, args) =>
-                {
-                    if(HighlightedLine != -1)
-                  
-                    {
-                        TextBox[HighlightedLine].BackgroundBrush = Brushes.Transparent;
-                        HighlightedLine = -1;
-                    }
-                };
-
                 TextBox.SyntaxHighlighter.InitStyleSchema(Language.CSharp);
-
-                TextBox.VisibleRangeChanged += (obj, args) =>
-                {
-                    TextBox.VisibleRange.ClearStyle(StyleIndex.All);
-
-                    TextBox.VisibleRange.SetFoldingMarkers(
-                        HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockOpened,
-                        HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockClosed);
-
-                    TextBox.VisibleRange.SetStyle(CommentStyle, CommentRegex);
-
-                    foreach (var item in KeywordRegexes)
-                        TextBox.VisibleRange.SetStyle(KeywordStyle, item);
-
-                    TextBox.VisibleRange.SetStyle(RegularStyle, PartialClassRegex);
-                    TextBox.VisibleRange.SetStyle(RegularStyle, PartialUnitsRegex);
-
-                    TextBox.VisibleRange.SetStyle(AssemblyNameStyle, AssemblyRegex);
-                    TextBox.VisibleRange.SetStyle(ClassNameStyle, FullClassRegex);
-                    TextBox.VisibleRange.SetStyle(UnitsNameStyle, FullUnitsRegex);
-
-                    TextBox.VisibleRange.SetStyle(StringStyle, String1Regex);
-                    TextBox.VisibleRange.SetStyle(StringStyle, String2Regex);
-                    
-                    TextBox.VisibleRange.SetStyle(LabelStyle, LabelRegex);
-                    TextBox.VisibleRange.SetStyle(VariableStyle, RegisterRegex);
-                    TextBox.VisibleRange.SetStyle(BinNumberStyle, BinRegex);
-                    TextBox.VisibleRange.SetStyle(DecNumberStyle, DecRegex);
-                    TextBox.VisibleRange.SetStyle(HexNumberStyle, HexRegex);
-
-                    foreach (var item in InstructionRegexes)
-                        TextBox.VisibleRange.SetStyle(InstructionStyle, item);
-
-                    foreach (var item in PreprocessorRegexes)
-                        TextBox.VisibleRange.SetStyle(PreprocessorStyle, item);
-
-                    foreach (var item in FunctionRegexes)
-                        TextBox.VisibleRange.SetStyle(BuiltinFunctionsStyle, item);
-                };
+                TextBox.ToolTipDelay = 200;
+                TextBox.ToolTip = new ToolTip();
+                TextBox.DelayedTextChangedInterval = 200;
+                TextBox.ToolTipNeeded += TextBox_ToolTipNeeded;
+                TextBox.TextChangedDelayed += TextBox_TextChangedDelayed;
             }
 
-            TextBox.TextChanged += (obj, args) =>
-            {
-                IsChanged = true;
-                Text = DisplayName + "*";
-            };
-
-            TextBox.KeyDown += (obj, args) =>
-            {
-                if (args.Control && args.KeyCode == Keys.S)
-                    Save();
-                if (args.Control && args.KeyCode == Keys.W)
-                    Close();
-                if (args.KeyCode == Keys.F5)
-                {
-                    Save();
-                    Editor.Self.Run(Path);
-                }
-            };
-
+            TextBox.TextChanged += TextBox_TextChanged;
+            TextBox.KeyDown += TextBox_KeyDown;
             TextBox.HighlightingRangeType = HighlightingRangeType.ChangedRange;
             Path = path;
 
             Controls.Add(TextBox);
+        }
 
+        private void TextBox_ToolTipNeeded(object sender, ToolTipNeededEventArgs e)
+        {
+            if(ErrorString != null)
+                if (ErrorString.Contains(e.HoveredWord)) //TODO:!!!!
+                    e.ToolTipText = ParseError.ToString();
+        }
+
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.S)
+                Save();
+            if (e.Control && e.KeyCode == Keys.W)
+                Close();
+            if (e.KeyCode == Keys.F5)
+            {
+                Save();
+                Editor.Self.Run(Path);
+            }
+        }
+
+        private void TextBox_TextChangedDelayed(object sender, TextChangedEventArgs e)
+        {
+            TaskRunner.Source = new HASMSource(Machine, TextBox.Text, Directory);
+            TaskRunner.Run(false, 5);
+            if (TaskRunner.Status == ParseTaskStatus.Failed)
+            {
+                ParseError error = TaskRunner.Tasks[TaskRunner.FailedTaskIndex].Error;
+                try
+                {
+                    if (error.Line != -1)
+                    {
+                        TextBox.Range.SetStyle(ErrorStyle, Regex.Escape(TextBox[error.Line].Text.Trim()));
+                        ErrorString = TextBox[error.Line].Text;
+                    }
+                }
+                catch
+                {
+
+                }
+                ParseError = error;
+                System.Console.WriteLine(error);
+                return;
+            }
+
+            ErrorString = null;
+            ParseError = null;
+
+            Regex classNames = CreateRegex(TaskRunner.Source.Assembly.AllClasses.Select(p => p.Name));
+            Regex functionNames = CreateRegex(TaskRunner.Source.Assembly.AllFunctions.Select(p => p.Name));
+            Regex fieldNames = CreateRegex(TaskRunner.Source.Assembly.AllFields.Select(p => p.Name));
+            System.Console.WriteLine("Delayed");
+
+            TextBox.Range.ClearStyle(StyleIndex.All);
+
+            TextBox.Range.SetFoldingMarkers(
+                HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockOpened,
+                HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockClosed);
+
+            TextBox.Range.SetStyle(CommentStyle, CommentRegex);
+            TextBox.Range.SetStyle(DirectiveKeywordStyle, DirectiveKeywordRegex);
+            TextBox.Range.SetStyle(KeywordStyle, KeywordRegex);
+            TextBox.Range.SetStyle(BaseTypesNameStyle, BaseTypeRegex);
+
+            TextBox.Range.SetStyle(AssemblyNameStyle, TaskRunner.Source.Assembly.Name);
+
+            TextBox.Range.SetStyle(ClassNameStyle, classNames);
+            TextBox.Range.SetStyle(FunctionNameStyle, functionNames);
+            TextBox.Range.SetStyle(FieldNameStyle, fieldNames);
+
+            TextBox.Range.SetStyle(StringStyle, String1Regex);
+            TextBox.Range.SetStyle(StringStyle, String2Regex);
+            TextBox.Range.SetStyle(LabelStyle, LabelRegex);
+            TextBox.Range.SetStyle(VariableStyle, RegisterRegex);
+            TextBox.Range.SetStyle(DecNumberStyle, BinRegex);
+            TextBox.Range.SetStyle(DecNumberStyle, DecRegex);
+            TextBox.Range.SetStyle(DecNumberStyle, HexRegex);
+
+            foreach (var item in InstructionRegexes)
+                TextBox.Range.SetStyle(InstructionStyle, item);
+
+            foreach (var item in PreprocessorRegexes)
+                TextBox.Range.SetStyle(PreprocessorStyle, item);
+
+            foreach (var item in FunctionRegexes)
+                TextBox.Range.SetStyle(BuiltinFunctionsStyle, item);
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            IsChanged = true;
+            Text = DisplayName + "*";
+            if (HighlightedLine != -1)
+            {
+                TextBox[HighlightedLine].BackgroundBrush = Brushes.Transparent;
+                HighlightedLine = -1;
+            }
         }
 
         public void Save()
@@ -234,12 +326,5 @@ namespace HASM
                 File.WriteAllText(Path, TextBox.Text);
             }
         }
-
-        public bool IsChanged = false;
-
-        public string DisplayName;
-        public string Path;
-
-        public FastColoredTextBox TextBox { get; }
     }
 }

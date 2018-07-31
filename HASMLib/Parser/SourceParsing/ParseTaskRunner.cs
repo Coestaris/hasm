@@ -29,7 +29,7 @@ namespace HASMLib.Parser.SourceParsing
         public event AsyncParseEndDelegate AsyncParseEnd;
         public event AsyncTaskChangedDelegate AsyncTaskСhanged;
 
-        private HASMSource Source;
+        public HASMSource Source;
 
         public ParseTaskRunner(HASMSource source)
         {
@@ -50,12 +50,14 @@ namespace HASMLib.Parser.SourceParsing
         }
 
 
-        public void Run()
+        public void Run(bool complete = true, int tasksToComplete = 0)
         {
             Status = ParseTaskStatus.Running;
             int index = 0;
             foreach (var task in Tasks)
             {
+                if (!complete && index == tasksToComplete) break;
+
                 index++;
                 AsyncTaskСhanged?.Invoke(this, Source);
                 task.Run(Source);
@@ -78,9 +80,9 @@ namespace HASMLib.Parser.SourceParsing
             AsyncParseEnd?.Invoke(this, Source);
         }
 
-        public void RunAsync()
+        public void RunAsync(bool complete = true, int tasksToComplete = 0)
         {
-            workingThread = new Thread(Run);
+            workingThread = new Thread(p => Run(complete, tasksToComplete));
             workingThread.Start();
         }
     }

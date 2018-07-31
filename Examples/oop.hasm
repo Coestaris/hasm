@@ -1,4 +1,4 @@
-﻿;
+;
 ; Пример работы с ООП
 ;
 
@@ -12,7 +12,7 @@
 {
     .class(public, sealed) TestClass
     {
-        .field(public, type:int) SomeField
+        ;.field(public, type:int) SomeField
 
         .constructor(public, param:int:a, param:int:b) SomeConstructor
         {
@@ -31,14 +31,18 @@
         {
             alloc local, int
             pusho a
-            getv TestClass.SomeField
+            getv SomeAssembly.TestClass.SomeField
             popr local
             
             pusho self
-            setv TestClass.SomeField, local + 10
+            setv SomeAssembly.TestClass.SomeField, local + 10
             
             ret
         }
+        
+        .field(public, type:int) SomeField
+        
+        .field(public, type:long) SomeField1
         
         ; Main Function with EnryPoint
         .function(public, static, entrypoint, ret:void) Main

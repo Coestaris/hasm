@@ -62,9 +62,14 @@ namespace HASM
 
             WorkingFolder config = (WorkingFolder)cfg.Clone();
 
-            config.PreferedToCompile.Path = Formatter.MakeRelative(config.PreferedToCompile.Path, config.Path + "\\");
-            config.CompileConfigPath = Formatter.MakeRelative(config.CompileConfigPath, config.Path + "\\");
-            config.UserConfigPath = Formatter.MakeRelative(config.UserConfigPath, config.Path + "\\");
+            if(!string.IsNullOrEmpty(config.PreferedToCompile.Path))
+                config.PreferedToCompile.Path = Formatter.MakeRelative(config.PreferedToCompile.Path, config.Path + "\\");
+
+            if (!string.IsNullOrEmpty(config.CompileConfigPath))
+                config.CompileConfigPath = Formatter.MakeRelative(config.CompileConfigPath, config.Path + "\\");
+
+            if (!string.IsNullOrEmpty(config.UserConfigPath))
+                config.UserConfigPath = Formatter.MakeRelative(config.UserConfigPath, config.Path + "\\");
 
 
             FileStream fs = new FileStream(filename, FileMode.Create);

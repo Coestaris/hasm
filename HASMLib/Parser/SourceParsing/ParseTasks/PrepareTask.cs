@@ -35,6 +35,12 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             //source._variables = new List<Variable>();
             //source._namedConsts = new List<NamedConstant>();
 
+            if(!string.IsNullOrEmpty(source.Source) && string.IsNullOrEmpty(source.BaseFilename))
+            {
+                source.BaseFilename = Path.GetTempFileName();
+                File.WriteAllText(source.BaseFilename, source.Source);
+            }
+
             if (!File.Exists(source.BaseFilename))
             {
                 var parseError = new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile);

@@ -20,22 +20,25 @@ namespace HASMLib
 
         public TimeSpan ParseTime { get; internal set; }
 
-        public HASMSource(HASMMachine machine, string fileName, string workingDirectory = null)
+        public HASMSource(HASMMachine machine, FileInfo fileName, string workingDirectory = null)
         {
-            BaseFilename = fileName;
+            WorkingDirectory = workingDirectory;
+            BaseFilename = fileName.FullName;
             Machine = machine;
         }
 
-        public HASMSource(HASMMachine machine, Stream fs)
+        public HASMSource(HASMMachine machine, Stream fs, string workingDirectory = null)
         {
+            WorkingDirectory = workingDirectory;
             byte[] bytes = new byte[fs.Length];
             fs.Read(bytes, 0, (int)fs.Length);
             Source = new string(bytes.Select(p => (char)p).ToArray());
             Machine = machine;
         }
 
-        public HASMSource(HASMMachine machine, string source)
+        public HASMSource(HASMMachine machine, string source, string workingDirectory = null)
         {
+            WorkingDirectory = workingDirectory;
             Source = source;
             Machine = machine;
         }

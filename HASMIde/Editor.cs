@@ -49,7 +49,7 @@ namespace HASM
 
             machine.SetRegisters(workingFolder.CompileConfig.RegisterNameFormat, (uint)workingFolder.CompileConfig.RegisterCount);
             
-            HASMSource source = new HASMSource(machine, FileName, null);
+            HASMSource source = new HASMSource(machine, new FileInfo(FileName), null);
 
             loadingCircle1.Visible = true;
             tabControl1.Enabled = false;
@@ -308,6 +308,7 @@ namespace HASM
                         CompileConfigPath = compileConfigFileName,
                         UserConfigPath = userConfigFileName,
                         Path = folderBrowserDialog1.SelectedPath,
+                        PreferedToCompile = new SourceFile("", "")
                     };
 
                     WorkingFolder.ToFile(configName, workingFolder);
