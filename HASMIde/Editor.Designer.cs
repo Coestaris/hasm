@@ -733,7 +733,7 @@
         private System.Windows.Forms.ToolStripMenuItem compileOptionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        internal System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.ToolStripMenuItem outputToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem hexOutputToolStripMenuItem;

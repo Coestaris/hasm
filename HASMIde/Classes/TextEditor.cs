@@ -88,6 +88,7 @@ namespace HASM
         public string Path;
         public FastColoredTextBox TextBox;
         public int HighlightedLine = -1;
+        private ToolStripLabel toolStripLabel;
 
         private static void InitPlatformSpecificRegexes()
         {
@@ -156,7 +157,7 @@ namespace HASM
             }
         }
         
-        public TextEditor(string path)
+        public TextEditor(string path, Control parent)
         {
             if (!File.Exists(path))
             {
@@ -211,13 +212,31 @@ namespace HASM
             Path = path;
 
             Controls.Add(TextBox);
+            toolStripLabel = (parent as Editor).toolStripLabel1;
+        }
+
+        private void OutputText(string text)
+        {
+            if ((Parent as TabControl).SelectedTab == this)
+                toolStripLabel.Text = text;
         }
 
         private void TextBox_ToolTipNeeded(object sender, ToolTipNeededEventArgs e)
         {
-            if(ErrorString != null)
-                if (ErrorString.Contains(e.HoveredWord)) //TODO:!!!!
-                    e.ToolTipText = ParseError.ToString();
+            if (ErrorString != null)
+                if (ParseError.Line != -1 && ParseError.Line == e.Place.iLine) //TODO:!!!!
+                {
+                    e.ToolTipTitle = "Error";
+                    e.ToolTipIcon = ToolTipIcon.Error;
+                    if (ParseError.FileName.Contains("tmp"))
+                    {
+                        e.ToolTipText = ParseError.ToString(Path);
+                    }
+                    else
+                    {
+                        e.ToolTipText = ParseError.ToString();
+                    }
+                }
         }
 
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
@@ -242,10 +261,20 @@ namespace HASM
                 ParseError error = TaskRunner.Tasks[TaskRunner.FailedTaskIndex].Error;
                 try
                 {
-                    if (error.Line != -1)
+                    if (error.FileName.Contains("tmp"))
                     {
-                        TextBox.Range.SetStyle(ErrorStyle, Regex.Escape(TextBox[error.Line].Text.Trim()));
-                        ErrorString = TextBox[error.Line].Text;
+                        //Current file
+                        if (error.Line != -1)
+                        {
+                            TextBox.Range.ClearStyle(ErrorStyle);
+                            TextBox.Range.SetStyle(ErrorStyle, Regex.Escape(TextBox[error.Line].Text.Trim()));
+                            ErrorString = TextBox[error.Line].Text;
+                        }
+                        OutputText(error.ToString(Path));
+                    }
+                    else
+                    {
+                        OutputText(error.ToString());
                     }
                 }
                 catch
@@ -257,6 +286,7 @@ namespace HASM
                 return;
             }
 
+            OutputText("");
             ErrorString = null;
             ParseError = null;
 

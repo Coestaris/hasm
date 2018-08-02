@@ -8,11 +8,16 @@ namespace HASMLib.Parser
 
         public override string ToString()
         {
+            return ToString(FileName);
+        }
+
+        public string ToString(string newFilenane)
+        {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("Error {0}", Type);
             if (Line != NullValue) sb.AppendFormat(" at line {0}", Line);
             if (Index != NullValue) sb.AppendFormat(" at index {0}", Index);
-            if (FileName != null) sb.AppendFormat(" at {0}", FileName);
+            if (newFilenane != null) sb.AppendFormat(" at {0}", newFilenane);
             return sb.ToString();
         }
 

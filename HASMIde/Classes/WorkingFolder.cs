@@ -122,8 +122,9 @@ namespace HASM
 
             il = new ImageList();
             il.Images.Add("dir", new Bitmap("icons\\dirIcon.png"));
-            il.Images.Add(".cfg", new Bitmap("icons\\cfg.png"));
             il.Images.Add("idedir", new Bitmap("icons\\ideDirIcon.png"));
+            il.Images.Add(".hasm", new Icon("icons\\hasm.ico"));
+            il.Images.Add(".cfg", new Bitmap("icons\\cfg.png"));
 
             _imgIndex = 1;
             TreeNode parent = new FileNode(removeFunc(Path), Path, true)

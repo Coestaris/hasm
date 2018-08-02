@@ -262,7 +262,7 @@ namespace HASM
                 }
             }
 
-            var editor = new TextEditor(path);
+            var editor = new TextEditor(path, this);
 
             tabControl1.TabPages.Add(editor);
             tabControl1.SelectedTab = editor;
