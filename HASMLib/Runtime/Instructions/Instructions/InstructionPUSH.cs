@@ -27,7 +27,7 @@ namespace HASMLib.Runtime.Instructions.Instructions
         {
             var source = GetNumericValue(parameters[0], package);
 
-            package.MemZone.Stack.Push(source.ToPrimitive()[0]);
+            //package.MemZone.Stack.Push(source.ToPrimitive()[0]);
 
             return RuntimeOutputCode.OK;
         }

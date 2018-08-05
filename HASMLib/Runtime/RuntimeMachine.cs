@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HASMLib.Parser;
 using HASMLib.Runtime.Structures.Units;
+using HASMLib.Runtime.Structures;
 
 namespace HASMLib.Runtime
 {
@@ -35,6 +36,16 @@ namespace HASMLib.Runtime
         {
             _machine = machine;
             _source = source;
+        }
+
+        private RuntimeError CreateError(RuntimeOutputCode code, Function function)
+        {
+            return new RuntimeError(code, function.Directive);
+        }
+
+        private RuntimeError CreateError(RuntimeOutputCode code, FlashElementInstruction instruction)
+        {
+            return new RuntimeError(code, instruction.Line);
         }
 
         internal void InbufferRecieved(List<Integer> inBuffer)
@@ -115,23 +126,42 @@ namespace HASMLib.Runtime
             return result;
         }
 
-        private RuntimeError CallFunction(Function function)
+        internal RuntimeError CallFunction(Function function)
         {
+            Integer localVarCounter = (Integer)0;
             CallStackItem csi = new CallStackItem(function, (Integer)0);
+            foreach (var parameter in function.Parameters)
+            {
+                if (_machine.MemZone.ParamStack.Count == 0)
+                    return CreateError(RuntimeOutputCode.ArgumentsAreExpected, function);
+
+                Structures.Object value = _machine.MemZone.ParamStack.Pop();
+                TypeReference type = parameter.Type;
+
+                if(value.Type != type)
+                {
+                    return CreateError(RuntimeOutputCode.ExpectedOtherType, function);
+                }
+
+                csi.Locals.Add(new Variable(value, localVarCounter));
+                localVarCounter += (Integer)1;
+            }
+
             RuntimeDataPackage package = new RuntimeDataPackage()
             {
                 Constants = function.RuntimeCache.Constants,
                 Expressions = function.RuntimeCache.Expressions,
                 MemZone = _machine.MemZone,
                 RuntimeMachine = this,
-                Assembly = _source.Assembly
+                Assembly = _source.Assembly,
+                CallStackItem = csi
             };
 
             CallStack.Add(csi);
 
             foreach (var variable in function.RuntimeCache.Variables)
             {
-                _machine.MemZone.RAM.Add(new Variable(variable.VariableType, variable.Index));
+                _machine.MemZone.Globals.Add(new Variable(variable.VariableType, variable.Index));
             }
 
             for (; (int)csi.ProgramCounter < function.RuntimeCache.Instructions.Count; csi.ProgramCounter += (Integer)1)
@@ -147,7 +177,7 @@ namespace HASMLib.Runtime
                 RuntimeOutputCode output = SourceLineInstruction.Instructions[(int)instruction.InstructionNumber].Apply(package, instruction.Parameters);
 
                 if (output != RuntimeOutputCode.OK)
-                    return new RuntimeError(output, instruction.Line);
+                    return CreateError(output, instruction);
             }
 
             return null;

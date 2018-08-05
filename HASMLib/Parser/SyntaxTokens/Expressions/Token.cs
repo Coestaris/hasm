@@ -131,7 +131,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 if (hasRefsToVar) referenceConditional = mz != null &&
                             Subtokens
                             .FindAll(p => p.Reference != null && p.Reference.Type == ReferenceType.Variable)
-                            .All(p => mz.RAM.Exists(j => j.Index == p.Reference.Index));
+                            .All(p => mz.Globals.Exists(j => j.Index == p.Reference.Index));
 
                 if (!referenceConditional)
                     return false;
@@ -140,7 +140,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                         (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null));
             }
             else if (_referenceSet && Reference.Type == ReferenceType.Variable)
-                return mz != null && mz.RAM.Exists(p => p.Index == Reference.Index);
+                return mz != null && mz.Globals.Exists(p => p.Index == Reference.Index);
             else
                 return true;
         }
@@ -374,7 +374,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 switch (Reference.Object.Type)
                 {
                     case FlashElementType.Variable:
-                        return new Constant(zone.RAM.Find(p => p.Index == (Reference.Object as FlashElementVariable).Index));
+                        return new Constant(zone.Globals.Find(p => p.Index == (Reference.Object as FlashElementVariable).Index));
                     case FlashElementType.Constant:
                         return (Reference.Object as FlashElementConstant).ToConstant();
                     case FlashElementType.Instruction:

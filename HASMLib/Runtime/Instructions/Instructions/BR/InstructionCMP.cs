@@ -47,7 +47,7 @@ namespace HASMLib.Runtime.Instructions.Instructions
             if (a > b) result |= ComapreResult.Greater;
             if (a < b) result |= ComapreResult.Less;
 
-            package.MemZone.Stack.Push(BaseIntegerType.PrimitiveType.Cast((Integer)(int)result)[0]);
+            //package.MemZone.Stack.Push(BaseIntegerType.PrimitiveType.Cast((Integer)(int)result)[0]);
 
             return RuntimeOutputCode.OK;
         }

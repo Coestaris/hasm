@@ -1,18 +1,19 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
+using HASMLib.Runtime.Structures;
 using System.Collections.Generic;
 
 namespace HASMLib.Core
 {
     public class MemZone
     {
-        public Stack<Integer> Stack { get; private set; }
-
-        public List<Variable> RAM { get; private set; }
-
+        public List<Variable> Globals { get; private set; }
+        public Stack<Object> ResultStack { get; private set; }
+        public Stack<Object> ParamStack { get; private set; }
+        
         public List<FlashElement> Flash { get; internal set; }
 
-        public int FreeRAM => _ram - Stack.Count - RAM.Count;
+        public int FreeRAM => throw new System.NotImplementedException();//_ram - Stack.Count - Globals.Count;
         public int FreeFlash => _flash - Flash.Count;
 
         private int _flash;
@@ -21,8 +22,11 @@ namespace HASMLib.Core
         public void Clear()
         {
             Flash = new List<FlashElement>();
-            RAM = new List<Variable>();
-            Stack = new Stack<Integer>();
+
+            ResultStack = new Stack<Object>();
+            ParamStack = new Stack<Object>();
+            Globals = new List<Variable>();
+            //Stack = new Stack<Integer>();
         }
 
         public MemZone(int flash_len, int ram, List<FlashElement> flash)

@@ -8,6 +8,7 @@ namespace HASMLib.Runtime
 {
     public class RuntimeDataPackage
     {
+        public CallStackItem CallStackItem;
         public MemZone MemZone;
         public List<ConstantMark> Constants;
         public List<FlashElementExpression> Expressions;

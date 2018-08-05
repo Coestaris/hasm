@@ -25,14 +25,14 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            ComapreResult result = (ComapreResult)(int)package.MemZone.Stack.Pop();
+            /*ComapreResult result = (ComapreResult)(int)package.MemZone.Stack.Pop();
 
             if (result.HasFlag(ComapreResult.Equal))
             {
                 Integer position = GetNumericValue(parameters[0], package).Value;
 
                 RuntimeMachineJump(position, package.RuntimeMachine);
-            }
+            }*/;
 
             return RuntimeOutputCode.OK;
         }

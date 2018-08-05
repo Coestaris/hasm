@@ -19,7 +19,10 @@ namespace HASMLib.Runtime.Instructions
 
         protected Variable GetVar(Integer index, RuntimeDataPackage package)
         {
-            return package.MemZone.RAM[(int)index];
+            if (index < (Integer)package.CallStackItem.Locals.Count)
+                return package.CallStackItem.Locals[(int)index];
+
+            return package.MemZone.Globals[(int)index + package.CallStackItem.Locals.Count];
         }
 
         protected ConstantMark GetConst(Integer index, RuntimeDataPackage package)

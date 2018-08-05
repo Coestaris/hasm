@@ -1,4 +1,5 @@
 ﻿using HASMLib.Core.BaseTypes;
+using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
 
 namespace HASMLib.Runtime.Structures
@@ -25,6 +26,14 @@ namespace HASMLib.Runtime.Structures
         public Object GetClassField(int UniqueID)
         {
             return ClassFields[UniqueID];
+        }
+
+        public Object(Integer integer, Assembly assembly)
+        {
+            TypeReference type = new TypeReference(integer.Type, assembly);
+            Type = type;
+
+            IntegerValue = integer;
         }
 
         public Object(TypeReference type)

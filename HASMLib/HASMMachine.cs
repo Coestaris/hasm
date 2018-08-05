@@ -37,8 +37,8 @@ namespace HASMLib
 
         public void ClearRegisters()
         {
-            if (MemZone.RAM.Count > RegisterCount)
-                MemZone.RAM.RemoveRange(0, (int)RegisterCount);
+            if (MemZone.Globals.Count > RegisterCount)
+                MemZone.Globals.RemoveRange(0, (int)RegisterCount);
         }
 
         public void SetBase(int hasmBase = 8)

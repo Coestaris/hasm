@@ -60,6 +60,11 @@ namespace HASMLib.Runtime.Structures
             }
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is TypeReference && obj as TypeReference == this;
+        }
+
         public TypeReference(ArrayType arrayType, Assembly assembly)
         {
             Type = TypeReferenceType.Integer;
@@ -108,6 +113,25 @@ namespace HASMLib.Runtime.Structures
                 Type = TypeReferenceType.Class;
             }
             assembly?.RegisterType(this);
+        }
+
+        public static bool operator ==(TypeReference a, TypeReference b)
+        {
+            if (a == null && b == null)
+                return true;
+
+            if ((a == null && b != null) || (a != null && b == null))
+                return false;
+
+            if (a.Registered && b.Registered)
+                return a.UniqueID == b.UniqueID;
+
+            return a.Name == b.Name;
+        }
+
+        public static bool operator !=(TypeReference a, TypeReference b)
+        {
+            return !(a == b);
         }
     }
 }

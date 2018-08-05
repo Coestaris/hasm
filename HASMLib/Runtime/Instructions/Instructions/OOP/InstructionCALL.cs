@@ -2,6 +2,7 @@
 using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
 using HASMLib.Parser;
+using HASMLib.Runtime.Structures.Units;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -25,6 +26,11 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
+            Integer id = parameters[0].Index;
+            Function function = package.Assembly.AllFunctions.Find(p => (Integer)p.UniqueID == id);
+
+            package.RuntimeMachine.CallFunction(function);
+
             return RuntimeOutputCode.OK;
         }
     }

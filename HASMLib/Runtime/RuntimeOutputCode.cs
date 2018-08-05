@@ -8,5 +8,7 @@
         StackOverFlow,
         OK,
         ExpectedIntegerVariable,
+        ExpectedOtherType,
+        ArgumentsAreExpected,
     }
 }
