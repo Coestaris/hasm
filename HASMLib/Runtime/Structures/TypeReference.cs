@@ -117,10 +117,10 @@ namespace HASMLib.Runtime.Structures
 
         public static bool operator ==(TypeReference a, TypeReference b)
         {
-            if (a == null && b == null)
+            if (a is null && b is null)
                 return true;
 
-            if ((a == null && b != null) || (a != null && b == null))
+            if ((a is null && !(b is null)) || (!(a is null) && b is null))
                 return false;
 
             if (a.Registered && b.Registered)
