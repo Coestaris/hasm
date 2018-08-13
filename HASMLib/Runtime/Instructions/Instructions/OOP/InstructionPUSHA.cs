@@ -26,19 +26,9 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            if (parameters[0].Type == ReferenceType.Variable)
-            {
-                package.MemZone.ParamStack.Push(GetVar(parameters[0].Index, package).Value);
-            }
-            else
-            {
-                var numericValue = GetNumericValue(parameters[0], package);
-                package.MemZone.ParamStack.Push(new Structures.Object(numericValue.Value, package.Assembly));
-            }
+            package.MemZone.ParamStack.Push(GetObject(parameters[0], package));
 
             return RuntimeOutputCode.OK;
-
-
         }
     }
 }

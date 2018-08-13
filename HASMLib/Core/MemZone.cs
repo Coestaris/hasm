@@ -10,7 +10,8 @@ namespace HASMLib.Core
         public List<Variable> Globals { get; private set; }
         public Stack<Object> ResultStack { get; private set; }
         public Stack<Object> ParamStack { get; private set; }
-        
+        public Object ObjectStackItem { get; internal set; }
+
         public List<FlashElement> Flash { get; internal set; }
 
         public int FreeRAM => throw new System.NotImplementedException();//_ram - Stack.Count - Globals.Count;

@@ -14,21 +14,25 @@
     {
         ;.field(public, type:int) SomeField
 
-        .constructor(public, param:int:a, param:int:b) SomeConstructor
+        .constructor(public) SomeConstructor
         {
-            alloc tmp, int
-            ldi tmp, 0
+            out byte_2
+            pass
         }
-
         
         .function(public, ret:void, param:int:a, param:int:b) AddValues
         {
             alloc tmp, int
             ldi tmp, 0
+            
+            out tmp
+            pass
         }
         
         .function(public, ret:void, param:TestClass:a) AddToField
         {
+            out byte_3
+            
             alloc local, int
             pusho a
             getv SomeAssembly.TestClass.SomeField
@@ -37,7 +41,7 @@
             pusho self
             setv SomeAssembly.TestClass.SomeField, local + 10
             
-            ret
+            pass
         }
         
         .field(public, type:int) SomeField
@@ -48,23 +52,28 @@
         .function(public, static, entrypoint, ret:void) Main
         {
             alloc local1, TestClass
+            pusho local1
             call TestClass.SomeConstructor
             popr local1
             
             alloc local2, TestClass
+            pusho local2
             call TestClass.SomeConstructor
             popr local2
             
             pusho local2
-            setv TestClass.SomeField, 123
+            setv TestClass.SomeField, int_123
             
             pusha local2
             pusho local1
             call TestClass.AddToField
             
             alloc value, int
+            pusho local1
             getv TestClass.SomeField
             popr value
+            
+            pass
         }
     }
 }

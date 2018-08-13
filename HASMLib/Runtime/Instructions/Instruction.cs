@@ -3,7 +3,7 @@ using HASMLib.Core.MemoryZone;
 using HASMLib.Parser;
 using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions;
-using System;
+using HASMLib.Runtime.Structures;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -32,11 +32,29 @@ namespace HASMLib.Runtime.Instructions
 
         public void RuntimeMachineJump(Integer position, RuntimeMachine runtimeMachine)
         {
-            throw new NotImplementedException();
-
+            throw new System.NotImplementedException();
+            //TODO
             //var localIndex = position;
             //var globalIndex = runtimeMachine.GetGlobalInstructionIndexByLocalOne(localIndex);
             //runtimeMachine.ProgramCounter = globalIndex - (Integer)1;
+        }
+
+        public Object GetObject(ObjectReference reference, RuntimeDataPackage package)
+        {
+            switch (reference.Type)
+            {
+                case ReferenceType.Variable:
+                    return GetVar(reference.Index, package).Value;
+                case ReferenceType.Constant:
+                case ReferenceType.Expression:
+                    return new Object(GetNumericValue(reference, package).Value, package.Assembly);
+                case ReferenceType.Define:
+                case ReferenceType.Type:
+                case ReferenceType.Function:
+                case ReferenceType.Field:
+                default:
+                    return null;
+            }
         }
 
         public Constant GetNumericValue(ObjectReference reference, RuntimeDataPackage package)
@@ -48,7 +66,7 @@ namespace HASMLib.Runtime.Instructions
                 case (ReferenceType.Variable):
                     {
                         var var = GetVar(reference.Index, package);
-                        if (var.Value.Type.Type != Structures.TypeReferenceType.Integer)
+                        if (var.Value.Type.Type != TypeReferenceType.Integer)
                             return null;
 
                         return new Constant(var);

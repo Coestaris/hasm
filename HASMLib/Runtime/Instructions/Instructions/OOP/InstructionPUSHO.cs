@@ -25,6 +25,10 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
+            Integer varIndex = parameters[0].Index;
+
+            package.MemZone.ObjectStackItem = GetVar(varIndex, package).Value;
+
             return RuntimeOutputCode.OK;
         }
     }

@@ -62,6 +62,7 @@
     <Compile Include="Parser\SourceParsing\ParseTasks\InstructionsTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\LinkingTask.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionGETV.cs" />
+    <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionPASS.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionSETV.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionCALL.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionPOPR.cs" />

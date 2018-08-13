@@ -30,7 +30,11 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         private List<FlashElementExpression> Expressions;
         private List<ConstnantGrouping> Constnants;
 
-        private void GetComponents(Runtime.Structures.Units.Function function)
+        private int _retInstructionIndex = SourceLineInstruction.Instructions.Find(p => p.NameString == "ret").Index;
+        private int _passInstructionIndex = SourceLineInstruction.Instructions.Find(p => p.NameString == "pass").Index;
+
+
+        private ParseError GetComponents(Runtime.Structures.Units.Function function)
         {
             Instructions = function.CompileCache.Compiled
                 .FindAll(p => p.Type == FlashElementType.Instruction)
@@ -47,9 +51,11 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             //Удаляем их из коллекции
             function.CompileCache.Compiled.RemoveAll(p => p.Type == FlashElementType.Instruction);
+
+            return null;
         }
 
-        private void ResolveExpressions(Runtime.Structures.Units.Function function)
+        private ParseError ResolveExpressions(Runtime.Structures.Units.Function function)
         {
             Dictionary<Integer, Integer> plainExpIndexes = new Dictionary<Integer, Integer>();
 
@@ -82,9 +88,11 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             reference.Index = plainExpIndexes[reference.Index];
                             reference.Type = ReferenceType.Constant;
                         }
+
+            return null;
         }
 
-        private void ResolveConsts(Runtime.Structures.Units.Function function)
+        private ParseError ResolveConsts(Runtime.Structures.Units.Function function)
         {
             Dictionary<Integer, Integer> plainConstIndexes = new Dictionary<Integer, Integer>();
             Integer ind = (Integer)0;
@@ -120,9 +128,11 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                     foreach (ObjectReference reference in instruction.Parameters)
                         if (reference.Type == ReferenceType.Constant)
                             reference.Index = plainConstIndexes[reference.Index];
+
+            return null;
         }
 
-        private void JoinComponents(Runtime.Structures.Units.Function function)
+        private ParseError JoinComponents(Runtime.Structures.Units.Function function)
         {
             //Пихаем в ее начало
             function.CompileCache.Compiled.InsertRange(0, Constnants.Select(
@@ -132,29 +142,78 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             function.CompileCache.Compiled.InsertRange(0, Expressions);
 
             function.CompileCache.Compiled.AddRange(Instructions);
+
+            return null;
         }
 
-        private void Other(Runtime.Structures.Units.Function function)
+        private ParseError Other(Runtime.Structures.Units.Function function)
         {
             //Если размер программы превышает максимально допустимый для этой машины
             int totalFlashSize = function.CompileCache.Compiled.Sum(p => p.FixedSize);
             if (totalFlashSize > source.Machine.Flash)
             {
-                var parseError = new ParseError(ParseErrorType.Other_OutOfFlash);
-                InnerEnd(parseError);
-                return;
+                return new ParseError(ParseErrorType.Other_OutOfFlash, function.Directive);
             }
+            return null;
+        }
+
+        private ParseError CheckRetEnding(Runtime.Structures.Units.Function function)
+        {
+            var last = Instructions.Last();
+            
+            if(last.InstructionNumber != (Integer)_retInstructionIndex && last.InstructionNumber != (Integer)_passInstructionIndex)
+            {
+                return new ParseError(ParseErrorType.Other_FunctionMustEndsWithPassOrRet, function.Directive);
+            }
+
+            return null;
         }
 
         protected override void InnerRun()
         {
             foreach (var function in source.Assembly.AllFunctions)
             {
-                GetComponents(function);
-                ResolveExpressions(function);
-                ResolveConsts(function);
-                JoinComponents(function);
-                Other(function);
+                ParseError err = GetComponents(function);
+                if (err != null)
+                {
+                    InnerEnd(err);
+                    return;
+                }
+
+                err = ResolveExpressions(function);
+                if (err != null)
+                {
+                    InnerEnd(err);
+                    return;
+                }
+
+                err = ResolveConsts(function);
+                if (err != null)
+                {
+                    InnerEnd(err);
+                    return;
+                }
+
+                err = JoinComponents(function);
+                if (err != null)
+                {
+                    InnerEnd(err);
+                    return;
+                }
+
+                err = Other(function);
+                if (err != null)
+                {
+                    InnerEnd(err);
+                    return;
+                }
+
+                err = CheckRetEnding(function);
+                if (err != null)
+                {
+                    InnerEnd(err);
+                    return;
+                }
             }
 
             InnerEnd();

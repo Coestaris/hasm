@@ -1,8 +1,4 @@
-﻿using HASMLib.Core;
-using HASMLib.Core.BaseTypes;
-using HASMLib.Core.MemoryZone;
-using HASMLib.Parser;
-using System;
+﻿using HASMLib.Parser;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -16,12 +12,22 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
             NameString = "ret";
             Name = new Regex("^ret", RegexOptions.IgnoreCase);
-            ParameterCount = 0;
-            ParameterTypes = new List<InstructionParameterType>() { };
+            ParameterCount = 1;
+            ParameterTypes = new List<InstructionParameterType>()
+            {
+                InstructionParameterType.Variable | InstructionParameterType.Constant | InstructionParameterType.Expression,
+            };
         }
 
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
+            if (package.CallStackItem.RunningFunction.IsConstuctor)
+                return RuntimeOutputCode.ReturnInConstructorsAreNotAllowed;
+
+            package.RuntimeMachine.Return();
+
+            package.MemZone.ObjectStackItem = GetObject(parameters[0], package);
+
             return RuntimeOutputCode.OK;
         }
     }

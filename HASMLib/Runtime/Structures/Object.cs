@@ -23,6 +23,11 @@ namespace HASMLib.Runtime.Structures
             IsNull = false;
         }
 
+        public void SetClassField(int UniqueID, Object value)
+        {
+            ClassFields[UniqueID] = value;
+        }
+
         public Object GetClassField(int UniqueID)
         {
             return ClassFields[UniqueID];
@@ -51,9 +56,15 @@ namespace HASMLib.Runtime.Structures
             }
             else if (Type.Type == TypeReferenceType.Class)
             {
+                ClassFields = new Dictionary<int, Object>();
                 IsNull = true;
             }
             else throw new System.ArgumentException();
+        }
+
+        public override string ToString()
+        {
+            return $"Object[Type:{Type}]";
         }
     }
 }

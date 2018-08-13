@@ -25,8 +25,10 @@ namespace HASMLib.Runtime
 
         internal List<Integer> InBuffer;
 
+        private bool _funcReturned;
         private HASMMachine _machine;
         private HASMSource _source;
+        private Stack<CallStackItem> _callStack;
 
         internal event RuntimeMachineIOHandler OnBufferFlushed;
         internal event RuntimeMachineIOHandler OnBufferClosed;
@@ -66,16 +68,16 @@ namespace HASMLib.Runtime
                 .First(p => p.ProgramIndex == localIndex).RuntimeAbsoluteIndex;*/
         }
 
-        private List<CallStackItem> CallStack;
 
         public RuntimeError Run()
         {
             DateTime startTime = DateTime.Now;
             IsRunning = true;
+            _funcReturned = false;
 
             Ticks = 0;
             InBuffer = new List<Integer>();
-            CallStack = new List<CallStackItem>();
+            _callStack = new Stack<CallStackItem>();
 
             OnBufferFlushed?.Invoke();
 
@@ -126,10 +128,19 @@ namespace HASMLib.Runtime
             return result;
         }
 
+        internal void Return()
+        {
+            _funcReturned = true;
+        }
+
         internal RuntimeError CallFunction(Function function)
         {
             Integer localVarCounter = (Integer)0;
             CallStackItem csi = new CallStackItem(function, (Integer)0);
+
+            if (!function.IsStatic && !function.IsEntryPoint)
+                csi.Locals.Add(new Variable(_source.Machine.MemZone.ObjectStackItem, localVarCounter += (Integer)1));
+
             foreach (var parameter in function.Parameters)
             {
                 if (_machine.MemZone.ParamStack.Count == 0)
@@ -157,12 +168,12 @@ namespace HASMLib.Runtime
                 CallStackItem = csi
             };
 
-            CallStack.Add(csi);
+            _callStack.Push(csi);
 
-            foreach (var variable in function.RuntimeCache.Variables)
-            {
-                _machine.MemZone.Globals.Add(new Variable(variable.VariableType, variable.Index));
-            }
+            //foreach (var variable in function.RuntimeCache.Variables)
+            //{
+                //_machine.MemZone.Globals.Add(new Variable(variable.VariableType, variable.Index));
+            //}
 
             for (; (int)csi.ProgramCounter < function.RuntimeCache.Instructions.Count; csi.ProgramCounter += (Integer)1)
             {
@@ -178,6 +189,13 @@ namespace HASMLib.Runtime
 
                 if (output != RuntimeOutputCode.OK)
                     return CreateError(output, instruction);
+
+                if (_funcReturned)
+                {
+                    _funcReturned = false;
+                    _callStack.Pop();
+                    return null;
+                }
             }
 
             return null;

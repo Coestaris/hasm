@@ -10,5 +10,10 @@
         ExpectedIntegerVariable,
         ExpectedOtherType,
         ArgumentsAreExpected,
+        ReturnInConstructorsAreNotAllowed,
+        ObjectStackIsEmpty,
+        DifferentClasses,
+        ClassTypeExpected,
+        DifferentTypes,
     }
 }

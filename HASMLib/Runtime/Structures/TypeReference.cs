@@ -62,7 +62,7 @@ namespace HASMLib.Runtime.Structures
 
         public override bool Equals(object obj)
         {
-            return obj is TypeReference && obj as TypeReference == this;
+            return obj is TypeReference _ref && _ref == this;
         }
 
         public TypeReference(ArrayType arrayType, Assembly assembly)

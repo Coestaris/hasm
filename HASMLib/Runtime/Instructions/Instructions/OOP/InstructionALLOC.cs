@@ -30,7 +30,7 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
             TypeReference type = package.Assembly.UsedTypes.Find(p => p.UniqueID == (int)classIndex);
 
-            package.MemZone.Globals.Add(new Variable(type, varIndex));
+            package.CallStackItem.Locals.Add(new Variable(type, varIndex));
 
             return RuntimeOutputCode.OK;
         }

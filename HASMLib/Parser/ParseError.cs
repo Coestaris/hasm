@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using HASMLib.Parser.SyntaxTokens.SourceLines;
+using System.Text;
 
 namespace HASMLib.Parser
 {
@@ -20,6 +21,9 @@ namespace HASMLib.Parser
             if (newFilenane != null) sb.AppendFormat(" at {0}", newFilenane);
             return sb.ToString();
         }
+
+        public ParseError(ParseErrorType type, SourceLine line) : this(type, line.LineIndex, line.FileName)
+        { }
 
         public ParseError(ParseErrorType type)
         {

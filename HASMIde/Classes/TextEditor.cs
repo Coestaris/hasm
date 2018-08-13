@@ -255,7 +255,7 @@ namespace HASM
         private void TextBox_TextChangedDelayed(object sender, TextChangedEventArgs e)
         {
             TaskRunner.Source = new HASMSource(Machine, TextBox.Text, Directory);
-            TaskRunner.Run(false, 5);
+            TaskRunner.Run();
             if (TaskRunner.Status == ParseTaskStatus.Failed)
             {
                 ParseError error = TaskRunner.Tasks[TaskRunner.FailedTaskIndex].Error;

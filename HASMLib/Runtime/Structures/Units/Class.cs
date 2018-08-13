@@ -16,6 +16,34 @@ namespace HASMLib.Runtime.Structures.Units
                 GetName(_class.InnerParent, separator, ref result);
         }
 
+        public static bool operator ==(Class a, Class b)
+        {
+            if (a is null && b is null)
+                return true;
+
+            if ((a is null && !(b is null)) || (!(a is null) && b is null))
+                return false;
+
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Class a, Class b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Class _class && Signature == _class.Signature;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1409748649;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Signature);
+            return hashCode;
+        }
+
         public override string FullName
         {
             get
