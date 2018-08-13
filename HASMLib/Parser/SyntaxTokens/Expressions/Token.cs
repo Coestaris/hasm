@@ -1,9 +1,8 @@
-﻿using HASMLib.Core;
-using HASMLib.Core.MemoryZone;
+﻿using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
-using HASMLib.Parser.SyntaxTokens.Preprocessor;
 using HASMLib.Parser.SyntaxTokens.Preprocessor.Directives;
+using HASMLib.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,7 +103,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Возможно ли расчитать числовое значение данного токена. Если да, то <see cref="Calculate"/> вернет данное значение
         /// </summary>
-        public bool CanBeCalculated(MemZone mz = null)
+        public bool CanBeCalculated(RuntimeDataPackage package = null)
         {
             //Можно посчиатать если:
             //  1. Значение уже подсчитано
@@ -128,10 +127,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             {
                 bool referenceConditional = true;
                 bool hasRefsToVar = Subtokens.Exists(p => p.Reference != null && p.Reference.Type == ReferenceType.Variable);
-                if (hasRefsToVar) referenceConditional = mz != null &&
+                if (hasRefsToVar) referenceConditional = package != null &&
                             Subtokens
                             .FindAll(p => p.Reference != null && p.Reference.Type == ReferenceType.Variable)
-                            .All(p => mz.Globals.Exists(j => j.Index == p.Reference.Index));
+                            .All(p => package.ContainsVarialbe(p.Reference.Index));
 
                 if (!referenceConditional)
                     return false;
@@ -140,7 +139,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                         (Subtokens.Exists(p => p.UnaryFunction == null) && Subtokens.Exists(p => p.UnaryOperator == null));
             }
             else if (_referenceSet && Reference.Type == ReferenceType.Variable)
-                return mz != null && mz.Globals.Exists(p => p.Index == Reference.Index);
+                return package != null && package.ContainsVarialbe(Reference.Index);
             else
                 return true;
         }
@@ -209,7 +208,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// Расчитывает числовое значение данного токена. Возможно только в случае если <see cref="CanBeCalculated"/> <see cref="true"/>
         /// </summary>
         /// <returns></returns>
-        public Constant Calculate(MemZone zone)
+        public Constant Calculate(RuntimeDataPackage package)
         {
             Steps = 0;
 
@@ -218,7 +217,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
             if (IsSimple)
             {
-                CalculateValue(Parse(zone), this);
+                CalculateValue(Parse(package), this);
                 _valueSet = true;
                 return Value;
             }
@@ -266,8 +265,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 //Получаем числовые значение
                 //Учитываем, что операнды могут иметь свои унарные операции и функции. 
                 //Их приоритет всегда выше бинарных, потому сразу выполняем их
-                CalculateValue(subTokens[maxLeftIndex].Parse(zone), subTokens[maxLeftIndex]);
-                CalculateValue(subTokens[maxRightIndex].Parse(zone), subTokens[maxRightIndex]);
+                CalculateValue(subTokens[maxLeftIndex].Parse(package), subTokens[maxLeftIndex]);
+                CalculateValue(subTokens[maxRightIndex].Parse(package), subTokens[maxRightIndex]);
 
                 var value = op.BinaryFunc(subTokens[maxLeftIndex].Value, subTokens[maxRightIndex].Value);
                 Steps += op.OperatorSteps;
@@ -359,7 +358,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// <summary>
         /// Получает числовое значение данного токена, если он является примитивным или значение уже подсчитано
         /// </summary>
-        private Constant Parse(MemZone zone)
+        private Constant Parse(RuntimeDataPackage package)
         {
             if (_valueSet)
                 return Value;
@@ -369,12 +368,12 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 return new Constant(PreprocessorIf.defines.Exists(p => p.Name == RawValue));
             }
 
-            if (_referenceSet && zone != null)
+            if (_referenceSet && package != null)
             {
                 switch (Reference.Object.Type)
                 {
                     case FlashElementType.Variable:
-                        return new Constant(zone.Globals.Find(p => p.Index == (Reference.Object as FlashElementVariable).Index));
+                        return new Constant(package.GetVariable((Reference.Object as FlashElementVariable).Index));
                     case FlashElementType.Constant:
                         return (Reference.Object as FlashElementConstant).ToConstant();
                     case FlashElementType.Instruction:

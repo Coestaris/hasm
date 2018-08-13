@@ -19,10 +19,7 @@ namespace HASMLib.Runtime.Instructions
 
         protected Variable GetVar(Integer index, RuntimeDataPackage package)
         {
-            if (index < (Integer)package.CallStackItem.Locals.Count)
-                return package.CallStackItem.Locals[(int)index];
-
-            return package.MemZone.Globals[(int)index + package.CallStackItem.Locals.Count];
+            return package.GetVariable(index);
         }
 
         protected ConstantMark GetConst(Integer index, RuntimeDataPackage package)
@@ -74,7 +71,7 @@ namespace HASMLib.Runtime.Instructions
                 case (ReferenceType.Expression):
                     {
                         Expression expression = package.Expressions.Find(p => p.Index == reference.Index).Expression;
-                        Constant constnant = expression.Calculate(package.MemZone, true);
+                        Constant constnant = expression.Calculate(package, true);
 
                         package.RuntimeMachine.Ticks += expression.Steps;
                         return constnant;
