@@ -159,6 +159,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         private ParseError CheckRetEnding(Runtime.Structures.Units.Function function)
         {
+            if(Instructions.Count == 0)
+                return new ParseError(ParseErrorType.Other_FunctionMustEndsWithPassOrRet, function.Directive);
+
             var last = Instructions.Last();
             
             if(last.InstructionNumber != (Integer)_retInstructionIndex && last.InstructionNumber != (Integer)_passInstructionIndex)

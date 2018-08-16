@@ -135,7 +135,7 @@ namespace HASMLib.Runtime
 
         internal RuntimeError CallFunction(Function function)
         {
-            Integer localVarCounter = (Integer)0;
+            Integer localVarCounter = (Integer)1;
             CallStackItem csi = new CallStackItem(function, (Integer)0);
 
             if (!function.IsStatic && !function.IsEntryPoint)

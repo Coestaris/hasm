@@ -38,8 +38,7 @@ namespace HASMLib.Core.BaseTypes
         {
             return unchecked(new Integer(~a.Value, a.Type));
         }
-
-
+        
         public static bool operator >=(Integer a, Integer b)
         {
             return unchecked(a.Value >= b.Value);

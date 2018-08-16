@@ -135,7 +135,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                                     int varIndex = function.CompileCache.Variables.Select(p => p.Name).ToList().IndexOf(token.RawValue);
                                     return new ObjectReference((Integer)varIndex, ReferenceType.Variable)
                                     {
-                                        Object = function.CompileCache.Variables[varIndex].FEReference
+                                        Object = null
                                     };
 
                                 }
@@ -227,8 +227,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 {
                     if(line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.NewVariable)
                     {
-                        function.CompileCache.Variables.Add(new VariableMark(argument));
                         function.CompileCache.VarIndex++;
+                        function.CompileCache.Variables.Add(new VariableMark(argument) { Index = (Integer)function.CompileCache.VarIndex });
                         usedIndexes.Add(new ObjectReference((Integer)function.CompileCache.VarIndex, ReferenceType.Variable));
                         continue;
                     }
@@ -268,8 +268,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                     if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FunctionName)
                     {
-                        Runtime.Structures.Units.Function func = source.Assembly.AllFunctions.Find(p => p.FullName ==
-                            source.Assembly.ToAbsoluteName(argument));
+                        var func = Runtime.Structures.Units.Function.GetInstance(argument, source.Assembly,
+                            function.BaseClass);
 
                         if (func == null)
                         {
@@ -314,9 +314,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             !line.Instruction.ParameterTypes[argIndex].HasFlag(InstructionParameterType.Constant))
                         {
                             //Получаем индекс переменной со списка переменных
-                            int varIndex = function.CompileCache.Variables.Select(p => p.Name).ToList().IndexOf(argument);
+                            Integer varIndex = function.CompileCache.Variables.Find(p => p.Name == argument).Index;
                             //Запоминаем индекс переменной
-                            usedIndexes.Add(new ObjectReference((Integer)varIndex, ReferenceType.Variable));
+                            usedIndexes.Add(new ObjectReference(varIndex, ReferenceType.Variable));
                         }
                         continue;
                     }
@@ -360,9 +360,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                         }
 
                         //Получаем индекс переменной со списка переменных 
-                        int varIndex = function.CompileCache.Variables.Select(p => p.Name).ToList().IndexOf(argument);
+                        Integer varIndex = function.CompileCache.Variables.Find(p => p.Name == argument).Index;
                         //Запоминаем индекс переменной
-                        usedIndexes.Add(new ObjectReference((Integer)varIndex, ReferenceType.Variable));
+                        usedIndexes.Add(new ObjectReference(varIndex, ReferenceType.Variable));
                         continue;
                     }
 

@@ -67,6 +67,9 @@
             this.decOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.charOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.binOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem_buildLog = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuItem_output = new System.Windows.Forms.ToolStripMenuItem();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.contextMenuStrip_node = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -93,9 +96,6 @@
             this.runToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAllExceptThisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripMenuItem_buildLog = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuItem_output = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip_node.SuspendLayout();
@@ -377,7 +377,7 @@
             this.hexOutputToolStripMenuItem.CheckOnClick = true;
             this.hexOutputToolStripMenuItem.Image = global::HASM.Properties.Resources.Hex_16xLG;
             this.hexOutputToolStripMenuItem.Name = "hexOutputToolStripMenuItem";
-            this.hexOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hexOutputToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.hexOutputToolStripMenuItem.Text = "Hex output";
             this.hexOutputToolStripMenuItem.Click += new System.EventHandler(this.hexOutputToolStripMenuItem_Click);
             // 
@@ -386,7 +386,7 @@
             this.decOutputToolStripMenuItem.CheckOnClick = true;
             this.decOutputToolStripMenuItem.Image = global::HASM.Properties.Resources.Dec_16xLG;
             this.decOutputToolStripMenuItem.Name = "decOutputToolStripMenuItem";
-            this.decOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.decOutputToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.decOutputToolStripMenuItem.Text = "Dec output";
             this.decOutputToolStripMenuItem.Click += new System.EventHandler(this.decOutputToolStripMenuItem_Click);
             // 
@@ -395,7 +395,7 @@
             this.charOutputToolStripMenuItem.CheckOnClick = true;
             this.charOutputToolStripMenuItem.Image = global::HASM.Properties.Resources.Char_16xLG;
             this.charOutputToolStripMenuItem.Name = "charOutputToolStripMenuItem";
-            this.charOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.charOutputToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.charOutputToolStripMenuItem.Text = "Char output";
             this.charOutputToolStripMenuItem.Click += new System.EventHandler(this.charOutputToolStripMenuItem_Click);
             // 
@@ -403,9 +403,30 @@
             // 
             this.binOutputToolStripMenuItem.Image = global::HASM.Properties.Resources.Binary_16xLG;
             this.binOutputToolStripMenuItem.Name = "binOutputToolStripMenuItem";
-            this.binOutputToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.binOutputToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.binOutputToolStripMenuItem.Text = "Bin output";
             this.binOutputToolStripMenuItem.Click += new System.EventHandler(this.binOutputToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator10
+            // 
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Size = new System.Drawing.Size(135, 6);
+            // 
+            // toolStripMenuItem_buildLog
+            // 
+            this.toolStripMenuItem_buildLog.Name = "toolStripMenuItem_buildLog";
+            this.toolStripMenuItem_buildLog.Size = new System.Drawing.Size(138, 22);
+            this.toolStripMenuItem_buildLog.Text = "Build log";
+            this.toolStripMenuItem_buildLog.Click += new System.EventHandler(this.toolStripMenuItem7_Click);
+            // 
+            // ToolStripMenuItem_output
+            // 
+            this.ToolStripMenuItem_output.Checked = true;
+            this.ToolStripMenuItem_output.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ToolStripMenuItem_output.Name = "ToolStripMenuItem_output";
+            this.ToolStripMenuItem_output.Size = new System.Drawing.Size(138, 22);
+            this.ToolStripMenuItem_output.Text = "Output";
+            this.ToolStripMenuItem_output.Click += new System.EventHandler(this.outputToolStripMenuItem1_Click);
             // 
             // textBox1
             // 
@@ -636,27 +657,6 @@
             this.closeAllExceptThisToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
             this.closeAllExceptThisToolStripMenuItem.Text = "Close all except this";
             this.closeAllExceptThisToolStripMenuItem.Click += new System.EventHandler(this.closeAllExceptThisToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator10
-            // 
-            this.toolStripSeparator10.Name = "toolStripSeparator10";
-            this.toolStripSeparator10.Size = new System.Drawing.Size(177, 6);
-            // 
-            // toolStripMenuItem_buildLog
-            // 
-            this.toolStripMenuItem_buildLog.Name = "toolStripMenuItem_buildLog";
-            this.toolStripMenuItem_buildLog.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItem_buildLog.Text = "Build log";
-            this.toolStripMenuItem_buildLog.Click += new System.EventHandler(this.toolStripMenuItem7_Click);
-            // 
-            // ToolStripMenuItem_output
-            // 
-            this.ToolStripMenuItem_output.Checked = true;
-            this.ToolStripMenuItem_output.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ToolStripMenuItem_output.Name = "ToolStripMenuItem_output";
-            this.ToolStripMenuItem_output.Size = new System.Drawing.Size(180, 22);
-            this.ToolStripMenuItem_output.Text = "Output";
-            this.ToolStripMenuItem_output.Click += new System.EventHandler(this.outputToolStripMenuItem1_Click);
             // 
             // Editor
             // 

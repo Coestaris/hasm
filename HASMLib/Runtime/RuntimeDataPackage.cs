@@ -25,9 +25,10 @@ namespace HASMLib.Runtime
 
         internal Variable GetVariable(Integer index)
         {
-            if (index >= (Integer)CallStackItem.Locals.Count)
-                return MemZone.Globals.Find(p => p.Index == index);
-            else return CallStackItem.Locals.Find(p => p.Index == index);
+            //TODO: GLOBALS
+            //if (index >= (Integer)CallStackItem.Locals.Count)
+              //  return MemZone.Globals.Find(p => p.Index == index);
+            return CallStackItem.Locals.Find(p => p.Index == index);
         }
     }
 }

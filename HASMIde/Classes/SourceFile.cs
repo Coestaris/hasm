@@ -22,9 +22,16 @@ namespace HASM
             };
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is SourceFile file && 
+                Path.ToLower().Replace('/','\\') == file.Path.ToLower().Replace('/', '\\');
+        }
+
         public override string ToString()
         {
             return DisplayNumber;
         }
+
     }
 }
