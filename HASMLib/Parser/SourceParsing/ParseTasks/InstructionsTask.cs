@@ -513,14 +513,19 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                     type.CheckClassType(source.Assembly.AllClasses, source.Assembly);
 
                     function.CompileCache.Variables.Add(
-                        new VariableMark(Runtime.Structures.Units.Function.SelfParameter,
-                        type));
+                        new VariableMark(Runtime.Structures.Units.Function.SelfParameter, type)
+                        {
+                            Index = (Integer)function.CompileCache.VarIndex
+                        });
                 }
 
                 foreach (var parameter in function.Parameters)
                 {
                     function.CompileCache.VarIndex++;
-                    function.CompileCache.Variables.Add(new VariableMark(parameter.Name, parameter.Type));
+                    function.CompileCache.Variables.Add(new VariableMark(parameter.Name, parameter.Type)
+                    {
+                        Index = (Integer)function.CompileCache.VarIndex
+                    });
                 } 
 
                 var error = ParseFunction(function);
