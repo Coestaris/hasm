@@ -18,13 +18,13 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
             CanAddNewLines = true;
         }
 
-        internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
+        internal override void Apply(StringGroup input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         //Для include
-        internal override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
+        internal override List<SourceLine> Apply(StringGroup input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
         {
             if (enableStack.Contains(false))
             {
@@ -32,17 +32,18 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                 return null;
             }
 
-            input = ClearInput(input);
+            string strInput = input.AsSingleLine();
+            strInput = ClearInput(strInput);
 
-            if (!Name1Regex.IsMatch(input) && !Name2Regex.IsMatch(input))
+            if (!Name1Regex.IsMatch(strInput) && !Name2Regex.IsMatch(strInput))
             {
                 error = new ParseError(ParseErrorType.Preprocessor_WrongNameFormat);
                 return null;
             }
 
-            input = input.Trim('\"', '<', '>');
+            strInput = strInput.Trim('\"', '<', '>');
 
-            var result = recursiveFunc(input);
+            var result = recursiveFunc(strInput);
             if (result.error != null)
             {
                 error = result.error;

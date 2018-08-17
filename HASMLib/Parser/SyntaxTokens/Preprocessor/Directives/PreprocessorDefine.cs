@@ -14,7 +14,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
             CanAddNewLines = false;
         }
 
-        internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
+        internal override void Apply(StringGroup input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
             if (enableStack.Contains(false))
             {
@@ -22,14 +22,14 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                 return;
             }
 
-            input = ClearInput(input);
-            if (string.IsNullOrEmpty(input))
+            string firstLine = ClearInput(input.AsSingleLine());
+            if (string.IsNullOrEmpty(firstLine))
             {
                 error = new ParseError(ParseErrorType.Preprocessor_NameExpected);
                 return;
             }
 
-            string[] parts = input.Split(' ');
+            string[] parts = firstLine.Split(' ');
             string name = parts[0];
 
             if (name.Contains('(') || name.Contains(')') || name.Contains(','))
@@ -46,7 +46,11 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                     return;
                 }
 
-                var newDef = new ParametricDefine(name, string.Join(" ", parts.Skip(1)));
+                var firstValueLine = string.Join(")", firstLine.Split(')').Skip(1).ToArray());
+                var group = new StringGroup(firstValueLine);
+                group.Strings.AddRange(input.Strings.Skip(1));
+
+                var newDef = new ParametricDefine(name, group);
 
                 if (defines.Exists(p => p.Name == newDef.Name))
                 {
@@ -58,44 +62,88 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                 Define.ResolveDefines(defines, ref value, -1, null);
                 newDef.Value = value;
                 defines.Add(newDef);
-
-                error = null;
-                return;
-            }
-
-            if (!Define.GeneralDefineNameRegex.IsMatch(name))
-            {
-                error = new ParseError(ParseErrorType.Preprocessor_WrongDefineName);
-                return;
-            }
-
-            if (defines.Exists(p => p.Name == Name))
-            {
-                error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
-                return;
-            }
-
-            if (parts.Length == 1)
-            {
-                defines.Add(new Define(name));
-
-            }
-            else
-            {
-                var newDef = new Define(name, string.Join(" ", parts.Skip(1)));
-                var value = newDef.Value;
-                Define.ResolveDefines(defines, ref value, -1, null);
-                newDef.Value = value;
-                defines.Add(newDef);
             }
 
             error = null;
         }
 
         //Для include
-        internal override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
+        internal override List<SourceLine> Apply(StringGroup input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
         {
             throw new NotSupportedException();
         }
     }
 }
+
+
+/*
+ * 
+ *    string strInput = ClearInput(input.AsSingleLine());
+                if (string.IsNullOrEmpty(strInput))
+                {
+                    error = new ParseError(ParseErrorType.Preprocessor_NameExpected);
+                    return;
+                }
+
+                string[] parts = strInput.Split(' ');
+                string name = parts[0];
+
+                if (name.Contains('(') || name.Contains(')') || name.Contains(','))
+                {
+                    if (!ParametricDefine.ParametricDefineRegex.IsMatch(name))
+                    {
+                        error = new ParseError(ParseErrorType.Preprocessor_WrongParametricDefineFormat);
+                        return;
+                    }
+
+                    if (parts.Length == 1)
+                    {
+                        error = new ParseError(ParseErrorType.Preprocessor_ParametricDefineWithoutExpression);
+                        return;
+                    }
+
+                    var newDef = new ParametricDefine(name, string.Join(" ", parts.Skip(1)));
+
+                    if (defines.Exists(p => p.Name == newDef.Name))
+                    {
+                        error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
+                        return;
+                    }
+
+                    var value = newDef.Value;
+                    Define.ResolveDefines(defines, ref value, -1, null);
+                    newDef.Value = value;
+                    defines.Add(newDef);
+
+                    error = null;
+                    return;
+                }
+
+                if (!Define.GeneralDefineNameRegex.IsMatch(name))
+                {
+                    error = new ParseError(ParseErrorType.Preprocessor_WrongDefineName);
+                    return;
+                }
+
+                if (defines.Exists(p => p.Name == Name))
+                {
+                    error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
+                    return;
+                }
+
+                if (parts.Length == 1)
+                {
+                    defines.Add(new Define(name));
+
+                }
+                else
+                {
+                    var newDef = new Define(name, string.Join(" ", parts.Skip(1)));
+                    var value = newDef.Value;
+                    Define.ResolveDefines(defines, ref value, -1, null);
+                    newDef.Value = value;
+                    defines.Add(newDef);
+                }
+ * 
+ * 
+ * */

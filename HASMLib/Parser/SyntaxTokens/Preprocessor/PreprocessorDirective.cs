@@ -14,7 +14,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
     {
         private static Regex GeneralPreprocessorRegex = new Regex(@"^#[^#]{1,}$");
         private static List<PreprocessorDirective> _preprocessorDirectives;
-        private static Func<string, List<List<string>>> getLinesFunc;
+        private static Func<string, List<StringGroup>> getLinesFunc;
         private static string workingDirectory;
         private static Stack<bool> enableStack;
         private static List<Define> defines;
@@ -37,7 +37,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             return line.StartsWith("#");
         }
 
-        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<List<string>>> GetLinesFunc, List<Define> defines)
+        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<StringGroup>> GetLinesFunc, List<Define> defines)
         {
             getLinesFunc = GetLinesFunc ?? throw new ArgumentNullException(nameof(GetLinesFunc));
             workingDirectory = WorkingDirectory;
@@ -113,47 +113,71 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                     new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile, -1, fileName));
             }
 
-            List<List<string>> lines = getLinesFunc(fileName);
+            List<StringGroup> stringGroups = getLinesFunc(fileName);
 
-            for (int index = 0; index < lines.Count; index++)
+            int index = -1;
+            foreach (var group in stringGroups)
             {
-                string line = lines[index];
+                if(group.IsSingleLine && !group.IsMultilineDefine)
+                    return new PreprocessorParseResult(null, new ParseError(ParseErrorType.Preprcessor_MultilineNonDefinesAreNotAllowed, index, fileName));
 
-                if (IsPreprocessorLine(line))
+                if(group.IsMultilineDefine)
                 {
-                    PreprocessorDirective directive = GetDirective(line, index, fileName, out ParseError error);
+                    PreprocessorDirective directive = GetDirective(group.Strings.First(), index, fileName, out ParseError error);
                     if (error != null) return new PreprocessorParseResult(null, error);
 
-                    if (directive.CanAddNewLines)
+                    //Preprocessor.Directives.PreprocessorDefine.
+                    directive.Apply(group, enableStack, defines, out ParseError parseError);
+                    if (parseError != null) return new PreprocessorParseResult(null, new ParseError(parseError.Type, index, fileName));
+
+                    index += group.Strings.Count;
+                }
+
+                if(group.IsSingleLine)
+                {
+                    index++;
+
+                    string line = group.AsSingleLine();
+                    if (IsPreprocessorLine(line))
                     {
-                        var newLines = directive.Apply(line, enableStack, defines, out ParseError parseError, RecursiveParse);
-                        if (parseError != null) return new PreprocessorParseResult(null, parseError);
-                        result.AddRange(newLines);
+                        PreprocessorDirective directive = GetDirective(line, index, fileName, out ParseError error);
+                        if (error != null) return new PreprocessorParseResult(null, error);
+
+                        if (directive.CanAddNewLines)
+                        {
+                            var newLines = directive.Apply(new StringGroup(line), enableStack, defines, out ParseError parseError, RecursiveParse);
+                            if (parseError != null) return new PreprocessorParseResult(null, parseError);
+                            result.AddRange(newLines);
+                        }
+                        else
+                        {
+                            directive.Apply(new StringGroup(line), enableStack, defines, out ParseError parseError);
+                            if (parseError != null) return new PreprocessorParseResult(null, new ParseError(parseError.Type, index, fileName));
+                        }
                     }
                     else
                     {
-                        directive.Apply(line, enableStack, defines, out ParseError parseError);
-                        if (parseError != null) return new PreprocessorParseResult(null, new ParseError(parseError.Type, index, fileName));
+                        if (!enableStack.Contains(false))
+                        {
+                            if (string.IsNullOrWhiteSpace(line))
+                                continue;
+
+                            ParseError parseError = Define.ResolveDefines(defines, ref line, index, fileName);
+                            if (parseError != null) return new PreprocessorParseResult(null, parseError);
+                            result.Add(new SourceLine(line, index, fileName));
+                        }
                     }
                 }
                 else
                 {
-                    if (!enableStack.Contains(false))
-                    {
-                        if (string.IsNullOrWhiteSpace(line))
-                            continue;
 
-                        ParseError parseError = Define.ResolveDefines(defines, ref line, index, fileName);
-                        if (parseError != null) return new PreprocessorParseResult(null, parseError);
-                        result.Add(new SourceLine(line, index, fileName));
-                    }
                 }
             }
             return new PreprocessorParseResult(result, null);
         }
 
-        internal abstract void Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error);
+        internal abstract void Apply(StringGroup input, Stack<bool> enableList, List<Define> defines, out ParseError error);
 
-        internal abstract List<SourceLine> Apply(string input, Stack<bool> enableList, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc);
+        internal abstract List<SourceLine> Apply(StringGroup input, Stack<bool> enableList, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc);
     }
 }

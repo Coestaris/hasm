@@ -17,7 +17,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
             CanAddNewLines = false;
         }
 
-        internal override void Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
+        internal override void Apply(StringGroup input, Stack<bool> enableStack, List<Define> defines, out ParseError error)
         {
             if (enableStack.Count == 0)
             {
@@ -34,10 +34,11 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
             PreprocessorIf.AllowDefinedFunction = true;
             PreprocessorIf.defines = defines;
 
-            input = ClearInput(input);
+            string strInput = input.AsSingleLine();
+            strInput = ClearInput(strInput);
 
 
-            var expError = Expression.Parse(input, out Expression exp, (token) =>
+            var expError = Expression.Parse(strInput, out Expression exp, (token) =>
             {
                 if (token.UnaryFunction == null || token.UnaryFunction.FunctionString != "defined")
                 {
@@ -73,7 +74,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
         }
 
         //Для include
-        internal override List<SourceLine> Apply(string input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
+        internal override List<SourceLine> Apply(StringGroup input, Stack<bool> enableStack, List<Define> defines, out ParseError error, Func<string, PreprocessorParseResult> recursiveFunc)
         {
             throw new NotSupportedException();
         }

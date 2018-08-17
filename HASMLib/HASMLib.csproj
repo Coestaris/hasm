@@ -61,6 +61,7 @@
     <Compile Include="Parser\SourceParsing\ObjectReference.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\InstructionsTask.cs" />
     <Compile Include="Parser\SourceParsing\ParseTasks\LinkingTask.cs" />
+    <Compile Include="Parser\SyntaxTokens\Preprocessor\StringGroup.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionGETV.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionPASS.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionSETV.cs" />

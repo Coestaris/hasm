@@ -66,5 +66,6 @@
         Syntax_Instruction_UnknownFieldName,
         Syntax_Instruction_UnknownFuncName,
         Other_FunctionMustEndsWithPassOrRet,
+        Preprcessor_MultilineNonDefinesAreNotAllowed,
     }
 }

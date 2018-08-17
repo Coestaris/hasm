@@ -11,8 +11,10 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         public Regex FindRegex { get; private set; }
         public bool IsParametric { get; protected set; }
         public string Name { get; private set; }
-        public string Value { get; internal set; }
-        public bool IsEmpty => string.IsNullOrEmpty(Value);
+        public StringGroup Value { get; internal set; }
+        public bool IsEmpty => Value.IsEmpty;
+
+        public bool IsMultiline { get; internal set; }
 
         private void InitRegex()
         {
@@ -24,10 +26,10 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             return
                 $"{Name}" +
                 $"{(IsParametric ? "(" + string.Join(",", (this as ParametricDefine).ParameterNames) + ")" : "")}" +
-                $"{(Value.Length > 10 ? "[" + Value.Substring(0, 10) + "...]" : (Value.Length != 0 ? "[" + Value + "]" : ""))}";
+                $"{(Value.AsSingleLine().Length > 10 ? "[" + Value.AsSingleLine().Substring(0, 10) + "...]" : (Value.AsSingleLine().Length != 0 ? "[" + Value + "]" : ""))}";
         }
 
-        public static ParseError ResolveDefines(List<Define> defines, ref string line, int index, string fileName)
+        public static ParseError ResolveDefines(List<Define> defines, ref StringGroup group, int index, string fileName)
         {
             foreach (Define define in defines)
             {
@@ -69,7 +71,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                         else
                         {
                             line = line.Remove(match.Index, match.Length);
-                            line = line.Insert(match.Index, define.Value);
+                            //line = line.Insert(match.Index, define.Value);
                         }
                     }
                 }
@@ -77,7 +79,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             return null;
         }
 
-        public Define(string name, string value)
+        public Define(string name, StringGroup value)
         {
             Name = name;
             Value = value;
@@ -87,7 +89,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         public Define(string name)
         {
             Name = name;
-            Value = "";
+            Value = StringGroup.Empty;
             InitRegex();
         }
     }

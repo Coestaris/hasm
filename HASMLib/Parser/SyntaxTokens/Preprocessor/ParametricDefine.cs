@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -13,7 +14,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
         private List<Regex> ParameterRegexes;
 
-        public ParametricDefine(string name, string value) : base(name.Split('(')[0], value)
+        public ParametricDefine(string name, StringGroup value) : base(name.Split('(')[0], value)
         {
             var parts = name.Split('(');
 
@@ -30,7 +31,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
             IsParametric = true;
         }
-        public string Expand(string input, out ParseError error)
+        public StringGroup Expand(string input, out ParseError error)
         {
             var parts = input.Split('(');
             var part = parts[1].Trim(')');
@@ -46,14 +47,19 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                 return null;
             }
 
-            string expanded = Value;
-            for (int i = 0; i < parameters.Count; i++)
+            StringGroup expanded = Value;
+            for(int grCouter = 0; grCouter < expanded.Strings.Count; grCouter++)
             {
-                var matches = ParameterRegexes[i].Matches(expanded);
-                for (int j = matches.Count - 1; j >= 0; j--)
+                for (int i = 0; i < parameters.Count; i++)
                 {
-                    expanded = expanded.Remove(matches[j].Index, matches[j].Length);
-                    expanded = expanded.Insert(matches[j].Index, parameters[i]);
+                    var matches = ParameterRegexes[i].Matches(expanded.Strings[grCouter]);
+                    for (int j = matches.Count - 1; j >= 0; j--)
+                    {
+                        expanded.Strings[grCouter] = expanded.Strings[grCouter]
+                            .Remove(matches[j].Index, matches[j].Length);
+                        expanded.Strings[grCouter] = expanded.Strings[grCouter]
+                            .Insert(matches[j].Index, parameters[i]);
+                    }
                 }
             }
 

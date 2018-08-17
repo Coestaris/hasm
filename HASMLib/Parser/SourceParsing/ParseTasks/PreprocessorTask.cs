@@ -19,28 +19,31 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         private const string PrepareSourceSpaceReplace = " ";
         private const string PrepareSourceMultiCommaReplace = ",";
 
-        private List<List<string>> BasePrepareLines(string absoluteFileName)
+        private List<StringGroup> BasePrepareLines(string absoluteFileName)
         {
             string input = File.ReadAllText(absoluteFileName);
 
             input = multipleSpaceRegex.Replace(input, PrepareSourceSpaceReplace);
             input = commaSpaceRegex.Replace(input, PrepareSourceMultiCommaReplace);
 
-            List<List<string>> result = new List<List<string>>();
+            List<StringGroup> result = new List<StringGroup>();
             var rawLines = input.Split('\n').Select(p => p.Trim(SourceLine.StringCleanUpChars));
+            bool lastWasMultilineMarked = false; 
 
             foreach (var line in rawLines)
             {
                 if (line.Last() == MultilineSymbol)
                 {
-                    result.Last().Add(line.TrimEnd(MultilineSymbol));
+                    if (lastWasMultilineMarked)
+                        result.Last().Add(line.TrimEnd(MultilineSymbol));
+                    else result.Add(new StringGroup(line));
+
+                    lastWasMultilineMarked = true;
                 }
                 else
                 {
-                    result.Add(new List<string>()
-                    {
-                        line
-                    });
+                    result.Add(new StringGroup(line));
+                    lastWasMultilineMarked = false;
                 }
             }
 
