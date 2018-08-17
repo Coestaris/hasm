@@ -29,23 +29,23 @@ namespace HASMLib.Runtime.Instructions.Instructions
             Integer id = parameters[0].Index;
             Function function = package.Assembly.AllFunctions.Find(p => (Integer)p.UniqueID == id);
 
-            if(function.IsConstuctor)
+            if(function.IsStatic)
             {
-                if(package.MemZone.ObjectStackItem == null)
-                    return RuntimeOutputCode.ObjectStackIsEmpty;
 
-                if (package.MemZone.ObjectStackItem.Type.Type != Structures.TypeReferenceType.Class)
-                    return RuntimeOutputCode.ClassTypeExpected;
+            }
+            else
+            {
+                if (!CheckObjectStackItem(package, function.BaseClass, out RuntimeOutputCode error))
+                    return error;
 
-                if (package.MemZone.ObjectStackItem.Type.ClassType != function.BaseClass)
-                    return RuntimeOutputCode.DifferentClasses;
-
-                package.MemZone.ObjectStackItem.InitClassObject();
+                if (function.IsConstuctor)
+                {
+                    package.MemZone.ObjectStackItem.InitClassObject();
+                }
             }
 
             var result = package.RuntimeMachine.CallFunction(function);
-            if (result != null)
-                return result.Code;
+            if (result != null) return result.Code;
 
             return RuntimeOutputCode.OK;
         }

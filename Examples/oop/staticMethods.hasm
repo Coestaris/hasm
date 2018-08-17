@@ -1,0 +1,61 @@
+;
+; Пример простого вызова функции
+;
+
+#include "../lib/ide.hasm"
+
+#define _callr_0(resultName, resultType, funcName) \
+    alloc resultName, resultType                   \
+    call funcName                                  \
+    popr resultName                                
+
+#define _call_2(funcName, arg1, arg2)  \
+    pusha arg1                         \
+    pusha arg2                         \
+    call funcName                      \
+    
+#define _callr_2(resultName, resultType, funcName, arg1, arg2) \
+    alloc resultName, resultType                               \
+    pusha arg1                                                 \
+    pusha arg2                                                 \
+    call funcName                                              \
+    popr resultName                                
+
+    
+
+.assembly SomeAssembly
+{
+    .class Base
+    {
+        .function(public, static, param:int:a, param:int:b, ret:void) Output
+        {
+            out a
+            out b
+            pass
+        }
+
+        .function(public, static, param:int:a, param:int:b, ret:int) AddValues
+        {
+            alloc sum, int
+            add sum, a
+            add sum, b
+            ret sum
+        }
+        
+        .function(public, entrypoint, static, ret:void) main
+        {
+            alloc var1, int           
+            alloc var2, int
+
+            ldi var1, int_10
+            ldi var2, int_20
+            
+            _call__2(Output, var1, var2)
+            _callr_2(addResult, int, AddValues, var1, var2)
+            out addResult
+
+            
+            pass
+        }
+    }
+}

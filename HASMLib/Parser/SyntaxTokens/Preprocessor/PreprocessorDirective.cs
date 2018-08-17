@@ -14,7 +14,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
     {
         private static Regex GeneralPreprocessorRegex = new Regex(@"^#[^#]{1,}$");
         private static List<PreprocessorDirective> _preprocessorDirectives;
-        private static Func<string, List<string>> getLinesFunc;
+        private static Func<string, List<List<string>>> getLinesFunc;
         private static string workingDirectory;
         private static Stack<bool> enableStack;
         private static List<Define> defines;
@@ -37,7 +37,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             return line.StartsWith("#");
         }
 
-        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<string>> GetLinesFunc, List<Define> defines)
+        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<List<string>>> GetLinesFunc, List<Define> defines)
         {
             getLinesFunc = GetLinesFunc ?? throw new ArgumentNullException(nameof(GetLinesFunc));
             workingDirectory = WorkingDirectory;
@@ -113,7 +113,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                     new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile, -1, fileName));
             }
 
-            List<string> lines = getLinesFunc(fileName);
+            List<List<string>> lines = getLinesFunc(fileName);
 
             for (int index = 0; index < lines.Count; index++)
             {

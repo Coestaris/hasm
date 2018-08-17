@@ -4,6 +4,7 @@ using HASMLib.Parser;
 using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions;
 using HASMLib.Runtime.Structures;
+using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -16,6 +17,30 @@ namespace HASMLib.Runtime.Instructions
         public Regex Name { get; protected set; }
         public int ParameterCount { get; protected set; }
         public List<InstructionParameterType> ParameterTypes { get; protected set; }
+
+        protected bool CheckObjectStackItem(RuntimeDataPackage package, Class baseClass, out RuntimeOutputCode error)
+        {
+            if (package.MemZone.ObjectStackItem == null)
+            {
+                error = RuntimeOutputCode.ObjectStackIsEmpty;
+                return false;
+            }
+            if (package.MemZone.ObjectStackItem.Type.Type != TypeReferenceType.Class)
+            {
+                error = RuntimeOutputCode.ClassTypeExpected;
+                return false;
+            }
+
+            if (package.MemZone.ObjectStackItem.Type.ClassType != baseClass)
+            {
+                error = RuntimeOutputCode.DifferentClasses;
+                return false;
+            }
+
+            error = RuntimeOutputCode.OK;
+            return true;
+        }
+
 
         protected Variable GetVar(Integer index, RuntimeDataPackage package)
         {

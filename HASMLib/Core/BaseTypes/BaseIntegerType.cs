@@ -19,6 +19,27 @@ namespace HASMLib.Core.BaseTypes
         public bool IsSigned;
         public string Name;
 
+        public static bool operator ==(BaseIntegerType a, BaseIntegerType b)
+        {
+            if (a is null && b is null)
+                return true;
+
+            if ((a is null && !(b is null)) || (!(a is null) && b is null))
+                return false;
+
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(BaseIntegerType a, BaseIntegerType b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is BaseIntegerType type && type.Base == Base && type.IsSigned == IsSigned;
+        }
+
         public BaseIntegerType(int _base, bool isSigned, string name)
         {
             Base = _base;
@@ -45,6 +66,15 @@ namespace HASMLib.Core.BaseTypes
         public override string ToString()
         {
             return $"{Name} - ({Base} bits)";
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -1036935733;
+            hashCode = hashCode * -1521134295 + UniqueID.GetHashCode();
+            hashCode = hashCode * -1521134295 + Base.GetHashCode();
+            hashCode = hashCode * -1521134295 + IsSigned.GetHashCode();
+            return hashCode;
         }
     }
 }

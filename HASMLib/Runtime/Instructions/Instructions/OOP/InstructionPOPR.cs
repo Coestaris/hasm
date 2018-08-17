@@ -29,6 +29,12 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
             var variable = GetVar(varIndex, package);
 
+            if (package.MemZone.ObjectStackItem == null)
+                return RuntimeOutputCode.ObjectStackIsEmpty;
+
+            if (package.MemZone.ObjectStackItem.Type != variable.Value.Type)
+                return RuntimeOutputCode.DifferentTypes;
+
             variable.Value = package.MemZone.ObjectStackItem;
 
             return RuntimeOutputCode.OK;

@@ -8,7 +8,6 @@ namespace HASMLib.Runtime.Structures.Units
 {
     public class Function : BaseStructure
     {
-        public const string StaticKeyword = "static";
         public const string EntryPointKeyword = "entrypoint";
         public const string SelfParameter = "self";
 
@@ -81,16 +80,7 @@ namespace HASMLib.Runtime.Structures.Units
                     new TypeReference(type, null), name));
             }
         }
-
-        public static Function GetInstance(string name, Assembly assembly, Class baseClass)
-        {
-            var rel = baseClass.Functions.Find(p => p.Name == name);
-            if (rel != null) return rel;
-
-            name = assembly.ToAbsoluteName(name);
-            var abs = assembly.AllFunctions.Find(p => p.FullName == name);
-            return abs;
-        }
+             
 
         public Function(BaseStructure Base) : this(Base, false)
         {

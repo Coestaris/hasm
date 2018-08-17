@@ -250,10 +250,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                     if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FieldName)
                     {
-                        Field field = source.Assembly.AllFields.Find(p => p.FullName == 
-                            source.Assembly.ToAbsoluteName(argument));
+                        var field = BaseStructure.GetInstance<Field>(argument, source.Assembly, function.BaseClass);
 
-                        if(field == null)
+                        if (field == null)
                         {
                             error = NewParseError(ParseErrorType.Syntax_Instruction_UnknownFieldName,
                                 line, argIndex);
@@ -268,7 +267,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                     if (line.Instruction.ParameterTypes[argIndex] == InstructionParameterType.FunctionName)
                     {
-                        var func = Runtime.Structures.Units.Function.GetInstance(argument, source.Assembly,
+                        var func = BaseStructure.GetInstance<Runtime.Structures.Units.Function>(argument, source.Assembly,
                             function.BaseClass);
 
                         if (func == null)

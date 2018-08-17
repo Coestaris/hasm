@@ -24,13 +24,17 @@ namespace HASMLib.Runtime.Instructions.Instructions
         {
             Field field = package.Assembly.AllFields.Find(p => p.UniqueID == (int)parameters[0].Index);
 
-            if (package.MemZone.ObjectStackItem.Type.Type != Structures.TypeReferenceType.Class)
-                return RuntimeOutputCode.ClassTypeExpected;
+            if(field.IsStatic)
+            {
+                package.MemZone.ObjectStackItem = field.BaseClass.StaticFields[field.UniqueID];
+            }
+            else
+            {
+                if (!CheckObjectStackItem(package, field.BaseClass, out RuntimeOutputCode error))
+                    return error;
 
-            if (package.MemZone.ObjectStackItem.Type.ClassType != field.BaseClass)
-                return RuntimeOutputCode.DifferentClasses;
-
-            package.MemZone.ObjectStackItem = package.MemZone.ObjectStackItem.GetClassField(field.UniqueID);
+                package.MemZone.ObjectStackItem = package.MemZone.ObjectStackItem.GetClassField(field.UniqueID);
+            }
 
             return RuntimeOutputCode.OK;
         }

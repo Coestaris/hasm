@@ -27,17 +27,20 @@ namespace HASMLib.Runtime.Instructions.Instructions
             Field field = package.Assembly.AllFields.Find(p => p.UniqueID == (int)parameters[0].Index);
             Object obj = GetObject(parameters[1], package);
 
-            if (package.MemZone.ObjectStackItem.Type.Type != Structures.TypeReferenceType.Class)
-                return RuntimeOutputCode.ClassTypeExpected;
-
-            if (package.MemZone.ObjectStackItem.Type.ClassType != field.BaseClass)
-                return RuntimeOutputCode.DifferentClasses;
-
-            if(obj.Type != field.Type)
+            if (obj.Type != field.Type)
                 return RuntimeOutputCode.DifferentTypes;
 
-            package.MemZone.ObjectStackItem.SetClassField(field.UniqueID, obj);
+            if (field.IsStatic)
+            {
+                field.BaseClass.StaticFields[field.UniqueID] = obj;
+            }
+            else
+            {
+                if (!CheckObjectStackItem(package, field.BaseClass, out RuntimeOutputCode error))
+                    return error;
 
+                package.MemZone.ObjectStackItem.SetClassField(field.UniqueID, obj);
+            }
             return RuntimeOutputCode.OK;
         }
     }

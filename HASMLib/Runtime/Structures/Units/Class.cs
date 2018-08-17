@@ -68,6 +68,7 @@ namespace HASMLib.Runtime.Structures.Units
 
         public Class(BaseStructure Base) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
         {
+            StaticFields = new Dictionary<int, Object>();
             Target = RuleTarget.Class;
             Directive = Base.Directive;
 
@@ -90,8 +91,13 @@ namespace HASMLib.Runtime.Structures.Units
                         Functions.Add(child as Function);
                         break;
                     case RuleTarget.Field:
-                        (child as Field).BaseClass = this;
-                        Fields.Add(child as Field);
+                        {
+                            Field field = child as Field;
+                            field.BaseClass = this;
+                            if (field.IsStatic)
+                                StaticFields.Add(field.UniqueID, new Object(field.Type));
+                            Fields.Add(child as Field);
+                        }
                         break;
                     case RuleTarget.Constructor:
                         (child as Function).BaseClass = this;
@@ -111,5 +117,7 @@ namespace HASMLib.Runtime.Structures.Units
         public List<Function> Functions { get; private set; }
         public List<Field> Fields { get; private set; }
         public List<Function> Constructors { get; private set; }
+
+        public Dictionary<int, Object> StaticFields;
     }
 }

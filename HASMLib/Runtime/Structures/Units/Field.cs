@@ -6,6 +6,7 @@ namespace HASMLib.Runtime.Structures.Units
     {
         public const string TypeKeyword = "type";
 
+        public bool IsStatic { get; set; }
         public Class BaseClass;
         internal TypeReference Type;
 
@@ -16,6 +17,8 @@ namespace HASMLib.Runtime.Structures.Units
 
             Modifier type = GetModifier(TypeKeyword);
             Type = new TypeReference(type.Value, null);
+
+            IsStatic = GetModifier(StaticKeyword) != null;
         }
 
         public override string FullName

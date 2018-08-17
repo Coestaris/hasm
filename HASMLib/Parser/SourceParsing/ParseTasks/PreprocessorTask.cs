@@ -13,19 +13,38 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerReset() { }
 
+        private const char MultilineSymbol = '\\';
         private static Regex multipleSpaceRegex = new Regex(@"[ \t]{1,}");
         private static Regex commaSpaceRegex = new Regex(@",[ \t]{1,}");
         private const string PrepareSourceSpaceReplace = " ";
         private const string PrepareSourceMultiCommaReplace = ",";
 
-        private List<string> BasePrepareLines(string absoluteFileName)
+        private List<List<string>> BasePrepareLines(string absoluteFileName)
         {
             string input = File.ReadAllText(absoluteFileName);
 
             input = multipleSpaceRegex.Replace(input, PrepareSourceSpaceReplace);
             input = commaSpaceRegex.Replace(input, PrepareSourceMultiCommaReplace);
 
-            return input.Split('\n').Select(p => p.Trim('\r', '\t')).ToList();
+            List<List<string>> result = new List<List<string>>();
+            var rawLines = input.Split('\n').Select(p => p.Trim(SourceLine.StringCleanUpChars));
+
+            foreach (var line in rawLines)
+            {
+                if (line.Last() == MultilineSymbol)
+                {
+                    result.Last().Add(line.TrimEnd(MultilineSymbol));
+                }
+                else
+                {
+                    result.Add(new List<string>()
+                    {
+                        line
+                    });
+                }
+            }
+
+            return result;
         }
 
         protected override void InnerRun()

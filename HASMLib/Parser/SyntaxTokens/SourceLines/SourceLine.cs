@@ -8,7 +8,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
 
         private const string CommentReplaceChar = "";
         private const char CommentTrimChar = ':';
-        protected static readonly char[] StringCleanUpChars = { ' ', '\t', '\r' };
+        public static readonly char[] StringCleanUpChars = { ' ', '\t', '\r' };
 
         public string FileName { get; protected set; }
         public int LineIndex { get; protected set; }
