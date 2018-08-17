@@ -44,7 +44,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                 {
                     var def = defines.Find(p => p.Name == token.RawValue);
                     if (def == null) throw new WrongTokenException();
-                    token.RawValue = def.Value;
+                    token.RawValue = def.Value.AsSingleLine();
 
                     if (!token.IsSimple)
                     {

@@ -47,7 +47,8 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             if (defines != null)
                 PreprocessorDirective.defines.AddRange(defines);
 
-            PreprocessorDirective.defines.Add(new Define("__base__", HASMBase.Base.ToString()));
+            //TODO: USER DEFINED CONSTS!
+            PreprocessorDirective.defines.Add(new Define("__base__", new StringGroup(HASMBase.Base.ToString())));
 
             var result = RecursiveParse(fileName);
 
@@ -116,9 +117,11 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             List<StringGroup> stringGroups = getLinesFunc(fileName);
 
             int index = -1;
-            foreach (var group in stringGroups)
+            for(int i = 0; i < stringGroups.Count; i++)
             {
-                if(group.IsSingleLine && !group.IsMultilineDefine)
+                StringGroup group = stringGroups[i];
+
+                if(!group.IsSingleLine && !group.IsMultilineDefine)
                     return new PreprocessorParseResult(null, new ParseError(ParseErrorType.Preprcessor_MultilineNonDefinesAreNotAllowed, index, fileName));
 
                 if(group.IsMultilineDefine)
@@ -162,15 +165,19 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                             if (string.IsNullOrWhiteSpace(line))
                                 continue;
 
-                            ParseError parseError = Define.ResolveDefines(defines, ref line, index, fileName);
+                            ParseError parseError = Define.ResolveDefines(defines, ref group, index, fileName);
                             if (parseError != null) return new PreprocessorParseResult(null, parseError);
-                            result.Add(new SourceLine(line, index, fileName));
+
+                            group.Strings.ForEach(p =>
+                            {
+                                result.Add(new SourceLine(p, index, fileName));
+                            });
                         }
                     }
                 }
                 else
                 {
-
+                    //STUB
                 }
             }
             return new PreprocessorParseResult(result, null);

@@ -31,10 +31,11 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
         public static ParseError ResolveDefines(List<Define> defines, ref StringGroup group, int index, string fileName)
         {
+            string plainText = group.ToString();
             foreach (Define define in defines)
             {
-                var matches = define.FindRegex.Matches(line);
-                var commentIndex = line.IndexOf(';');
+                var matches = define.FindRegex.Matches(plainText);
+                var commentIndex = plainText.IndexOf(';');
 
                 if (matches.Count != 0)
                 {
@@ -52,16 +53,16 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
                         if (define.IsParametric)
                         {
-                            Match parametricMatch = ParametricDefine.ParametricUsageRegex.Match(line);
+                            Match parametricMatch = ParametricDefine.ParametricUsageRegex.Match(plainText);
                             if (parametricMatch.Success)
                             {
-                                var subStr = line.Substring(parametricMatch.Index, parametricMatch.Length);
-                                line = line.Remove(parametricMatch.Index, parametricMatch.Length);
+                                var subStr = plainText.Substring(parametricMatch.Index, parametricMatch.Length);
+                                plainText = plainText.Remove(parametricMatch.Index, parametricMatch.Length);
 
-                                var newStr = (define as ParametricDefine).Expand(subStr, out ParseError parseError);
+                                var newStr = (define as ParametricDefine).Expand(subStr, out ParseError parseError).ToString();
                                 if (parseError != null) return new ParseError(parseError.Type, index, parametricMatch.Index, fileName);
 
-                                line = line.Insert(parametricMatch.Index, newStr);
+                                plainText = plainText.Insert(parametricMatch.Index, newStr);
                             }
                             else
                             {
@@ -70,12 +71,13 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                         }
                         else
                         {
-                            line = line.Remove(match.Index, match.Length);
-                            //line = line.Insert(match.Index, define.Value);
+                            plainText = plainText.Remove(match.Index, match.Length);
+                            plainText = plainText.Insert(match.Index, define.Value.ToString());
                         }
                     }
                 }
             }
+            group = new StringGroup(plainText.Split('\n'));
             return null;
         }
 

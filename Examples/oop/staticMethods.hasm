@@ -4,26 +4,7 @@
 
 #include "../lib/ide.hasm"
 
-#define _callr_0(resultName, resultType, funcName) \
-    alloc resultName, resultType                   \
-    call funcName                                  \
-    popr resultName                                
-
-#define _call_2(funcName, arg1, arg2)  \
-    pusha arg1                         \
-    pusha arg2                         \
-    call funcName                      \
-    
-#define _callr_2(resultName, resultType, funcName, arg1, arg2) \
-    alloc resultName, resultType                               \
-    pusha arg1                                                 \
-    pusha arg2                                                 \
-    call funcName                                              \
-    popr resultName                                
-
-    
-
-.assembly SomeAssembly
+.assembly SomeAssembly 
 {
     .class Base
     {
@@ -50,10 +31,10 @@
             ldi var1, int_10
             ldi var2, int_20
             
-            _call__2(Output, var1, var2)
+            _call__2(Output, var1, var2) ; Use some ditry macroses to call functions
             _callr_2(addResult, int, AddValues, var1, var2)
+            
             out addResult
-
             
             pass
         }

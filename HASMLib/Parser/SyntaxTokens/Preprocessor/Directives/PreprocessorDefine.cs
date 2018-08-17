@@ -40,7 +40,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                     return;
                 }
 
-                if (parts.Length == 1)
+                if (parts.Length == 1 && input.IsSingleLine)
                 {
                     error = new ParseError(ParseErrorType.Preprocessor_ParametricDefineWithoutExpression);
                     return;
@@ -63,7 +63,39 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                 newDef.Value = value;
                 defines.Add(newDef);
             }
+            else
+            {
 
+                if (!Define.GeneralDefineNameRegex.IsMatch(name))
+                {
+                    error = new ParseError(ParseErrorType.Preprocessor_WrongDefineName);
+                    return;
+                }
+
+                if (defines.Exists(p => p.Name == Name))
+                {
+                    error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
+                    return;
+                }
+
+                if (parts.Length == 1)
+                {
+                    defines.Add(new Define(name));
+
+                }
+                else
+                {
+                    var firstValueLine = string.Join(" ", parts.Skip(1).ToArray());
+                    var group = new StringGroup(firstValueLine);
+                    group.Strings.AddRange(input.Strings.Skip(1));
+
+                    var newDef = new Define(name, group);
+                    var value = newDef.Value;
+                    Define.ResolveDefines(defines, ref value, -1, null);
+                    newDef.Value = value;
+                    defines.Add(newDef);
+                }
+            }
             error = null;
         }
 

@@ -39,5 +39,51 @@
 
 #endif
 
+#define _call__0(funcName)                                      \
+    call funcName                                               \
+
+#define _call__1(funcName, arg1)                                \
+    pusha arg1                                                  \
+    call funcName                                               \
+    
+#define _call__2(funcName, arg1, arg2)                          \
+    pusha arg1                                                  \
+    pusha arg2                                                  \
+    call funcName                                               \
+    
+#define _call__3(funcName, arg1, arg2, arg3)                    \
+    pusha arg1                                                  \
+    pusha arg2                                                  \   
+    pusha arg3                                                  \
+    call funcName                                               \
+    
+#define _callr_0(resultName, resultType, funcName)              \
+    alloc resultName, resultType                                \
+    pusha arg1                                                  \
+    pusha arg2                                                  \
+    call funcName                                               \
+    popr resultName                                             \
+    
+#define _callr_1(resultName, resultType, funcName, arg1)        \
+    alloc resultName, resultType                                \
+    pusha arg1                                                  \
+    pusha arg2                                                  \
+    call funcName                                               \
+    popr resultName                                             \
+    
+#define _callr_2(resultName, resultType, funcName, arg1, arg2)  \
+    alloc resultName, resultType                                \
+    pusha arg1                                                  \
+    pusha arg2                                                  \
+    call funcName                                               \
+    popr resultName                                             \
+    
+#define _callr_3(resultName, resultType, funcName, arg1, arg2, arg3) \
+    alloc resultName, resultType                                     \
+    pusha arg1                                                       \
+    pusha arg2                                                       \
+    pusha arg3                                                       \
+    call funcName                                                    \
+    popr resultName                                                  \
 
 #endif

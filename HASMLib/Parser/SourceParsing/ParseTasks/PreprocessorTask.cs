@@ -32,11 +32,11 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             foreach (var line in rawLines)
             {
-                if (line.Last() == MultilineSymbol)
+                if (!string.IsNullOrEmpty(line) && line.Last() == MultilineSymbol)
                 {
                     if (lastWasMultilineMarked)
                         result.Last().Add(line.TrimEnd(MultilineSymbol));
-                    else result.Add(new StringGroup(line));
+                    else result.Add(new StringGroup(line.TrimEnd(MultilineSymbol)));
 
                     lastWasMultilineMarked = true;
                 }

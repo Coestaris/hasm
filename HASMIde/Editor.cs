@@ -43,7 +43,7 @@ namespace HASM
                 BannedFeatures = workingFolder.CompileConfig.BannedFeatures,
                 UserDefinedDefines = workingFolder.CompileConfig.Defines
                     .FindAll(p => !string.IsNullOrEmpty(p.Name))
-                    .Select(p => new HASMLib.Parser.SyntaxTokens.Preprocessor.Define(p.Name, p.Value))
+                    .Select(p => new HASMLib.Parser.SyntaxTokens.Preprocessor.Define(p.Name, new HASMLib.Parser.SyntaxTokens.Preprocessor.StringGroup(p.Value)))
                     .ToList()
             };
 
