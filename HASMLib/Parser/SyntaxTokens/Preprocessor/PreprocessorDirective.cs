@@ -1,7 +1,7 @@
 ﻿using HASMLib.Core;
 using HASMLib.Parser.Preprocessor;
-using HASMLib.Parser.SourceParsing;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
+using HASMLib.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,12 +12,15 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     public abstract class PreprocessorDirective
     {
+        private const char DirectiveBeginChar = '#';
+
         private static Regex GeneralPreprocessorRegex = new Regex(@"^#[^#]{1,}$");
         private static List<PreprocessorDirective> _preprocessorDirectives;
         private static Func<string, List<StringGroup>> getLinesFunc;
         private static string workingDirectory;
         private static Stack<bool> enableStack;
-        private static List<Define> defines;
+        internal static List<Define> defines;
+        private static Cache Cache;
 
         public bool CanAddNewLines { get; protected set; }
         public string Name { get; protected set; }
@@ -29,16 +32,19 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             if (match.Success)
                 input = input.Remove(match.Index, match.Length);
 
-            return input.TrimStart('#').Remove(0, Name.Length).Trim(' ', '\t', '\r');
+            return input.TrimStart(DirectiveBeginChar).Remove(0, Name.Length).Trim(
+                SourceLine.StringCleanUpChars);
         }
 
         public static bool IsPreprocessorLine(string line)
         {
-            return line.StartsWith("#");
+            return line.StartsWith(DirectiveBeginChar.ToString());
         }
 
-        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<StringGroup>> GetLinesFunc, List<Define> defines)
+        public static List<SourceLine> RecursiveParse(string fileName, string WorkingDirectory, out ParseError error, Func<string, List<StringGroup>> GetLinesFunc, List<Define> defines, Cache cache)
         {
+            Cache = cache;
+
             getLinesFunc = GetLinesFunc ?? throw new ArgumentNullException(nameof(GetLinesFunc));
             workingDirectory = WorkingDirectory;
             enableStack = new Stack<bool>();
@@ -65,7 +71,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             }
 
             //Удаляем шарп с начала строки
-            input = input.TrimStart('#');
+            input = input.TrimStart(DirectiveBeginChar);
             string directiveName = input.Split(' ')[0];
 
             foreach (var item in PreprocessorDirectives)
@@ -105,13 +111,22 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
             var result = new List<SourceLine>();
 
             if (!File.Exists(fileName))
-                fileName = Path.Combine(workingDirectory, fileName);
+                fileName = new FileInfo(Path.Combine(workingDirectory, fileName)).FullName;
 
             if (!File.Exists(fileName))
             {
                 return new PreprocessorParseResult(
                     null,
                     new ParseError(ParseErrorType.IO_UnabletoFindSpecifiedFile, -1, fileName));
+            }
+
+            if(Cache.FileCache.ContainsKey(fileName))
+            {
+                FileCache cache = Cache.FileCache[fileName];
+                if (cache.CompiledDefines != null)
+                    defines.AddRange(cache.CompiledDefines);
+
+                return new PreprocessorParseResult(new List<SourceLine>(), null);
             }
 
             List<StringGroup> stringGroups = getLinesFunc(fileName);

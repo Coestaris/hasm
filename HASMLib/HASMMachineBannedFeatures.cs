@@ -9,6 +9,6 @@ namespace HASMLib
         Keywords = 0x2,
         Comments = 0x4,
         MultipleInstructionsPerLine = 0x8,
-        Classes = 0x10,
+        FileWithoutClasses = 0x10,
     }
 }

@@ -502,6 +502,12 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerRun()
         {
+            if (source.Assembly == null)
+            {
+                InnerEnd();
+                return;
+            }
+
             foreach (var function in source.Assembly.AllFunctions)
             {
                 if (!function.IsStatic)

@@ -65,6 +65,11 @@ namespace HASMLib.Runtime.Structures
             return obj is TypeReference _ref && _ref == this;
         }
 
+        public override int GetHashCode()
+        {
+            return 494236115 + UniqueID.GetHashCode();
+        }
+
         public TypeReference(ArrayType arrayType, Assembly assembly)
         {
             Type = TypeReferenceType.Integer;

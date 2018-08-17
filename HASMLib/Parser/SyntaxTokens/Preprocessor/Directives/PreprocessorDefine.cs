@@ -81,7 +81,6 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
                 if (parts.Length == 1)
                 {
                     defines.Add(new Define(name));
-
                 }
                 else
                 {
@@ -106,76 +105,3 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
         }
     }
 }
-
-
-/*
- * 
- *    string strInput = ClearInput(input.AsSingleLine());
-                if (string.IsNullOrEmpty(strInput))
-                {
-                    error = new ParseError(ParseErrorType.Preprocessor_NameExpected);
-                    return;
-                }
-
-                string[] parts = strInput.Split(' ');
-                string name = parts[0];
-
-                if (name.Contains('(') || name.Contains(')') || name.Contains(','))
-                {
-                    if (!ParametricDefine.ParametricDefineRegex.IsMatch(name))
-                    {
-                        error = new ParseError(ParseErrorType.Preprocessor_WrongParametricDefineFormat);
-                        return;
-                    }
-
-                    if (parts.Length == 1)
-                    {
-                        error = new ParseError(ParseErrorType.Preprocessor_ParametricDefineWithoutExpression);
-                        return;
-                    }
-
-                    var newDef = new ParametricDefine(name, string.Join(" ", parts.Skip(1)));
-
-                    if (defines.Exists(p => p.Name == newDef.Name))
-                    {
-                        error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
-                        return;
-                    }
-
-                    var value = newDef.Value;
-                    Define.ResolveDefines(defines, ref value, -1, null);
-                    newDef.Value = value;
-                    defines.Add(newDef);
-
-                    error = null;
-                    return;
-                }
-
-                if (!Define.GeneralDefineNameRegex.IsMatch(name))
-                {
-                    error = new ParseError(ParseErrorType.Preprocessor_WrongDefineName);
-                    return;
-                }
-
-                if (defines.Exists(p => p.Name == Name))
-                {
-                    error = new ParseError(ParseErrorType.Preprocessor_DefineNameAlreadyExists);
-                    return;
-                }
-
-                if (parts.Length == 1)
-                {
-                    defines.Add(new Define(name));
-
-                }
-                else
-                {
-                    var newDef = new Define(name, string.Join(" ", parts.Skip(1)));
-                    var value = newDef.Value;
-                    Define.ResolveDefines(defines, ref value, -1, null);
-                    newDef.Value = value;
-                    defines.Add(newDef);
-                }
- * 
- * 
- * */

@@ -11,8 +11,6 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
     internal class PreprocessorIf : PreprocessorDirective
     {
         public static bool AllowDefinedFunction = false;
-        public static List<Define> defines;
-
 
         public PreprocessorIf()
         {
@@ -29,7 +27,6 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
             }
 
             AllowDefinedFunction = true;
-            PreprocessorIf.defines = defines;
 
             string strInput = input.AsSingleLine();
             strInput = ClearInput(strInput);

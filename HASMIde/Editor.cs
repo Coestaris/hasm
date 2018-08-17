@@ -26,31 +26,16 @@ namespace HASM
 
         public static Editor Self;
         private OutputType outputType;
-        private WorkingFolder workingFolder;
+        internal WorkingFolder workingFolder;
         private FileNode selectedNode = null;
         private Thread runThread;
         private List<Integer> Output;
         private List<ParseTask> Tasks;
+        internal HASMMachine Machine;
 
         public void Run(string FileName)
         {
-            HASMMachine machine = new HASMMachine(
-                (uint)workingFolder.CompileConfig.RAM, 
-                (uint)workingFolder.CompileConfig.EEPROM, 
-                (uint)workingFolder.CompileConfig.Flash,
-                workingFolder.CompileConfig.Base)
-            {
-                BannedFeatures = workingFolder.CompileConfig.BannedFeatures,
-                UserDefinedDefines = workingFolder.CompileConfig.Defines
-                    .FindAll(p => !string.IsNullOrEmpty(p.Name))
-                    .Select(p => new HASMLib.Parser.SyntaxTokens.Preprocessor.Define(p.Name, new HASMLib.Parser.SyntaxTokens.Preprocessor.StringGroup(p.Value)))
-                    .ToList()
-            };
-
-            machine.SetRegisters(workingFolder.CompileConfig.RegisterNameFormat, (uint)workingFolder.CompileConfig.RegisterCount);
-            
-            HASMSource source = new HASMSource(machine, new FileInfo(FileName), null);
-
+            HASMSource source = new HASMSource(Machine, new FileInfo(FileName), null);
             loadingCircle1.Visible = true;
             tabControl1.Enabled = false;
             stopToolStripMenuItem.Enabled = true;
@@ -60,6 +45,27 @@ namespace HASM
             parser.AsyncTaskСhanged += Parser_AsyncTaskChanged;
 
             parser.RunAsync();
+        }
+
+        private void RebuildCache()
+        {
+            DateTime startTime = DateTime.Now;
+            Machine.Cache.ClearCache();
+            var buildCacheResult = Machine.Cache.BuildCache();
+            if (buildCacheResult != null)
+            {
+                toolStripLabel1.Text = "Cache build failed";
+                MessageBox.Show("Building cache failed, please do something with it! Error: " + buildCacheResult,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                toolStripLabel1.Text = $"Cache built in {Formatter.ToPrettyFormat(DateTime.Now - startTime)}" +
+                    $". PDefs: {(Machine.Cache.FileCache.Values.Sum(p => p.CompiledDefines.Count(j => j is HASMLib.Parser.SyntaxTokens.Preprocessor.ParametricDefine)))}" +
+                    $". Defs: {(Machine.Cache.FileCache.Values.Sum(p => p.CompiledDefines.Count(j => !(j is HASMLib.Parser.SyntaxTokens.Preprocessor.ParametricDefine))))}" +
+                    $". Classes: {(Machine.Cache.FileCache.Values.Sum(p => p.CompiledClasses.Count()))}";
+            }
+
         }
 
         private void Parser_AsyncTaskChanged(ParseTaskRunner runner, HASMSource Source)
@@ -373,14 +379,6 @@ namespace HASM
                 UserConfig.ToFile(workingFolder.UserConfigPath, workingFolder.UserConfig);
             }
 
-            if (workingFolder.UserConfig.OpenedTabs != null)
-            {
-                foreach (string path in workingFolder.UserConfig.OpenedTabs)
-                {
-                    AddTab(path);
-                }
-            }
-
             if (File.Exists(workingFolder.CompileConfigPath))
             {
                 workingFolder.CompileConfig = CompileConfig.FromFile(workingFolder.CompileConfigPath);
@@ -393,6 +391,50 @@ namespace HASM
                     FileName = workingFolder.CompileConfigPath
                 };
                 CompileConfig.ToFile(workingFolder.CompileConfigPath, workingFolder.CompileConfig);
+            }
+
+            Machine = new HASMMachine(
+                (uint)workingFolder.CompileConfig.RAM,
+                (uint)workingFolder.CompileConfig.EEPROM,
+                (uint)workingFolder.CompileConfig.Flash,
+                workingFolder.CompileConfig.Base)
+            {
+                BannedFeatures = workingFolder.CompileConfig.BannedFeatures,
+                UserDefinedDefines = workingFolder.CompileConfig.Defines
+                    .FindAll(p => !string.IsNullOrEmpty(p.Name))
+                    .Select(p => new HASMLib.Parser.SyntaxTokens.Preprocessor.Define(p.Name, new HASMLib.Parser.SyntaxTokens.Preprocessor.StringGroup(p.Value)))
+                    .ToList()
+            };
+            Machine.SetRegisters(workingFolder.CompileConfig.RegisterNameFormat, (uint)workingFolder.CompileConfig.RegisterCount);
+            foreach (var path in workingFolder.CompileConfig.IncludePaths)
+            {
+                string value = path.Split(',')[0];
+                string pattern = path.Split(',')[1];
+
+                if (Directory.Exists(value))
+                    Machine.Cache.AddFileNames(value, pattern);
+
+                else 
+                {
+                    value = workingFolder.Path + value;
+                    if (Directory.Exists(value))
+                        Machine.Cache.AddFileNames(value, pattern);
+
+                    else
+                    {
+                        MessageBox.Show($"Unable to directory file {value}",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        continue;
+                    }
+                }
+            }
+            RebuildCache();
+            if (workingFolder.UserConfig.OpenedTabs != null)
+            {
+                foreach (string path in workingFolder.UserConfig.OpenedTabs)
+                {
+                    AddTab(path);
+                }
             }
 
             workingFolder.SetTreeView(treeView1);
@@ -964,6 +1006,11 @@ namespace HASM
             workingFolder.SaveUser();
 
             OutputToTextBox();
+        }
+
+        private void toolStripMenuItem7_Click_1(object sender, EventArgs e)
+        {
+            RebuildCache();
         }
     }
 }

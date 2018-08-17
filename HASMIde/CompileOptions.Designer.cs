@@ -48,12 +48,14 @@
             this.textBox_registerCount = new System.Windows.Forms.TextBox();
             this.label_base = new System.Windows.Forms.Label();
             this.comboBox_base = new System.Windows.Forms.ComboBox();
+            this.richTextBox_incPath = new System.Windows.Forms.RichTextBox();
+            this.label_incPath = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // button_ok
             // 
-            this.button_ok.Location = new System.Drawing.Point(364, 351);
+            this.button_ok.Location = new System.Drawing.Point(353, 382);
             this.button_ok.Name = "button_ok";
             this.button_ok.Size = new System.Drawing.Size(75, 23);
             this.button_ok.TabIndex = 0;
@@ -63,7 +65,7 @@
             // 
             // button_cancel
             // 
-            this.button_cancel.Location = new System.Drawing.Point(283, 351);
+            this.button_cancel.Location = new System.Drawing.Point(272, 382);
             this.button_cancel.Name = "button_cancel";
             this.button_cancel.Size = new System.Drawing.Size(75, 23);
             this.button_cancel.TabIndex = 1;
@@ -74,9 +76,9 @@
             // checkedListBox_bf
             // 
             this.checkedListBox_bf.FormattingEnabled = true;
-            this.checkedListBox_bf.Location = new System.Drawing.Point(113, 102);
+            this.checkedListBox_bf.Location = new System.Drawing.Point(113, 103);
             this.checkedListBox_bf.Name = "checkedListBox_bf";
-            this.checkedListBox_bf.Size = new System.Drawing.Size(176, 109);
+            this.checkedListBox_bf.Size = new System.Drawing.Size(315, 64);
             this.checkedListBox_bf.TabIndex = 2;
             // 
             // label1
@@ -130,7 +132,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(19, 102);
+            this.label4.Location = new System.Drawing.Point(19, 103);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(88, 13);
             this.label4.TabIndex = 9;
@@ -139,7 +141,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(19, 217);
+            this.label5.Location = new System.Drawing.Point(20, 265);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(43, 13);
             this.label5.TabIndex = 11;
@@ -151,9 +153,9 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Name,
             this.Value});
-            this.dataGridView1.Location = new System.Drawing.Point(113, 217);
+            this.dataGridView1.Location = new System.Drawing.Point(113, 265);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(326, 128);
+            this.dataGridView1.Size = new System.Drawing.Size(315, 111);
             this.dataGridView1.TabIndex = 12;
             // 
             // Name
@@ -220,11 +222,30 @@
             this.comboBox_base.TabIndex = 18;
             this.comboBox_base.Text = "8";
             // 
+            // richTextBox_incPath
+            // 
+            this.richTextBox_incPath.Location = new System.Drawing.Point(113, 173);
+            this.richTextBox_incPath.Name = "richTextBox_incPath";
+            this.richTextBox_incPath.Size = new System.Drawing.Size(315, 86);
+            this.richTextBox_incPath.TabIndex = 19;
+            this.richTextBox_incPath.Text = "";
+            // 
+            // label_incPath
+            // 
+            this.label_incPath.AutoSize = true;
+            this.label_incPath.Location = new System.Drawing.Point(20, 176);
+            this.label_incPath.Name = "label_incPath";
+            this.label_incPath.Size = new System.Drawing.Size(71, 13);
+            this.label_incPath.TabIndex = 20;
+            this.label_incPath.Text = "Include paths";
+            // 
             // CompileOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(448, 386);
+            this.ClientSize = new System.Drawing.Size(442, 417);
+            this.Controls.Add(this.label_incPath);
+            this.Controls.Add(this.richTextBox_incPath);
             this.Controls.Add(this.comboBox_base);
             this.Controls.Add(this.label_base);
             this.Controls.Add(this.textBox_registerCount);
@@ -273,5 +294,7 @@
         private System.Windows.Forms.TextBox textBox_registerCount;
         private System.Windows.Forms.Label label_base;
         private System.Windows.Forms.ComboBox comboBox_base;
+        private System.Windows.Forms.RichTextBox richTextBox_incPath;
+        private System.Windows.Forms.Label label_incPath;
     }
 }

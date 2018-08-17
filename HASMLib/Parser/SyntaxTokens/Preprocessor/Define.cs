@@ -8,6 +8,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         public static Regex GeneralDefineNameRegex = new Regex(@"^\D\w*");
         public static string FindBaseRegex = @"(^{0}(?=\W))|((?<=\W){0}(?=\W))|((?<=\W){0}$)";
 
+        public bool IsFileSpecific;
         public Regex FindRegex { get; private set; }
         public bool IsParametric { get; protected set; }
         public string Name { get; private set; }

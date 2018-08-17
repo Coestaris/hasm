@@ -96,6 +96,7 @@
             this.runToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeAllExceptThisToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.contextMenuStrip_node.SuspendLayout();
@@ -227,6 +228,7 @@
             this.toolStripComboBox1,
             this.stopToolStripMenuItem,
             this.toolStripMenuItem2,
+            this.toolStripMenuItem7,
             this.toolStripSeparator2,
             this.saveCompiledToolStripMenuItem,
             this.loadCompiledToolStripMenuItem,
@@ -658,6 +660,13 @@
             this.closeAllExceptThisToolStripMenuItem.Text = "Close all except this";
             this.closeAllExceptThisToolStripMenuItem.Click += new System.EventHandler(this.closeAllExceptThisToolStripMenuItem_Click);
             // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(181, 22);
+            this.toolStripMenuItem7.Text = "Rebuild Cache";
+            this.toolStripMenuItem7.Click += new System.EventHandler(this.toolStripMenuItem7_Click_1);
+            // 
             // Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -762,6 +771,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_buildLog;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_output;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem7;
     }
 }
 

@@ -151,13 +151,13 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             var block = GetLines(0, lines.Count, lines, out error, null);
             if (error != null) return null;
 
-            if(block.ChildBlocks.Count == 0 && !source.Machine.BannedFeatures.HasFlag(HASMMachineBannedFeatures.Classes))
+            if(block.ChildBlocks.Count == 0 && source.Machine.BannedFeatures.HasFlag(HASMMachineBannedFeatures.FileWithoutClasses))
             {
                 error = new ParseError(ParseErrorType.Other_DocumentWithNoParentClassIsNotAllowed);
                 return null;
             }
 
-            if(block.RawLines.Count != 0 && !source.Machine.BannedFeatures.HasFlag(HASMMachineBannedFeatures.Classes))
+            if(block.RawLines.Count != 0 && source.Machine.BannedFeatures.HasFlag(HASMMachineBannedFeatures.FileWithoutClasses))
             {
                 error = new ParseError(ParseErrorType.Other_InstructionsInRootOfDocumentIsNotAllowed);
                 return null;

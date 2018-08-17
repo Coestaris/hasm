@@ -30,6 +30,8 @@ namespace HASM
 
         public int Base;
 
+        public List<string> IncludePaths;
+
         public CompileConfig(int rAM, int flash, int eEPROM, HASMMachineBannedFeatures bannedFeatures, List<Define> defines)
         {
             RAM = rAM;

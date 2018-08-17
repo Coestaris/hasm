@@ -1,8 +1,5 @@
-﻿using HASMLib.Core;
-using HASMLib.Core.BaseTypes;
-using HASMLib.Core.MemoryZone;
+﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Parser;
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 

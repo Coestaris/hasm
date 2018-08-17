@@ -81,7 +81,6 @@ namespace HASM
         private ParseError ParseError;
         private string Directory;
         private ParseTaskRunner TaskRunner;
-        private HASMMachine Machine;
 
         public bool IsChanged = false;
         public string DisplayName;
@@ -89,6 +88,7 @@ namespace HASM
         public FastColoredTextBox TextBox;
         public int HighlightedLine = -1;
         private ToolStripLabel toolStripLabel;
+        private Editor Parrent;
 
         private static void InitPlatformSpecificRegexes()
         {
@@ -159,6 +159,7 @@ namespace HASM
         
         public TextEditor(string path, Control parent)
         {
+            Parrent = parent as Editor;
             if (!File.Exists(path))
             {
                 MessageBox.Show($"Unable to find file {path}");
@@ -177,8 +178,7 @@ namespace HASM
                 
             };
 
-            Machine = new HASMMachine(0xFFFF, 0xFFFF, 0xFFFF);
-            HASMSource source = new HASMSource(Machine, TextBox.Text);
+            HASMSource source = new HASMSource(Parrent.Machine, TextBox.Text);
             TaskRunner = new ParseTaskRunner(source);
 
             InitPlatformSpecificRegexes();
@@ -212,7 +212,7 @@ namespace HASM
             Path = path;
 
             Controls.Add(TextBox);
-            toolStripLabel = (parent as Editor).toolStripLabel1;
+            toolStripLabel = Parrent.toolStripLabel1;
         }
 
         private void OutputText(string text)
@@ -254,7 +254,7 @@ namespace HASM
 
         private void TextBox_TextChangedDelayed(object sender, TextChangedEventArgs e)
         {
-            TaskRunner.Source = new HASMSource(Machine, TextBox.Text, Directory);
+            TaskRunner.Source = new HASMSource(Parrent.Machine, TextBox.Text, Directory);
             TaskRunner.Run();
             if (TaskRunner.Status == ParseTaskStatus.Failed)
             {
@@ -287,13 +287,10 @@ namespace HASM
             }
 
             OutputText("");
+            System.Console.WriteLine("Compiled!");
+
             ErrorString = null;
             ParseError = null;
-
-            Regex classNames = CreateRegex(TaskRunner.Source.Assembly.AllClasses.Select(p => p.Name));
-            Regex functionNames = CreateRegex(TaskRunner.Source.Assembly.AllFunctions.Select(p => p.Name));
-            Regex fieldNames = CreateRegex(TaskRunner.Source.Assembly.AllFields.Select(p => p.Name));
-            System.Console.WriteLine("Delayed");
 
             TextBox.Range.ClearStyle(StyleIndex.All);
 
@@ -306,11 +303,18 @@ namespace HASM
             TextBox.Range.SetStyle(KeywordStyle, KeywordRegex);
             TextBox.Range.SetStyle(BaseTypesNameStyle, BaseTypeRegex);
 
-            TextBox.Range.SetStyle(AssemblyNameStyle, TaskRunner.Source.Assembly.Name);
 
-            TextBox.Range.SetStyle(ClassNameStyle, classNames);
-            TextBox.Range.SetStyle(FunctionNameStyle, functionNames);
-            TextBox.Range.SetStyle(FieldNameStyle, fieldNames);
+            if (TaskRunner.Source.Assembly != null)
+            {
+                Regex classNames = CreateRegex(TaskRunner.Source.Assembly.AllClasses.Select(p => p.Name));
+                Regex functionNames = CreateRegex(TaskRunner.Source.Assembly.AllFunctions.Select(p => p.Name));
+                Regex fieldNames = CreateRegex(TaskRunner.Source.Assembly.AllFields.Select(p => p.Name));
+
+                TextBox.Range.SetStyle(AssemblyNameStyle, TaskRunner.Source.Assembly.Name);
+                TextBox.Range.SetStyle(ClassNameStyle, classNames);
+                TextBox.Range.SetStyle(FunctionNameStyle, functionNames);
+                TextBox.Range.SetStyle(FieldNameStyle, fieldNames);
+            }
 
             TextBox.Range.SetStyle(StringStyle, String1Regex);
             TextBox.Range.SetStyle(StringStyle, String2Regex);

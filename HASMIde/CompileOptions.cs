@@ -18,6 +18,7 @@ namespace HASM
             textBox_eeprom.Text = cfg.EEPROM.ToString();
             textBox_registerCount.Text = cfg.RegisterCount.ToString();
             textBox_registerNameFormat.Text = cfg.RegisterNameFormat;
+            richTextBox_incPath.Text = string.Join("\n", cfg.IncludePaths);
             comboBox_base.Text = cfg.Base.ToString();
 
             checkedListBox_bf.Items.Clear();
@@ -55,6 +56,9 @@ namespace HASM
 
         private void button_ok_Click(object sender, EventArgs e)
         {
+            config.IncludePaths = new List<string>();
+            config.IncludePaths.AddRange(richTextBox_incPath.Text.Split('\n'));
+
             config.EEPROM = int.Parse(textBox_eeprom.Text);
             config.Flash = int.Parse(textBox_flash.Text);
             config.RAM = int.Parse(textBox_ram.Text);

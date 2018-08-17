@@ -217,7 +217,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             }
 
             source._parentBlock = null;
-            source.Assembly =  new Assembly(structures[0]);
+            if(structures != null && structures.Count != 0)
+                source.Assembly =  new Assembly(structures[0]);
+
             InnerEnd();
         }
     }

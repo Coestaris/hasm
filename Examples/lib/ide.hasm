@@ -86,4 +86,56 @@
     call funcName                                                    \
     popr resultName                                                  \
 
+
+#define ocall__1(objName, funcName, arg1)                       \
+    pusho objName                                               \
+    pusha arg1                                                  \
+    call funcName                                               \
+    
+#define ocall__2(objName, funcName, arg1, arg2)                 \
+    pusho objName                                               \
+    pusha arg1                                                  \
+    pusha arg2                                                  \
+    call funcName                                               \
+    
+#define ocall__3(objName, funcName, arg1, arg2, arg3)           \
+    pusho objName                                               \    
+    pusha arg1                                                  \
+    pusha arg2                                                  \   
+    pusha arg3                                                  \
+    call funcName                                               \
+    
+#define ocallr_0(objName, resultName, resultType, funcName)     \
+    pusho objName                                               \    
+    alloc resultName, resultType                                \
+    pusha arg1                                                  \
+    pusha arg2                                                  \
+    call funcName                                               \
+    popr resultName                                             \
+    
+#define ocallr_1(objName, resultName, resultType, funcName, arg1) \
+    pusho objName                                                 \    
+    alloc resultName, resultType                                  \
+    pusha arg1                                                    \
+    pusha arg2                                                    \
+    call funcName                                                 \
+    popr resultName                                               \
+    
+#define ocallr_2(objName, resultName, resultType, funcName, arg1, arg2) \
+    pusho objName                                                       \    
+    alloc resultName, resultType                                        \
+    pusha arg1                                                          \
+    pusha arg2                                                          \
+    call funcName                                                       \
+    popr resultName                                                     \
+    
+#define ocallr_3(objName, resultName, resultType, funcName, arg1, arg2, arg3) \
+    pusho objName                                                             \    
+    alloc resultName, resultType                                              \
+    pusha arg1                                                                \
+    pusha arg2                                                                \
+    pusha arg3                                                                \
+    call funcName                                                             \
+    popr resultName                                                           \
+    
 #endif

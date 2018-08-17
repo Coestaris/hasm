@@ -1,11 +1,13 @@
 ﻿using HASMLib.Core;
 using HASMLib.Parser.SyntaxTokens.Preprocessor;
 using HASMLib.Runtime;
+using HASMLib.Storage;
 using System;
 using System.Collections.Generic;
 
 namespace HASMLib
 {
+
     public class HASMMachine
     {
         public UInt32 RegisterCount { get; set; }
@@ -16,10 +18,13 @@ namespace HASMLib
         public List<Define> UserDefinedDefines { get; set; }
         public HASMMachineBannedFeatures BannedFeatures { get; set; }
 
+        public Cache Cache { get; private set; }
+
         private string _registerNameFormat;
 
         public HASMMachine(uint ram, uint eeprom, uint flash, int hasmBase = 8)
         {
+            Cache = new Cache(this);
             SetBase(hasmBase);
 
             RAM = ram;

@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Storage\Cache.cs" />
     <Compile Include="Core\BaseTypes\Array.cs" />
     <Compile Include="Core\BaseTypes\ArrayType.cs" />
     <Compile Include="Core\BaseTypes\BaseIntegerType.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Core\MemZone\FlashElementType.cs" />
     <Compile Include="Core\MemZone\FlashElementVariable.cs" />
     <Compile Include="Core\MemZone\Variable.cs" />
+    <Compile Include="Storage\FileCache.cs" />
     <Compile Include="HASMMachine.cs" />
     <Compile Include="HASMMachineBannedFeatures.cs" />
     <Compile Include="HASMSource.cs" />

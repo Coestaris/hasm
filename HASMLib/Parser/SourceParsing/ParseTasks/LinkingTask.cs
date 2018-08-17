@@ -117,6 +117,12 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerRun()
         {
+            if(source.Assembly == null)
+            {
+                InnerEnd();
+                return;
+            }
+
             classID = 1;
             fieldID = 0;
             functionID = 0;
