@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
-    public class StringGroup
+    public class StringGroup : ICloneable
     {
         public bool IsEmpty => Strings == null;
 
@@ -42,6 +43,11 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         public override string ToString()
         {
             return string.Join("\n", Strings);
+        }
+
+        public object Clone()
+        {
+            return new StringGroup(Strings.Select(p => p.Clone()).Cast<string>());
         }
     }
 }

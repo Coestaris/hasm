@@ -1,0 +1,35 @@
+;
+; Пример простого вызова функции
+;
+
+#include "../lib/ide.hasm"
+
+.assembly SomeAssembly 
+{
+    .class Base
+    {
+        .field(public, static, type:int) Field1
+        .field(public, static, type:long) Field2
+        
+        .function(public, entrypoint, static, ret:void) main
+        {
+            ; Example how to set end read static properties
+            
+            ialloc(var1, int, int_10)   ;
+            _fset(Field1, var1)         ; Macro style
+            _fget(Field1, output1, int) ;
+            out output1                 ;
+            
+            
+            alloc var2, long            ; 
+            ldi var2, ulong_20          ;
+            setv Field2, var2           ;
+            alloc output2, long         ; Instruction style
+            getv Field2                 ;
+            popr output2                ;
+            out output2                 ;
+            
+            pass
+        }
+    }
+}

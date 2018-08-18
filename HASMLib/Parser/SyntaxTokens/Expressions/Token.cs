@@ -1,6 +1,7 @@
 ﻿using HASMLib.Core.MemoryZone;
 using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
+using HASMLib.Parser.SyntaxTokens.Preprocessor;
 using HASMLib.Parser.SyntaxTokens.Preprocessor.Directives;
 using HASMLib.Runtime;
 using System;
@@ -365,24 +366,33 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
             if (_referenceSet && Reference.Type == ReferenceType.Define)
             {
-                return new Constant(PreprocessorIf.defines.Exists(p => p.Name == RawValue));
+                return new Constant(PreprocessorDirective.defines.Exists(p => p.Name == RawValue));
             }
 
             if (_referenceSet && package != null)
             {
-                switch (Reference.Object.Type)
+                if (Reference.Type == ReferenceType.Variable)
                 {
-                    case FlashElementType.Variable:
-                        return new Constant(package.GetVariable((Reference.Object as FlashElementVariable).Index));
-                    case FlashElementType.Constant:
-                        return (Reference.Object as FlashElementConstant).ToConstant();
-                    case FlashElementType.Instruction:
-                    case FlashElementType.Expression:
-                    case FlashElementType.Undefined:
-                    default:
-                        throw new Exception("Wrong reference object!");
-                }
+                    var variable = package.GetVariable(Reference.Index);
+                    if(variable.Value.Type.Type != Runtime.Structures.TypeReferenceType.Integer)
+                        throw new Exception("Wrong object type!");
 
+                    return new Constant(variable.Value.IntegerValue);
+                }
+                else
+                {
+                    switch (Reference.Object.Type)
+                    {
+                        case FlashElementType.Constant:
+                            return (Reference.Object as FlashElementConstant).ToConstant();
+                        case FlashElementType.Variable:
+                        case FlashElementType.Instruction:
+                        case FlashElementType.Expression:
+                        case FlashElementType.Undefined:
+                        default:
+                            throw new Exception("Wrong reference object!");
+                    }
+                }
             }
             else
             {

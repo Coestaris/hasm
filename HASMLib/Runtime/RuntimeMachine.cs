@@ -139,7 +139,10 @@ namespace HASMLib.Runtime
             CallStackItem csi = new CallStackItem(function, (Integer)0);
 
             if (!function.IsStatic && !function.IsEntryPoint)
-                csi.Locals.Add(new Variable(_source.Machine.MemZone.ObjectStackItem, localVarCounter += (Integer)1));
+            {
+                csi.Locals.Add(new Variable(_source.Machine.MemZone.ObjectStackItem, localVarCounter));
+                localVarCounter += (Integer)1;
+            }
 
             foreach (var parameter in function.Parameters)
             {

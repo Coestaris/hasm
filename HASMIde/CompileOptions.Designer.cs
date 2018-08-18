@@ -215,7 +215,9 @@
             this.comboBox_base.Items.AddRange(new object[] {
             "8",
             "12",
-            "16"});
+            "16",
+            "32",
+            "64"});
             this.comboBox_base.Location = new System.Drawing.Point(327, 68);
             this.comboBox_base.Name = "comboBox_base";
             this.comboBox_base.Size = new System.Drawing.Size(101, 21);

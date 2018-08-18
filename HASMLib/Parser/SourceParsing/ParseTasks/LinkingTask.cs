@@ -65,12 +65,16 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             foreach (var field in PlainFiledsList)
             {
-                if (fieldNames.Contains(field.FullName))
+                if (fieldNames.Contains(field.Signature))
                 {
                     return new ParseError(ParseErrorType.Directives_FieldWithThatNameAlreadyExists,
                         field.Directive.LineIndex, field.Directive.FileName);
                 }
-                fieldNames.Add(field.FullName);
+                fieldNames.Add(field.Signature);
+
+                if (field.IsStatic)
+                    field.BaseClass.StaticFields.Add(field.UniqueID,
+                        new Runtime.Structures.Object(field.Type));
             }
 
             foreach (var Class in PlainClassesList)

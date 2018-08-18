@@ -47,7 +47,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                 return null;
             }
 
-            StringGroup expanded = Value;
+            StringGroup expanded = (StringGroup)Value.Clone();
             for(int grCouter = 0; grCouter < expanded.Strings.Count; grCouter++)
             {
                 for (int i = 0; i < parameters.Count; i++)

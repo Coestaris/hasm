@@ -94,8 +94,6 @@ namespace HASMLib.Runtime.Structures.Units
                         {
                             Field field = child as Field;
                             field.BaseClass = this;
-                            if (field.IsStatic)
-                                StaticFields.Add(field.UniqueID, new Object(field.Type));
                             Fields.Add(child as Field);
                         }
                         break;

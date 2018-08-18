@@ -138,4 +138,26 @@
     call funcName                                                             \
     popr resultName                                                           \
     
+#define ialloc(varName, varType, value)              \
+    alloc varName, varType                           \
+    ldi varName, value                               \
+
+#define _fset(fieldName, value)                      \
+    setv fieldName, value                            \
+
+#define ofset(fieldName, objName, value)             \
+    pusho objName                                    \
+    setv fieldName, value                            \    
+
+#define _fget(fieldName, varName, typeName)          \
+    alloc varName, typeName                          \
+    getv fieldName                                   \
+    popr varName                                     \
+
+#define ofget(fieldName, varName, typeName, objName) \
+    alloc varName, typeName                          \    
+    pusho objName                                    \
+    getv fieldName                                   \
+    popr varName                                     \
+    
 #endif
