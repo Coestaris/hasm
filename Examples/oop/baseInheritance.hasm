@@ -20,12 +20,12 @@
         {
             ofget(Name, _locName, string, self)
             out _locName
-            
             pass
         }
         
         .function(public, ret:void, virtual) OutputInfo
         {
+            
             pass
         }
     }
@@ -48,7 +48,6 @@
             
             ocall__0(person, Person.Display)   ; Calling same method for both instances
             ocall__0(employee, Person.Display) ;
-            
             pass
         }
     }
