@@ -7,7 +7,7 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 {
     public class ParametricDefine : Define
     {
-        public static Regex ParametricDefineRegex = new Regex(@"^[A-Za-z_](?:(?!\W)\w)*\(([A-Za-z_](?:(?!\W\s)\w)*(, *?[A-Za-z_](\w)*)*)+\)");
+        public static Regex ParametricDefineRegex = new Regex(@"^[A-Za-z_](?:(?!\W)\w)*\(([A-Za-z_](?:(?!\W\s)\w)*(, *?[A-Za-z_](\w)*)*)+\)", RegexOptions.None, TimeSpan.FromSeconds(1));
         public static Regex ParametricUsageRegex = new Regex(@"[A-Za-z_](?:(?!\W)\w)*\(([^(),]+(, *?[^(),]+)*)+\)");
 
         public List<string> ParameterNames { get; private set; }

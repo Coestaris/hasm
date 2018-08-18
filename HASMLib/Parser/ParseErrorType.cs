@@ -67,5 +67,6 @@
         Syntax_Instruction_UnknownFuncName,
         Other_FunctionMustEndsWithPassOrRet,
         Preprcessor_MultilineNonDefinesAreNotAllowed,
+        Directives_ClassNameExpected,
     }
 }

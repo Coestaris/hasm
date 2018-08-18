@@ -1,0 +1,55 @@
+;
+; Пример простого вызова функции
+;
+
+#include "../lib/ide.hasm"
+
+.assembly BaseInheritance
+{
+    .class Person
+    {
+        .field(public, type:string) Name
+        
+        .constructor(public) Constructor
+        {
+            ofset(Name, self, "Some person\n")
+            pass
+        }
+        
+        .function(public, ret:void) Display
+        {
+            ofget(Name, _locName, string, self)
+            out _locName
+            
+            pass
+        }
+        
+        .function(public, ret:void, virtual) OutputInfo
+        {
+            pass
+        }
+    }
+    
+    .class(extends:Person) Employee
+    {
+        .constructor(public) Constructor
+        {
+            ofset(Name, self, "Employee\n")
+            pass
+        }
+    }
+    
+    .class Program
+    {
+        .function(private, static, entrypoint, ret:void) Main
+        {
+            oalloc_0(person, Person, Person.Constructor)        ; Creating variable person
+            oalloc_0(employee, Employee, Employee.Constructor)  ; Creating variable employee
+            
+            ocall__0(person, Person.Display)   ; Calling same method for both instances
+            ocall__0(employee, Person.Display) ;
+            
+            pass
+        }
+    }
+}

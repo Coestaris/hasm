@@ -1,5 +1,4 @@
-﻿using HASMLib.Core.MemoryZone;
-using HASMLib.Parser;
+﻿using HASMLib.Parser;
 using HASMLib.Parser.SyntaxTokens.Structure;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +14,9 @@ namespace HASMLib.Runtime.Structures.Units
         public const string ParameterKeyword = "param";
         public const string NoReturnableValueKeyword = "void";
 
+        public const string VirtualKeyword = "virtual";
+        public const string OverrideKeyword = "override";
+
         public Class BaseClass;
         public bool HasNoRetValue { get; private set; }
         public TypeReference RetType { get; internal set; }
@@ -23,6 +25,8 @@ namespace HASMLib.Runtime.Structures.Units
         public bool IsConstuctor { get; private set; }
         public bool IsStatic { get; private set; }
         public bool IsEntryPoint { get; private set; }
+        public bool IsOverride { get; private set; }
+        public bool IsVirtual { get; private set; }
 
         internal FunctionCompileCache CompileCache;
         internal FunctionRuntimeCache RuntimeCache;
@@ -65,6 +69,8 @@ namespace HASMLib.Runtime.Structures.Units
                 }
                 else RetType = new TypeReference(retModifier.Value, null);
 
+                if (GetModifier(OverrideKeyword) != null) IsStatic = true;
+                if (GetModifier(VirtualKeyword) != null) IsStatic = true;
                 if (GetModifier(StaticKeyword) != null) IsStatic = true;
                 if (GetModifier(EntryPointKeyword) != null) IsEntryPoint = true;
             }

@@ -34,6 +34,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 {
                     new Modifier(false, false, Class.AbstractKeyword),
                     new Modifier(false, false, Class.SealedKeyword),
+                    new Modifier(false, true, Class.ExtendsKeyword),
                 }
             },
             new StructureRule()
@@ -50,10 +51,13 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 AllowedInnerInstructions = true,
                 Modifiers = new List<Modifier>()
                 {
-                    new Modifier(false, false, Function.StaticKeyword),
+                    new Modifier(false, false, BaseStructure.StaticKeyword),
                     new Modifier(false, false, Function.EntryPointKeyword),
                     new Modifier(true, true, Function.ReturnKeyword),
-                    new Modifier(false, true, Function.ParameterKeyword)
+                    new Modifier(false, true, Function.ParameterKeyword),
+                    
+                    new Modifier(false, false, Function.VirtualKeyword),
+                    new Modifier(false, false, Function.OverrideKeyword)
                 },
             },
             new StructureRule()

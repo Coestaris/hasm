@@ -7,10 +7,10 @@ namespace HASMLib.Core.MemoryZone
     public class FlashElementConstant : FlashElement
     {
         public Integer Index { get; set; }
-        public Integer Value { get; set; }
+        public Constant Value { get; set; }
         public override FlashElementType Type => FlashElementType.Constant;
 
-        public FlashElementConstant(Integer value, Integer index)
+        public FlashElementConstant(Constant value, Integer index)
         {
             Index = index;
             Value = value;
@@ -23,7 +23,7 @@ namespace HASMLib.Core.MemoryZone
 
         public Constant ToConstant()
         {
-            return new Constant(Value);
+            return Value;
         }
 
         public override byte[] ToBytes()
@@ -32,12 +32,13 @@ namespace HASMLib.Core.MemoryZone
             // 2. (n bytes) - const global index
             // 3. (1 byte)  - length: 1 - single, 2 - double, 3 - quad(n)
             // 4. (n bytes) - data
-            List<byte> bytes = new List<byte>();
+            /*List<byte> bytes = new List<byte>();
             bytes.Add(Element_Const);                   // Is Const;
             bytes.AddRange(Index.ToBytes());            // Global Index
             bytes.Add((byte)Value.Type.Base);           // Length of const
             bytes.AddRange(Value.ToBytes());
-            return bytes.ToArray();
+            return bytes.ToArray();*/
+            return null;
         }
 
         public override string ToString()

@@ -28,6 +28,9 @@ namespace HASM
             Class.SealedKeyword,
             Field.TypeKeyword,
 
+            Function.OverrideKeyword,
+            Function.VirtualKeyword,
+
             AccessModifier.Default.ToString().ToLower(),
             AccessModifier.Inner.ToString().ToLower(),
             AccessModifier.Private.ToString().ToLower(),

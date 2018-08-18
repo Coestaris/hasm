@@ -13,7 +13,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
             return (value > type.MaxValue) || ((long)value < type.MinValue);
         }
 
-        public ParseError Parse(string str, out Constant constant)
+        public virtual ParseError Parse(string str, out Constant constant)
         {
             if (str.Contains('_'))
             {

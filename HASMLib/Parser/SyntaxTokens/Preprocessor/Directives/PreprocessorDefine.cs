@@ -34,7 +34,15 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
 
             if (name.Contains('(') || name.Contains(')') || name.Contains(','))
             {
-                if (!ParametricDefine.ParametricDefineRegex.IsMatch(name))
+                try
+                {
+                    if (!ParametricDefine.ParametricDefineRegex.IsMatch(name))
+                    {
+                        error = new ParseError(ParseErrorType.Preprocessor_WrongParametricDefineFormat);
+                        return;
+                    }
+                }
+                catch
                 {
                     error = new ParseError(ParseErrorType.Preprocessor_WrongParametricDefineFormat);
                     return;

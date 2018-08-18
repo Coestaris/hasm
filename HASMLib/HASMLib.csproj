@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Parser\SyntaxTokens\Constants\ConstantStringFormat.cs" />
     <Compile Include="Runtime\Instructions\Instructions\OOP\InstructionCAST.cs" />
     <Compile Include="Storage\Cache.cs" />
     <Compile Include="Core\BaseTypes\Array.cs" />

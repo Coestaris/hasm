@@ -16,7 +16,7 @@ namespace HASMLib.Core.BaseTypes
         public TypeReference BaseType;
         public static Regex ArrayTypeRegex = new Regex(@"array\[\w+\]");
 
-        protected ArrayType(TypeReference type)
+        public ArrayType(TypeReference type)
         {
             BaseType = type;
         }

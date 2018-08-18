@@ -84,8 +84,12 @@
     pusha arg2                                                       \
     pusha arg3                                                       \
     call funcName                                                    \
-    popr resultName                                                  \
+    popr resultName 
 
+#define ocall__0(objName, funcName)                             \
+    pusho objName                                               \
+    call funcName                                               \
+    
 
 #define ocall__1(objName, funcName, arg1)                       \
     pusho objName                                               \
@@ -159,5 +163,31 @@
     pusho objName                                    \
     getv fieldName                                   \
     popr varName                                     \
+    
+#define oalloc_0(varName, typeName, constrName)             \
+    alloc varName, typeName                                 \
+    pusho varName                                           \
+    call constrName                                         \
+
+#define oalloc_1(varName, typeName, constrName, arg1)       \
+    alloc varName, typeName                                 \
+    pusha arg1                                              \
+    pusho varName                                           \
+    call constrName                                         \
+
+#define oalloc_2(varName, typeName, constrName, arg1, arg2) \
+    alloc varName, typeName                                 \
+    pusha arg1                                              \
+    pusha arg2                                              \
+    pusho varName                                           \
+    call constrName                                         \       
+ 
+#define oalloc_3(varName, typeName, constrName, arg1, arg2, arg3) \
+    alloc varName, typeName                                       \
+    pusha arg1                                                    \
+    pusha arg2                                                    \
+    pusha arg3                                                    \
+    pusho varName                                                 \
+    call constrName                                               \ 
     
 #endif

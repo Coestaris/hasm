@@ -12,7 +12,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
 
         protected override ParseError Parse(string str, BaseIntegerType type, out Constant constant)
         {
-            constant = new Constant();
+            constant = new Constant(type);
             ulong value = 0;
 
             try
@@ -27,7 +27,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
             if (CheckMaxValues(value, type))
                 return new ParseError(ParseErrorType.Syntax_Constant_BaseOverflow);
 
-            constant.Value = new Integer(value, type);
+            constant.IntValue = new Integer(value, type);
 
             return null;
         }

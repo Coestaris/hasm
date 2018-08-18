@@ -1,4 +1,5 @@
-﻿using HASMLib.Runtime.Structures.Units;
+﻿using HASMLib.Runtime.Structures;
+using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
 
 namespace HASMLib.Parser.SourceParsing.ParseTasks
@@ -22,18 +23,15 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             {
                 foreach (var parameter in function.Parameters)
                     if (!parameter.Type.CheckClassType(PlainClassesList, source.Assembly))
-                        return new ParseError(ParseErrorType.Directives_WrongTypeReference,
-                            function.Directive.LineIndex, function.Directive.FileName);
+                        return new ParseError(ParseErrorType.Directives_WrongTypeReference, function.Directive);
 
                 if (!function.RetType.CheckClassType(PlainClassesList, source.Assembly))
-                    return new ParseError(ParseErrorType.Directives_WrongTypeReference,
-                        function.Directive.LineIndex, function.Directive.FileName);
+                    return new ParseError(ParseErrorType.Directives_WrongTypeReference, function.Directive);
             }
 
             foreach (var field in PlainFiledsList)
                 if (!field.Type.CheckClassType(PlainClassesList, source.Assembly))
-                    return new ParseError(ParseErrorType.Directives_WrongTypeReference,
-                        field.Directive.LineIndex, field.Directive.FileName);
+                    return new ParseError(ParseErrorType.Directives_WrongTypeReference, field.Directive);
 
             return null;
         }
@@ -48,16 +46,15 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             {
                 if (funcNames.Contains(function.Signature))
                 {
-                    return new ParseError(ParseErrorType.Directives_FunctionWithThatNameAlreadyExists,
-                        function.Directive.LineIndex, function.Directive.FileName);
+                    return new ParseError(ParseErrorType.Directives_FunctionWithThatNameAlreadyExists, function.Directive);
                 }
+
                 funcNames.Add(function.Signature);
 
                 if (function.IsEntryPoint)
                 {
                     if (source.Assembly._entryPoint != null)
-                        return new ParseError(ParseErrorType.Directives_MoreThanOneEntryPointDeclared,
-                        function.Directive.LineIndex, function.Directive.FileName);
+                        return new ParseError(ParseErrorType.Directives_MoreThanOneEntryPointDeclared, function.Directive);
 
                     source.Assembly._entryPoint = function;
                 }
@@ -67,24 +64,38 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             {
                 if (fieldNames.Contains(field.Signature))
                 {
-                    return new ParseError(ParseErrorType.Directives_FieldWithThatNameAlreadyExists,
-                        field.Directive.LineIndex, field.Directive.FileName);
+                    return new ParseError(ParseErrorType.Directives_FieldWithThatNameAlreadyExists, field.Directive);
                 }
+
                 fieldNames.Add(field.Signature);
 
                 if (field.IsStatic)
                     field.BaseClass.StaticFields.Add(field.UniqueID,
-                        new Runtime.Structures.Object(field.Type));
+                        new Object(field.Type));
             }
 
             foreach (var Class in PlainClassesList)
             {
                 if (classNames.Contains(Class.FullName))
                 {
-                    return new ParseError(ParseErrorType.Directives_ClassWithThatNameAlreadyExists,
-                        Class.Directive.LineIndex, Class.Directive.FileName);
+                    return new ParseError(ParseErrorType.Directives_ClassWithThatNameAlreadyExists, Class.Directive);
                 }
                 classNames.Add(Class.FullName);
+
+                var extends = Class.Modifiers.FindAll(p => p.Name == Class.ExtendsKeyword);
+                foreach(var extend in extends)
+                {
+                    var type = new TypeReference(extend.Value, source.Assembly);
+                    if (!type.CheckClassType(PlainClassesList, source.Assembly))
+                        return new ParseError(ParseErrorType.Directives_WrongTypeReference, Class.Directive);
+
+                    if (type.Type != TypeReferenceType.Class)
+                        return new ParseError(ParseErrorType.Directives_ClassNameExpected, Class.Directive);
+
+                    Class.Extends.Add(type.ClassType);
+                    Class.Functions.AddRange(type.ClassType.Functions);
+                    Class.Fields.AddRange(type.ClassType.Fields);
+                }
             }
 
             return null;
@@ -153,8 +164,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
             if (source.Assembly._entryPoint == null)
             {
-                InnerEnd(new ParseError(ParseErrorType.Directives_NoEntryPointFound,
-                        source.Assembly.Directive.LineIndex, source.Assembly.Directive.FileName));
+                InnerEnd(new ParseError(ParseErrorType.Directives_NoEntryPointFound, source.Assembly.Directive));
                 return;
             }
 

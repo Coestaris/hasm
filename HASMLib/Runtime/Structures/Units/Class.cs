@@ -7,6 +7,7 @@ namespace HASMLib.Runtime.Structures.Units
     {
         public const string AbstractKeyword = "abstract";
         public const string SealedKeyword = "sealed";
+        public const string ExtendsKeyword = "extends";
         internal string _fullName;
         
         private static void GetName(Class _class, string separator, ref string result)
@@ -65,9 +66,20 @@ namespace HASMLib.Runtime.Structures.Units
 
         public bool IsInner { get; private set; }
         public Class InnerParent { get; private set; }
+        public bool IsSealed => Modifiers.Exists(p => p.Name == AbstractKeyword);
+        public bool IsAbstact => Modifiers.Exists(p => p.Name == SealedKeyword);
+
+        public List<Class> InnerClasses { get; private set; }
+        public List<Function> Functions { get; private set; }
+        public List<Field> Fields { get; private set; }
+        public List<Function> Constructors { get; private set; }
+
+        public Dictionary<int, Object> StaticFields;
+        public List<Class> Extends;
 
         public Class(BaseStructure Base) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)
         {
+            Extends = new List<Class>();
             StaticFields = new Dictionary<int, Object>();
             Target = RuleTarget.Class;
             Directive = Base.Directive;
@@ -108,14 +120,5 @@ namespace HASMLib.Runtime.Structures.Units
             }
         }
 
-        public bool IsSealed => Modifiers.Exists(p => p.Name == AbstractKeyword);
-        public bool IsAbstact => Modifiers.Exists(p => p.Name == SealedKeyword);
-
-        public List<Class> InnerClasses { get; private set; }
-        public List<Function> Functions { get; private set; }
-        public List<Field> Fields { get; private set; }
-        public List<Function> Constructors { get; private set; }
-
-        public Dictionary<int, Object> StaticFields;
     }
 }
