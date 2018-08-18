@@ -25,7 +25,7 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            Integer position = GetNumericValue(parameters[0], package).Value;
+            Integer position = GetNumericValue(parameters[0], package).IntValue;
 
             //RuntimeMachineJump(position, runtimeMachine);
 

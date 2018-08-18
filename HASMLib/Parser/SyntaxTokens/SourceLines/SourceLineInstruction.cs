@@ -84,7 +84,7 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
                 return new string[2]
                 {
                     parts[0],
-                    string.Join("", parts.Skip(1))
+                    string.Join(" ", parts.Skip(1))
                 };
             }
         }

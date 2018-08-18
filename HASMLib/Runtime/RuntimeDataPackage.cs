@@ -18,9 +18,10 @@ namespace HASMLib.Runtime
 
         public bool ContainsVarialbe(Integer index)
         {
-            if (index >= (Integer)CallStackItem.Locals.Count)
-                return MemZone.Globals.Exists(p => p.Index == index);
-            else return CallStackItem.Locals.Exists(p => p.Index == index);
+            //TODO: GLOBALS
+            //if (index >= (Integer)CallStackItem.Locals.Count)
+            //return MemZone.Globals.Exists(p => p.Index == index);
+            return CallStackItem.Locals.Exists(p => p.Index == index);
         }
 
         internal Variable GetVariable(Integer index)

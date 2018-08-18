@@ -69,7 +69,7 @@ namespace HASMLib.Runtime.Instructions
                     return GetVar(reference.Index, package).Value;
                 case ReferenceType.Constant:
                 case ReferenceType.Expression:
-                    return new Object(GetNumericValue(reference, package).Value, package.Assembly);
+                    return new Object(GetNumericValue(reference, package).IntValue, package.Assembly);
                 case ReferenceType.Define:
                 case ReferenceType.Type:
                 case ReferenceType.Function:

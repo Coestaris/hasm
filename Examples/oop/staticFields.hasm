@@ -14,11 +14,13 @@
         .function(public, entrypoint, static, ret:void) main
         {
             ; Example how to set end read static properties
-            
+            out "Entrypoint method Main is called\n"
+
             ialloc(var1, int, int_10)   ;
             _fset(Field1, var1)         ; Macro style
             _fget(Field1, output1, int) ;
-            out output1                 ;
+            out "Result is "            ;
+            out strof(output1)          ;
             
             
             alloc var2, long            ; 
@@ -27,7 +29,8 @@
             alloc output2, long         ; Instruction style
             getv Field2                 ;
             popr output2                ;
-            out output2                 ;
+            out "\nResult is "          ;
+            out strof(output2)          ;
             
             pass
         }

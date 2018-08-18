@@ -249,7 +249,7 @@ namespace HASM
                     break;
 
                 case OutputType.Char:
-                    richTextBox1.Text = string.Join("", Output.Select(p => (char)p));
+                    richTextBox1.Text = new string(Output.Select(p => (char)(byte)p).ToArray());
                     break;
 
                 default:

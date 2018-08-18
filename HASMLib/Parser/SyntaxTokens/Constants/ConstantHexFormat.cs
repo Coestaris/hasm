@@ -28,7 +28,7 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
             if (CheckMaxValues(value, type))
                 return new ParseError(ParseErrorType.Syntax_Constant_BaseOverflow);
 
-            constant.IntValueValue = new Integer(value, type);
+            constant.IntValue = new Integer(value, type);
 
             return null;
         }

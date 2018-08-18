@@ -30,7 +30,7 @@ namespace HASMLib.Runtime.Instructions.Instructions
             if (dest.Value.Type.Type != Structures.TypeReferenceType.Integer)
                 return RuntimeOutputCode.ExpectedIntegerVariable;
 
-            dest.Value.IntegerValue += source.Value;
+            dest.Value.IntegerValue += source.IntValue;
 
             return RuntimeOutputCode.OK;
         }

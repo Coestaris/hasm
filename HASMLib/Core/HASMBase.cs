@@ -37,7 +37,7 @@ namespace HASMLib.Core
                             new BaseIntegerType(16, true , "short"),
                             new BaseIntegerType(8, false, "byte"),
                             new BaseIntegerType(8, true , "sbyte"),
-                            new BaseIntegerType(16, true , "char"),
+                            new BaseIntegerType(8, true , "char"),
                         };
                         BaseIntegerType.PrimitiveType = BaseIntegerType.Types.Find(p => p.Name == "byte");
                         BaseIntegerType.CommonCharType = BaseIntegerType.Types.Find(p => p.Name == "char");

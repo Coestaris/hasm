@@ -32,10 +32,10 @@ namespace HASMLib.Runtime.Instructions.Instructions
             if (dest.Value.Type.Type != Structures.TypeReferenceType.Integer)
                 return RuntimeOutputCode.ExpectedIntegerVariable;
 
-            if (dest.Value.Type.IntegerType != source.Value.Type)
+            if (dest.Value.Type.IntegerType != source.IntValue.Type)
                 return RuntimeOutputCode.DifferentTypes;
 
-            dest.Value.IntegerValue = source.Value;
+            dest.Value.IntegerValue = source.IntValue;
 
             return RuntimeOutputCode.OK;
         }

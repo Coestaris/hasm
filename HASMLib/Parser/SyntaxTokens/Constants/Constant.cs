@@ -15,6 +15,24 @@ namespace HASMLib.Parser.SyntaxTokens.Constants
 
         public TypeReferenceType Type;
 
+        public List<Integer> ToPrimitiveArray()
+        {
+            List<Integer> result = new List<Integer>();
+            if (ArrayValue.Type.BaseType.Type == TypeReferenceType.Integer)
+            {
+                foreach (var a in ArrayValue.Collection)
+                    result.AddRange(a.IntegerValue.Cast(BaseIntegerType.PrimitiveType));
+            }
+            else
+            {
+                var data = new Array(ArrayValue.ToString());
+                foreach (var a in ArrayValue.Collection)
+                    result.Add(a.IntegerValue);
+            }
+
+            return result;
+        }
+
         public bool AsBool()
         {
             if (Type == TypeReferenceType.Integer)

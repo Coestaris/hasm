@@ -65,12 +65,23 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         /// </summary>
         public static readonly List<Function> Functions = new List<Function>()
         {
-            new Function(1, "double", (a) => new Constant(a.Value * (Integer)2)),
-            new Function(2, "exp2", (a) => new Constant(a.Value * a.Value)),
-            new Function(8, "log2", (a) => new Constant((Integer)(long)Math.Log((long)a.Value, 2))),
-            new Function(2, "abs", (a) => new Constant(new Integer((ulong)Math.Abs((long)a.Value), a.Value.Type))),
+            new Function(8, "strof", (a) =>
+            {
+                if(a.Type == Runtime.Structures.TypeReferenceType.Integer)
+                    return new Constant(new Core.BaseTypes.Array(a.IntValue.Value.ToString()));
+
+                if(a.ArrayValue.IsString)
+                    return new Constant(a.ArrayValue);
+
+                return new Constant(new Core.BaseTypes.Array(a.ArrayValue.ToString()));
+
+            }),
+            new Function(1, "double", (a) => new Constant(a.IntValue * (Integer)2)),
+            new Function(2, "exp2", (a) => new Constant(a.IntValue * a.IntValue)),
+            new Function(8, "log2", (a) => new Constant((Integer)(long)Math.Log((long)a.IntValue, 2))),
+            new Function(2, "abs", (a) => new Constant(new Integer((ulong)Math.Abs((long)a.IntValue), a.IntValue.Type))),
             new Function(1, "defined", (a) => a), //TODO!
-            new Function(1, "strlen", (a) => new Constant()),
+            new Function(1, "strlen", (a) => new Constant(BaseIntegerType.CommonType)),
         };
 
         /// <summary>
@@ -85,35 +96,35 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         public static readonly List<Operator> Operators = new List<Operator>()
         {
             //Unary 
-            new Operator(1, "!", (a) => new Constant(new Integer(a.AsBool() ? 0U : 1U, a.Value.Type))),
-            new Operator(1, "~", (a) => new Constant(~ a.Value)),
-            new Operator(1, "-", (a) => new Constant(~ a.Value), true),
+            new Operator(1, "!", (a) => new Constant(new Integer(a.AsBool() ? 0U : 1U, a.IntValue.Type))),
+            new Operator(1, "~", (a) => new Constant(~ a.IntValue)),
+            new Operator(1, "-", (a) => new Constant(~ a.IntValue), true),
 
             //Binnary
-            new Operator(2, 13, "*",  (a, b) => new Constant(a.Value * b.Value)),
-            new Operator(2, 13, "/",  (a, b) => new Constant(a.Value / b.Value)),
+            new Operator(2, 13, "*",  (a, b) => new Constant(a.IntValue * b.IntValue)),
+            new Operator(2, 13, "/",  (a, b) => new Constant(a.IntValue / b.IntValue)),
 
-            new Operator(2, 12, "%",  (a, b) => new Constant(a.Value % b.Value)),
+            new Operator(2, 12, "%",  (a, b) => new Constant(a.IntValue % b.IntValue)),
 
-            new Operator(2, 11, "+",  (a, b) => new Constant(a.Value + b.Value)),
-            new Operator(2, 11, "-",  (a, b) => new Constant(a.Value - b.Value)),
+            new Operator(2, 11, "+",  (a, b) => new Constant(a.IntValue + b.IntValue)),
+            new Operator(2, 11, "-",  (a, b) => new Constant(a.IntValue - b.IntValue)),
 
-            new Operator(2, 10, "<<", (a, b) => new Constant(a.Value << (int)b.Value)),
-            new Operator(2, 10, ">>", (a, b) => new Constant(a.Value >> (int)b.Value)),
+            new Operator(2, 10, "<<", (a, b) => new Constant(a.IntValue << (int)b.IntValue)),
+            new Operator(2, 10, ">>", (a, b) => new Constant(a.IntValue >> (int)b.IntValue)),
 
-            new Operator(1, 9, "<",   (a, b) => new Constant(new Integer(a.Value < b.Value ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
-            new Operator(1, 9, "<=",  (a, b) => new Constant(new Integer(a.Value <= b.Value ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
-            new Operator(1, 9, ">",   (a, b) => new Constant(new Integer(a.Value > b.Value ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
-            new Operator(1, 9, ">=",  (a, b) => new Constant(new Integer(a.Value >= b.Value ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(1, 9, "<",   (a, b) => new Constant(new Integer(a.IntValue < b.IntValue ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
+            new Operator(1, 9, "<=",  (a, b) => new Constant(new Integer(a.IntValue <= b.IntValue ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
+            new Operator(1, 9, ">",   (a, b) => new Constant(new Integer(a.IntValue > b.IntValue ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
+            new Operator(1, 9, ">=",  (a, b) => new Constant(new Integer(a.IntValue >= b.IntValue ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
 
-            new Operator(1, 8, "!=",  (a, b) => new Constant(new Integer(a.Value != b.Value ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
-            new Operator(1, 8, "==",  (a, b) => new Constant(new Integer(a.Value == b.Value ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(1, 8, "!=",  (a, b) => new Constant(new Integer(a.IntValue != b.IntValue ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
+            new Operator(1, 8, "==",  (a, b) => new Constant(new Integer(a.IntValue == b.IntValue ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
 
-            new Operator(2, 7, "&",  (a, b) => new Constant(a.Value & b.Value)),
-            new Operator(2, 6, "^",  (a, b) => new Constant(a.Value ^ b.Value)),
-            new Operator(2, 5, "|",  (a, b) => new Constant(a.Value | b.Value)),
-            new Operator(2, 4, "&&", (a, b) => new Constant(new Integer(a.AsBool() && b.AsBool() ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
-            new Operator(2, 3, "||", (a, b) => new Constant(new Integer(a.AsBool() || b.AsBool() ? 1U : 0U, Integer.SelectType(a.Value, b.Value)))),
+            new Operator(2, 7, "&",  (a, b) => new Constant(a.IntValue & b.IntValue)),
+            new Operator(2, 6, "^",  (a, b) => new Constant(a.IntValue ^ b.IntValue)),
+            new Operator(2, 5, "|",  (a, b) => new Constant(a.IntValue | b.IntValue)),
+            new Operator(2, 4, "&&", (a, b) => new Constant(new Integer(a.AsBool() && b.AsBool() ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
+            new Operator(2, 3, "||", (a, b) => new Constant(new Integer(a.AsBool() || b.AsBool() ? 1U : 0U, Integer.SelectType(a.IntValue, b.IntValue)))),
 
             new Operator(1, 2, "?",  (a, b) =>
             {
@@ -700,6 +711,10 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             catch (WrongTokenException)
             {
                 return new ParseError(ParseErrorType.Syntax_Expression_UnknownToken);
+            }
+            catch(IndexOutOfRangeException)
+            {
+                return new ParseError(ParseErrorType.Syntax_Expression_CantParse);
             }
 
             return null;

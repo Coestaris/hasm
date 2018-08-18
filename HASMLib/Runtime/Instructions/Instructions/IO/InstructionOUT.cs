@@ -30,7 +30,10 @@ namespace HASMLib.Runtime.Instructions.Instructions
             if (value == null)
                 return RuntimeOutputCode.ExpectedIntegerVariable;
 
-            package.RuntimeMachine.OutBytes("stdout", value.ToPrimitive());
+            if (value.Type == Structures.TypeReferenceType.Integer)
+                package.RuntimeMachine.OutBytes("stdout", value.ToPrimitiveInt());
+            else
+                package.RuntimeMachine.OutBytes("stdout", value.ToPrimitiveArray());
             return RuntimeOutputCode.OK;
         }
     }

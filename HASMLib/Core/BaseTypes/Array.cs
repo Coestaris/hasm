@@ -9,6 +9,8 @@ namespace HASMLib.Core.BaseTypes
         public ArrayType Type;
         public List<Object> Collection;
 
+        internal bool IsString => Type.GetType() == typeof(StringType);
+
         public string AsString()
         {
             BaseIntegerType charType;
@@ -37,6 +39,11 @@ namespace HASMLib.Core.BaseTypes
                     IntegerValue = BaseIntegerType.CommonCharType.Cast((Integer)p)[0]
                 });
             });
+        }
+
+        public override string ToString()
+        {
+            return $"Array[{Type}]{(IsString ? $"({AsString()})" : "")}";
         }
 
         public Array(ArrayType type)

@@ -1,5 +1,6 @@
 ﻿using HASMLib.Core.BaseTypes;
 using HASMLib.Core.MemoryZone;
+using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.SourceLines;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,11 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         private struct ConstnantGrouping
         {
-            public Integer Value;
+            public Constant Value;
             public Integer NewIndex;
             public List<Integer> Indexes;
 
-            public ConstnantGrouping(Integer value, List<Integer> indexes, Integer ind)
+            public ConstnantGrouping(Constant value, List<Integer> indexes, Integer ind)
             {
                 NewIndex = ind;
                 Value = value;
@@ -71,7 +72,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                     Integer constIndex = (Integer)0;
 
                     function.CompileCache.Compiled.Add(new FlashElementConstant(
-                        flashElement.Expression.TokenTree.Value.Value,
+                        flashElement.Expression.TokenTree.Value,
                         constIndex));
 
                     plainExpIndexes.Add(flashElement.Index, constIndex);

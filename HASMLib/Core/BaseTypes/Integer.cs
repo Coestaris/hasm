@@ -116,6 +116,11 @@ namespace HASMLib.Core.BaseTypes
             return unchecked(new Integer(a, BaseIntegerType.CommonType));
         }
 
+        public static explicit operator Integer(char a)
+        {
+            return unchecked(new Integer(a, BaseIntegerType.CommonType));
+        }
+
         public static explicit operator Integer(byte a)
         {
             return unchecked(new Integer(a, BaseIntegerType.CommonType));
@@ -144,6 +149,11 @@ namespace HASMLib.Core.BaseTypes
         public static explicit operator UInt64(Integer a)
         {
             return unchecked((UInt64)(a.Value & 0xFFFFFFFF));
+        }
+
+        public static explicit operator char(Integer a)
+        {
+            return unchecked((char)(a.Value & 0xFF));
         }
 
         public static explicit operator Int16(Integer a)

@@ -34,13 +34,13 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 var info = function.CompileCache.UnknownLabelNameErrorList.Find(p => p.Name == name);
 
                 info.namedConstant.Constant = new Constant(value);
-                info.memZoneFlashElementConstant.UpdateValue((Integer)value, info.ConstIndex);
+                info.memZoneFlashElementConstant.UpdateValue(new Constant((Integer)value), info.ConstIndex);
                 return null;
             }
 
             int constIndex = ++function.CompileCache.ConstIndex;
 
-            var constant = new FlashElementConstant((Integer)value, (Integer)constIndex);
+            var constant = new FlashElementConstant(new Constant((Integer)value), (Integer)constIndex);
             function.CompileCache.NamedConsts.Add(new ConstantMark(name, (Integer)constIndex, new Constant(value))
             {
                 FEReference = constant
@@ -132,7 +132,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                                 if (variable != null)
                                 {
 
-                                    int varIndex = function.CompileCache.Variables.Select(p => p.Name).ToList().IndexOf(token.RawValue);
+                                    //Получаем индекс переменной со списка переменных
+                                    Integer varIndex = function.CompileCache.Variables.Find(p => p.Name == token.RawValue).Index;
+                                    //Запоминаем индекс переменной
                                     return new ObjectReference((Integer)varIndex, ReferenceType.Variable)
                                     {
                                         Object = null
@@ -175,7 +177,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                                         int constIndex = ++function.CompileCache.ConstIndex;
                                         FlashElementConstantDummy dummyConstant = new FlashElementConstantDummy((Integer)constIndex);
-                                        ConstantMark dummyNamedConstant = new ConstantMark(token.RawValue, (Integer)constIndex, new Constant())
+                                        ConstantMark dummyNamedConstant = new ConstantMark(token.RawValue, (Integer)constIndex, new Constant(BaseIntegerType.CommonType))
                                         {
                                             FEReference = dummyConstant
                                         };
@@ -400,7 +402,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                                 int constIndex = ++function.CompileCache.ConstIndex;
                                 FlashElementConstantDummy dummyConstant = new FlashElementConstantDummy((Integer)constIndex);
-                                ConstantMark dummyNamedConstant = new ConstantMark(argument, (Integer)constIndex, new Constant())
+                                ConstantMark dummyNamedConstant = new ConstantMark(argument, (Integer)constIndex, new Constant(BaseIntegerType.CommonType))
                                 {
                                     FEReference = dummyConstant
                                 };
@@ -426,6 +428,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                     //Если удалось частично пропарсить константу, но были переполнения и тд...
                     if (constError.Type == ParseErrorType.Syntax_Constant_BaseOverflow ||
                         constError.Type == ParseErrorType.Syntax_Constant_WrongType ||
+                        constError.Type == ParseErrorType.Syntax_Constant_WrongEscapeSymbol ||
                         constError.Type == ParseErrorType.Syntax_Constant_TooLong)
                     {
                         //Вернуть новую ошибку с типо старой

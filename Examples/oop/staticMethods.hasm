@@ -10,13 +10,17 @@
     {
         .function(public, static, param:int:a, param:int:b, ret:void) Output
         {
-            out a
-            out b
+            out "Static method Output is called\nA is "
+            out strof(a)
+            out ".\nB is "
+            out strof(b)
+            out ".\n"
             pass
         }
 
         .function(public, static, param:int:a, param:int:b, ret:int) AddValues
         {
+            out "Static method AddValues is called\n"
             alloc sum, int
             add sum, a
             add sum, b
@@ -25,6 +29,7 @@
         
         .function(public, entrypoint, static, ret:void) main
         {
+            out "Entrypoint method Main is called\n"
             alloc var1, int           
             alloc var2, int
 
@@ -34,7 +39,8 @@
             _call__2(Output, var1, var2) ; Use some ditry macroses to call functions
             _callr_2(addResult, int, AddValues, var1, var2)
             
-            out addResult
+            out "Result is "
+            out strof(addResult)
             
             pass
         }

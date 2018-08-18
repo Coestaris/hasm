@@ -36,8 +36,8 @@ namespace HASMLib.Runtime.Instructions.Instructions
 
         public override RuntimeOutputCode Apply(RuntimeDataPackage package, List<ObjectReference> parameters)
         {
-            Integer a = GetNumericValue(parameters[0], package).Value;
-            Integer b = GetNumericValue(parameters[1], package).Value;
+            Integer a = GetNumericValue(parameters[0], package).IntValue;
+            Integer b = GetNumericValue(parameters[1], package).IntValue;
 
             ComapreResult result = 0;
 

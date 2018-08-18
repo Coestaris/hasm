@@ -68,5 +68,6 @@
         Other_FunctionMustEndsWithPassOrRet,
         Preprcessor_MultilineNonDefinesAreNotAllowed,
         Directives_ClassNameExpected,
+        Syntax_Constant_WrongEscapeSymbol,
     }
 }
