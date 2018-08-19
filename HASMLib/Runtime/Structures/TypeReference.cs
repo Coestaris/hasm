@@ -72,7 +72,7 @@ namespace HASMLib.Runtime.Structures
 
         public TypeReference(ArrayType arrayType, Assembly assembly)
         {
-            Type = TypeReferenceType.Integer;
+            Type = TypeReferenceType.Array;
             Name = arrayType.Name;
             ArrayType = arrayType;
             assembly?.RegisterType(this);
