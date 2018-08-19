@@ -8,6 +8,7 @@ using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -269,19 +270,26 @@ namespace HASM.Classes
                 HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockOpened,
                 HASMLib.Parser.SyntaxTokens.Structure.CodeBlock.BlockClosed);
 
-            HighlightBaseSyntax();
 
             if (TaskRunner.Source.Assembly != null)
             {
-                Regex classNames = CreateRegex(TaskRunner.Source.Assembly.AllClasses.Select(p => p.Name));
-                Regex functionNames = CreateRegex(TaskRunner.Source.Assembly.AllFunctions.Select(p => p.Name));
-                Regex fieldNames = CreateRegex(TaskRunner.Source.Assembly.AllFields.Select(p => p.Name));
+                var classNames = TaskRunner.Source.Assembly.AllClasses.Select(p => (p.Name, p.AccessModifier) );
+                var functionNames = TaskRunner.Source.Assembly.AllFunctions.Select(p => (p.Name, p.AccessModifier));
+                var fieldNames = TaskRunner.Source.Assembly.AllFields.Select(p => (p.Name, p.AccessModifier));
+
+                Regex classRegex = CreateRegex(classNames.Select(p => p.Name));
+                Regex functionRegex = CreateRegex(functionNames.se);
+                Regex fieldRegex = CreateRegex(fieldNames);
 
                 TextBox.Range.SetStyle(AssemblyNameStyle, TaskRunner.Source.Assembly.Name);
-                TextBox.Range.SetStyle(ClassNameStyle, classNames);
-                TextBox.Range.SetStyle(FunctionNameStyle, functionNames);
-                TextBox.Range.SetStyle(FieldNameStyle, fieldNames);
+                TextBox.Range.SetStyle(ClassNameStyle, classRegex);
+                TextBox.Range.SetStyle(FunctionNameStyle, functionRegex);
+                TextBox.Range.SetStyle(FieldNameStyle, fieldRegex);
+
+
             }
+
+            HighlightBaseSyntax();
 
         }
 

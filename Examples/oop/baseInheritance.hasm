@@ -25,7 +25,6 @@
         
         .function(public, ret:void, virtual) OutputInfo
         {
-            
             pass
         }
     }
