@@ -14,8 +14,21 @@ namespace HASMLib.Core
 
         public List<FlashElement> Flash { get; internal set; }
 
-        public int FreeRAM => throw new System.NotImplementedException();//_ram - Stack.Count - Globals.Count;
-        public int FreeFlash => _flash - Flash.Count;
+        public int FreeRAM 
+		{
+			get
+			{
+				throw new System.NotImplementedException();//_ram - Stack.Count - Globals.Count;
+			}
+		}
+
+        public int FreeFlash 
+		{
+			get
+			{
+				return _flash - Flash.Count;
+			}
+		}
 
         private int _flash;
         private int _ram;

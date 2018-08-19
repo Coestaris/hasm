@@ -127,7 +127,9 @@ namespace HASMLib.Parser.SyntaxTokens.SourceLines
                     if (stringParts.Length == 2)
                     {
                         //Выделяем со строки параметры в отдельный массив
-                        SplitLineIntoArguments(stringParts, out var instructionName, out var parameters);
+						string instructionName;
+						string[] parameters;
+						SplitLineIntoArguments(stringParts, out instructionName, out parameters);
                         Parameters = parameters;
                     }
 

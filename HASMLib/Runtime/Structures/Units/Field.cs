@@ -23,12 +23,18 @@ namespace HASMLib.Runtime.Structures.Units
 
         public override string FullName
         {
-            get => BaseClass.ToAbsoluteName(Name);
+            get 
+			{
+				return BaseClass.ToAbsoluteName (Name);
+			}
         }
 
         public override string Signature
         {
-            get => $"{Type} {FullName}";
+            get 
+			{
+				return $"{Type} {FullName}";
+			}
         }
     }
 }

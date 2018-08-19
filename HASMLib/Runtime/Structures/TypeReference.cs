@@ -62,7 +62,7 @@ namespace HASMLib.Runtime.Structures
 
         public override bool Equals(object obj)
         {
-            return obj is TypeReference _ref && _ref == this;
+			return obj is TypeReference && (obj as TypeReference) == this;
         }
 
         public override int GetHashCode()
@@ -122,11 +122,12 @@ namespace HASMLib.Runtime.Structures
 
         public static bool operator ==(TypeReference a, TypeReference b)
         {
-            if (a is null && b is null)
-                return true;
+			if (Object.ReferenceEquals(a, null) && Object.ReferenceEquals(b,null))
+				return true;
 
-            if ((a is null && !(b is null)) || (!(a is null) && b is null))
-                return false;
+			if ((Object.ReferenceEquals(a, null) && !(Object.ReferenceEquals(b, null))) ||
+				(!(Object.ReferenceEquals(a, null)) && Object.ReferenceEquals(b, null)))
+				return false;
 
             if (a.Registered && b.Registered)
                 return a.UniqueID == b.UniqueID;

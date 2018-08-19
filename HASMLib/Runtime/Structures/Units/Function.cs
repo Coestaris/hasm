@@ -33,13 +33,19 @@ namespace HASMLib.Runtime.Structures.Units
 
         public override string FullName
         {
-            get => BaseClass.ToAbsoluteName(Name);
+            get 
+			{
+				return BaseClass.ToAbsoluteName (Name);
+			}
         }
 
         public override string Signature
         {
-            get => $"{(HasNoRetValue ? NoReturnableValueKeyword : RetType.ToString())} {FullName}" +
-                (Parameters.Count == 0 ? "" : "(" + string.Join(", ", Parameters.Select(p => p.Type + " " + p.Name)) + ")");
+            get 
+			{
+				return $"{(HasNoRetValue ? NoReturnableValueKeyword : RetType.ToString())} {FullName}" +
+                	(Parameters.Count == 0 ? "" : "(" + string.Join(", ", Parameters.Select(p => p.Type + " " + p.Name)) + ")");
+			}
         }
 
         public Function(BaseStructure Base, bool asConstructor) : base(Base.Name, Base.Modifiers, Base.AccessModifier, Base.Childs)

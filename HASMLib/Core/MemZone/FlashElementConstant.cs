@@ -18,7 +18,10 @@ namespace HASMLib.Core.MemoryZone
 
         public override int FixedSize
         {
-            get => 2 * 8 / BaseIntegerType.PrimitiveType.Base + 2 * HASMBase.PrimitiveTypesInCommon;
+            get 
+			{ 
+				return 2 * 8 / BaseIntegerType.PrimitiveType.Base + 2 * HASMBase.PrimitiveTypesInCommon;
+			}
         }
 
         public Constant ToConstant()

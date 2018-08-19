@@ -60,7 +60,8 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                                 var subStr = plainText.Substring(parametricMatch.Index, parametricMatch.Length);
                                 plainText = plainText.Remove(parametricMatch.Index, parametricMatch.Length);
 
-                                var value = (define as ParametricDefine).Expand(subStr, out ParseError parseError);
+								ParseError parseError;
+                                var value = (define as ParametricDefine).Expand(subStr, out parseError);
                                 if (parseError != null) return new ParseError(parseError.Type, index, parametricMatch.Index, fileName);
 
                                 plainText = plainText.Insert(parametricMatch.Index, value.ToString());

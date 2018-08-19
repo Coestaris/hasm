@@ -45,12 +45,19 @@ namespace HASMLib.Runtime.Structures.Units
 
         public override string FullName
         {
-            get => Name;
+            get 
+			{
+				return Name;
+			}
         }
 
         public override string Signature
         {
-            get => $"Assembly: {FullName}";
+            get 
+			{
+				return $"Assembly: {FullName}";
+			}
+				
         }
 
         public List<Field> AllFields { get; internal set; }

@@ -212,7 +212,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             List<BaseStructure> structures = new List<BaseStructure>();
             foreach (var child in block.ChildBlocks)
             {
-                structures.Add(GetStructures(child, out ParseError error));
+				ParseError error;
+                structures.Add(GetStructures(child, out error));
                 if(error != null)
                 {
                     InnerEnd(error);

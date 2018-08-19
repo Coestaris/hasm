@@ -496,7 +496,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         private Operator FindUnaryOperator(string name, bool ignoreIngoring)
         {
             var a = Operators.Find(p => p.IsUnary && (ignoreIngoring || !p.Ignore) && p.OperatorString == name);
-            return a ?? throw new UnknownOperatorException(name);
+			if(a == null) throw new UnknownOperatorException(name);;
+			return a;
         }
 
         /// <summary>
@@ -507,7 +508,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         private Operator FindOperator(string name, bool ignoreIngoring)
         {
             var a = Operators.Find(p => (ignoreIngoring || !p.Ignore) && p.OperatorString == name);
-            return a ?? throw new UnknownOperatorException(name);
+			if(a == null) throw new UnknownOperatorException(name);;
+			return a;
         }
 
         /// <summary>

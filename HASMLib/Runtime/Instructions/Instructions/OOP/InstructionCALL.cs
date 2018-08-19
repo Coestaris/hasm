@@ -35,7 +35,8 @@ namespace HASMLib.Runtime.Instructions.Instructions
             }
             else
             {
-                if (!CheckObjectStackItem(package, function.BaseClass, out RuntimeOutputCode error))
+				RuntimeOutputCode error;
+                if (!CheckObjectStackItem(package, function.BaseClass, out error))
                     return error;
 
                 if (function.IsConstuctor)

@@ -31,7 +31,8 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
             string strInput = input.AsSingleLine();
             strInput = ClearInput(strInput);
 
-            var expError = Expression.Parse(strInput, out Expression exp, (token) =>
+			Expression exp;
+            var expError = Expression.Parse(strInput, out exp, (token) =>
             {
                 if (token.UnaryFunction == null || token.UnaryFunction.FunctionString != "defined")
                 {
@@ -41,7 +42,8 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor.Directives
 
                     if (!token.IsSimple)
                     {
-                        Expression.Parse(token.RawValue, out Expression expression);
+						Expression expression;
+                        Expression.Parse(token.RawValue, out expression);
                         token.Subtokens = expression.TokenTree.Subtokens;
                     }
 

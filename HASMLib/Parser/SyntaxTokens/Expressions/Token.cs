@@ -331,7 +331,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             if (_valueSet)
                 return;
 
-            var error = Constant.Parse(RawValue, out Constant constant);
+			Constant constant;
+            var error = Constant.Parse(RawValue, out constant);
             if (error != null)
             {
                 if (error.Type == ParseErrorType.Syntax_Constant_TooLong || error.Type == ParseErrorType.Syntax_Constant_BaseOverflow)
@@ -396,7 +397,8 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             }
             else
             {
-                var error = Constant.Parse(RawValue, out Constant constant);
+				Constant constant;
+                var error = Constant.Parse(RawValue, out constant);
 
                 if (error != null)
                 {

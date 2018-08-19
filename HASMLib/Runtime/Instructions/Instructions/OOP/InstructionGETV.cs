@@ -30,7 +30,8 @@ namespace HASMLib.Runtime.Instructions.Instructions
             }
             else
             {
-                if (!CheckObjectStackItem(package, field.BaseClass, out RuntimeOutputCode error))
+				RuntimeOutputCode error;
+                if (!CheckObjectStackItem(package, field.BaseClass, out error))
                     return error;
 
                 package.MemZone.ObjectStackItem = package.MemZone.ObjectStackItem.GetClassField(field.UniqueID);

@@ -16,7 +16,10 @@ namespace HASMLib.Core
 
         public static int Base
         {
-            get => _base;
+			get 
+			{ 
+				return _base;
+			}
             set
             {
                 _base = value;

@@ -109,12 +109,14 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                 argIndex++;
                 
                 //Попытка пропарсить константу
-                ParseError constError = Constant.Parse(argument, out Constant constant);
+				Constant constant;
+                ParseError constError = Constant.Parse(argument, out constant);
 
                 //Попытка пропарсить выражение
-                ParseError expressionError = expressionError = Expression.Parse(argument, out Expression expression);
+				Expression expression;
+                ParseError expressionError = expressionError = Expression.Parse(argument, out expression);
 
-                //Грубое определние типа нашего аргумента
+				//Грубое определние типа нашего аргумента
                 bool isConst = constant != null;
                 bool isVar = function.CompileCache.Variables.Select(p => p.Name).Contains(argument);
 
@@ -480,7 +482,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
             {
                 if (line.IsEmpty) continue;
 
-                var res = ProceedInstruction(function, line, out ParseError parseError);
+				ParseError parseError;
+                var res = ProceedInstruction(function, line, out parseError);
                 if (parseError != null)
                 {
                     return parseError;

@@ -21,11 +21,12 @@ namespace HASMLib.Core.BaseTypes
 
         public static bool operator ==(BaseIntegerType a, BaseIntegerType b)
         {
-            if (a is null && b is null)
-                return true;
+			if (Object.ReferenceEquals(a, null) && Object.ReferenceEquals(b,null))
+				return true;
 
-            if ((a is null && !(b is null)) || (!(a is null) && b is null))
-                return false;
+			if ((Object.ReferenceEquals(a, null) && !(Object.ReferenceEquals(b, null))) ||
+				(!(Object.ReferenceEquals(a, null)) && Object.ReferenceEquals(b, null)))
+				return false;
 
             return a.Equals(b);
         }
@@ -37,7 +38,9 @@ namespace HASMLib.Core.BaseTypes
 
         public override bool Equals(object obj)
         {
-            return obj is BaseIntegerType type && type.Base == Base && type.IsSigned == IsSigned;
+			return obj is BaseIntegerType && 
+				(obj as BaseIntegerType).Base == Base && 
+				(obj as BaseIntegerType).IsSigned == IsSigned;
         }
 
         public BaseIntegerType(int _base, bool isSigned, string name)

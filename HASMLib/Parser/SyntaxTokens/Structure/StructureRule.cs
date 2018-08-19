@@ -22,7 +22,10 @@ namespace HASMLib.Parser.SyntaxTokens.Structure
 
                 AvailableAccsessModifiersStrings = _availableAccsessModifiers.Select(p => p.ToString().ToLower()).ToList();
             }
-            get => _availableAccsessModifiers;
+            get 
+			{
+				return _availableAccsessModifiers;
+			}
         }
         public RuleTarget Target;
 
@@ -33,7 +36,10 @@ namespace HASMLib.Parser.SyntaxTokens.Structure
                 if (value == null) _modifiers = new List<Modifier>();
                 else _modifiers = value;
             }
-            get => _modifiers;
+			get 
+			{
+				return _modifiers;
+			}
         }
 
         public List<RuleTarget> AllowedChilds
@@ -43,7 +49,10 @@ namespace HASMLib.Parser.SyntaxTokens.Structure
                 if (value == null) _targets = new List<RuleTarget>();
                 else _targets = value;
             }
-            get => _targets;
+            get
+			{
+				return _targets;
+			}
         }
 
         public bool AllowedInnerInstructions;

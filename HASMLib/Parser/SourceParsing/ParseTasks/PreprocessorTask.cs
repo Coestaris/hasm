@@ -52,8 +52,9 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
         protected override void InnerRun()
         {
+			ParseError parseError;
             List<SourceLine> lines = PreprocessorDirective.RecursiveParse(source.BaseFilename,
-                source.WorkingDirectory, out ParseError parseError, BasePrepareLines, 
+				source.WorkingDirectory, out parseError, BasePrepareLines, 
                 source.Machine.UserDefinedDefines, source.Machine.Cache);
 
             source._lines = lines;

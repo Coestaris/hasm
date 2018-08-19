@@ -171,7 +171,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
         {
             var lines = source._lines;
 
-            var a = ResolveStructures(lines, out ParseError error);
+			ParseError error;
+			var a = ResolveStructures(lines, out error);
             if (error != null)
             {
                 InnerEnd(error);

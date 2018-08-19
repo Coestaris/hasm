@@ -19,10 +19,11 @@ namespace HASMLib.Runtime.Structures.Units
 
         public static bool operator ==(Class a, Class b)
         {
-            if (a is null && b is null)
+			if (Object.ReferenceEquals(a, null) && Object.ReferenceEquals(b,null))
                 return true;
 
-            if ((a is null && !(b is null)) || (!(a is null) && b is null))
+			if ((Object.ReferenceEquals(a, null) && !(Object.ReferenceEquals(b, null))) ||
+				(!(Object.ReferenceEquals(a, null)) && Object.ReferenceEquals(b, null)))
                 return false;
 
             return a.Equals(b);
@@ -35,7 +36,7 @@ namespace HASMLib.Runtime.Structures.Units
 
         public override bool Equals(object obj)
         {
-            return obj is Class _class && Signature == _class.Signature;
+			return obj is Class && Signature == (obj as Class).Signature;
         }
 
         public override int GetHashCode()
@@ -61,7 +62,10 @@ namespace HASMLib.Runtime.Structures.Units
 
         public override string Signature
         {
-            get => $"class({AccessModifier.ToString().ToLower()}) {FullName}";
+			get
+			{
+				return	$"class({AccessModifier.ToString().ToLower()}) {FullName}";
+			}
         }
 
         public bool IsInner { get; private set; }

@@ -45,7 +45,10 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
         {
             Cache = cache;
 
-            getLinesFunc = GetLinesFunc ?? throw new ArgumentNullException(nameof(GetLinesFunc));
+			if (GetLinesFunc == null)
+				new ArgumentNullException (nameof (GetLinesFunc));
+			
+			getLinesFunc = GetLinesFunc;
             workingDirectory = WorkingDirectory;
             enableStack = new Stack<bool>();
             PreprocessorDirective.defines = new List<Define>();
@@ -141,11 +144,13 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
 
                 if(group.IsMultilineDefine)
                 {
-                    PreprocessorDirective directive = GetDirective(group.Strings.First(), index, fileName, out ParseError error);
+					ParseError error;
+                    PreprocessorDirective directive = GetDirective(group.Strings.First(), index, fileName, out error);
                     if (error != null) return new PreprocessorParseResult(null, error);
 
+					ParseError parseError;
                     //Preprocessor.Directives.PreprocessorDefine.
-                    directive.Apply(group, enableStack, defines, out ParseError parseError);
+                    directive.Apply(group, enableStack, defines, out parseError);
                     if (parseError != null) return new PreprocessorParseResult(null, new ParseError(parseError.Type, index, fileName));
 
                     index += group.Strings.Count;
@@ -158,18 +163,21 @@ namespace HASMLib.Parser.SyntaxTokens.Preprocessor
                     string line = group.AsSingleLine();
                     if (IsPreprocessorLine(line))
                     {
-                        PreprocessorDirective directive = GetDirective(line, index, fileName, out ParseError error);
+						ParseError error;
+                        PreprocessorDirective directive = GetDirective(line, index, fileName, out error);
                         if (error != null) return new PreprocessorParseResult(null, error);
 
                         if (directive.CanAddNewLines)
                         {
-                            var newLines = directive.Apply(new StringGroup(line), enableStack, defines, out ParseError parseError, RecursiveParse);
+							ParseError parseError;
+                            var newLines = directive.Apply(new StringGroup(line), enableStack, defines, out parseError, RecursiveParse);
                             if (parseError != null) return new PreprocessorParseResult(null, parseError);
                             result.AddRange(newLines);
                         }
                         else
                         {
-                            directive.Apply(new StringGroup(line), enableStack, defines, out ParseError parseError);
+							ParseError parseError;
+                            directive.Apply(new StringGroup(line), enableStack, defines, out parseError);
                             if (parseError != null) return new PreprocessorParseResult(null, new ParseError(parseError.Type, index, fileName));
                         }
                     }
