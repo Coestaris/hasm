@@ -68,6 +68,7 @@ namespace HASM.Classes
         };
 
         private static ImageList AutocompleteImageList;
+        private static List<AutocompleteItem> AutoCompleteStaticValues = new List<AutocompleteItem>();
 
         private static readonly string KeywordRegexTemplate = @"(?<=[,\.\s:()])({0})(?=[,\.\s:()])";
 
@@ -103,7 +104,7 @@ namespace HASM.Classes
         private static readonly Regex BinRegex = new Regex(@"(?<=\W)0[bB][0-1]{1,100}(_[sdq]){0,1}");
         private static readonly Regex DecRegex = new Regex(@"(?<=\W)\d{1,30}(_[sdq]){0,1}");
         private static readonly Regex HexRegex = new Regex(@"(?<=\W)0[xX][0-9A-Fa-f]{1,15}(_[sdq]){0,1}");
-        private static readonly Regex String1Regex = new Regex("\\\".*\\\"");
+        private static readonly Regex String1Regex = new Regex("\\\".*?\\\"");
         private static readonly Regex String2Regex = new Regex(@"<.*>");
 
         private static Regex BaseTypeRegex;
@@ -142,6 +143,63 @@ namespace HASM.Classes
             foreach (var item in HASMLib.Parser.SyntaxTokens.Preprocessor.PreprocessorDirective.PreprocessorDirectives)
                 PreprocessorRegexes.Add(new Regex($"#{item.Name}\\s"));
 
+            foreach (var a in Keywords)
+                AutoCompleteStaticValues.Add(new AutocompleteItem()
+                {
+                    Text = a,
+                    ToolTipTitle = "Keyword " + a,
+                    ToolTipText = "Keyword " + a,
+                    ImageIndex = keyword
+                });
+
+            foreach (var a in new List<string>{ "function", "assembly", "field", "class", "constructor" })
+                AutoCompleteStaticValues.Add(new AutocompleteItem()
+                {
+                    Text = a,
+                    ToolTipTitle = "Keyword " + a,
+                    ToolTipText = "Keyword " + a,
+                    ImageIndex = keyword
+                });
+
+            foreach (var a in HASMLib.Parser.SyntaxTokens.SourceLines.SourceLineInstruction.Instructions)
+            {
+                int counter = 1;
+                AutoCompleteStaticValues.Add(new AutocompleteItem()
+                {
+                    Text = a.NameString,
+                    ToolTipTitle = "Instruction " + a.NameString,
+                    ToolTipText = $"Parameter count: {a.ParameterCount}\nParameter types:\n{string.Join("\n", a.ParameterTypes.Select(p => $"{counter++}. {p}"))}",
+                    ImageIndex = instruction
+                });
+            }
+
+            foreach (var a in HASMLib.Parser.SyntaxTokens.Preprocessor.PreprocessorDirective.PreprocessorDirectives)
+                AutoCompleteStaticValues.Add(new AutocompleteItem()
+                {
+                    Text = "#" + a.Name,
+                    ToolTipTitle = "Directriove " + a.Name,
+                    ToolTipText = "Can add values " + a.CanAddNewLines,
+                    ImageIndex = preprocessorDir
+                });
+
+            foreach(var a in BaseIntegerType.Types)
+                AutoCompleteStaticValues.Add(new AutocompleteItem()
+                {
+                    Text = a.Name,
+                    ToolTipTitle = "Base int type " + a.Name,
+                    ToolTipText = $"A {a.Base}-bit {(a.IsSigned ? "signed" : "unsigned")} type\nMin value: {a.MinValue}\nMax value: {a.MaxValue}",
+                    ImageIndex = type
+                });
+
+            foreach(var a in HASMLib.Parser.SyntaxTokens.Expressions.Expression.Functions)
+                AutoCompleteStaticValues.Add(new AutocompleteItem()
+                {
+                    Text = a.FunctionString,
+                    ToolTipTitle = "Function " + a.FunctionString,
+                    ToolTipText = $"Takes {a.FunctionSteps} steps",
+                    ImageIndex = function
+                });
+            AutoCompleteStaticValues = AutoCompleteStaticValues.OrderBy(p => p.Text).ToList();
         }
 
         private static Regex CreateRegex(IEnumerable<string> collection)

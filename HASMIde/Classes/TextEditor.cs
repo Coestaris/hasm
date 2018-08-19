@@ -18,6 +18,8 @@ namespace HASM.Classes
 {
     public partial class TextEditor : TabPage
     {
+        
+
         private string ErrorString;
         private ParseError ParseError;
         private string Directory;
@@ -88,54 +90,15 @@ namespace HASM.Classes
                 
             };
 
-            List<AutocompleteItem> items = new List<AutocompleteItem>();
-            popupMenu = new AutocompleteMenu(TextBox);
-            popupMenu.ImageList = AutocompleteImageList;
-            foreach (var a in Keywords)
-                items.Add(new AutocompleteItem()
-                {
-                    Text = a,
-                    ToolTipText = "Keyword " + a,
-                    ToolTipTitle = "Keyword " + a,
-                    ImageIndex = keyword
-                });
 
-            foreach (var a in HASMLib.Parser.SyntaxTokens.Expressions.Expression.Functions)
-                items.Add(new AutocompleteItem()
-                {
-                    Text = a.FunctionString,
-                    ToolTipText = "Keyword " + a,
-                    ToolTipTitle = "Keyword " + a,
-                    ImageIndex = function
-                });
-
-
-            InstructionRegexes = new List<Regex>();
-            foreach (var a in HASMLib.Parser.SyntaxTokens.SourceLines.SourceLineInstruction.Instructions)
-                items.Add(new AutocompleteItem()
-                {
-                    Text = a.NameString,
-                    ToolTipText = "Keyword " + a,
-                    ToolTipTitle = "Keyword " + a,
-                    ImageIndex = instruction
-                });
-
-
-            PreprocessorRegexes = new List<Regex>();
-            foreach (var a in HASMLib.Parser.SyntaxTokens.Preprocessor.PreprocessorDirective.PreprocessorDirectives)
-                items.Add(new AutocompleteItem()
-                {
-                    Text = "#" + a.Name,
-                    ToolTipText = "Keyword " + a,
-                    ToolTipTitle = "Keyword " + a,
-                    ImageIndex = preprocessorDir
-                });
-
-
-            popupMenu.Items.SetAutocompleteItems(items);
-            popupMenu.MinFragmentLength = 1;
-            popupMenu.Items.MaximumSize = new Size(200, 300);
-            popupMenu.Items.Width = 200;
+            popupMenu = new AutocompleteMenu(TextBox)
+            {
+                ImageList = AutocompleteImageList,
+                MinFragmentLength = 1
+            };
+            popupMenu.Items.SetAutocompleteItems(AutoCompleteStaticValues);
+            popupMenu.Items.MaximumSize = new Size(300, 200);
+            popupMenu.Items.Width = 300;
 
             HASMSource source = new HASMSource(Parrent.Machine, TextBox.Text);
             TaskRunner = new ParseTaskRunner(source);
@@ -278,15 +241,15 @@ namespace HASM.Classes
                 var fieldNames = TaskRunner.Source.Assembly.AllFields.Select(p => (p.Name, p.AccessModifier));
 
                 Regex classRegex = CreateRegex(classNames.Select(p => p.Name));
-                Regex functionRegex = CreateRegex(functionNames.se);
-                Regex fieldRegex = CreateRegex(fieldNames);
+                Regex functionRegex = CreateRegex(functionNames.Select(p => p.Name));
+                Regex fieldRegex = CreateRegex(fieldNames.Select(p => p.Name));
 
                 TextBox.Range.SetStyle(AssemblyNameStyle, TaskRunner.Source.Assembly.Name);
                 TextBox.Range.SetStyle(ClassNameStyle, classRegex);
                 TextBox.Range.SetStyle(FunctionNameStyle, functionRegex);
                 TextBox.Range.SetStyle(FieldNameStyle, fieldRegex);
 
-
+                
             }
 
             HighlightBaseSyntax();

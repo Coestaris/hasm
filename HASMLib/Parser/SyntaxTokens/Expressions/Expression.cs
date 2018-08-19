@@ -4,6 +4,7 @@ using HASMLib.Parser.SyntaxTokens.Constants;
 using HASMLib.Parser.SyntaxTokens.Expressions.Exceptions;
 using HASMLib.Parser.SyntaxTokens.Preprocessor.Directives;
 using HASMLib.Runtime;
+using HASMLib.Runtime.Structures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,7 +68,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
         {
             new Function(8, "strof", (a) =>
             {
-                if(a.Type == Runtime.Structures.TypeReferenceType.Integer)
+                if(a.Type == TypeReferenceType.Integer)
                     return new Constant(new Core.BaseTypes.Array(a.IntValue.Value.ToString()));
 
                 if(a.ArrayValue.IsString)
@@ -106,7 +107,24 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
 
             new Operator(2, 12, "%",  (a, b) => new Constant(a.IntValue % b.IntValue)),
 
-            new Operator(2, 11, "+",  (a, b) => new Constant(a.IntValue + b.IntValue)),
+            new Operator(2, 11, "+",  (a, b) =>
+            {
+                if(a.Type == TypeReferenceType.Array || b.Type == TypeReferenceType.Array)
+                {
+                    string result = "";
+                    if(a.Type == TypeReferenceType.Array)
+                        result += a.ArrayValue.AsString();
+                    else result += a.IntValue;
+
+                    if(b.Type == TypeReferenceType.Array)
+                        result += b.ArrayValue.AsString();
+                    else result += b.IntValue;
+
+                    return new Constant(new Core.BaseTypes.Array(result));
+                }
+                else return new Constant(a.IntValue + b.IntValue);
+            }),
+
             new Operator(2, 11, "-",  (a, b) => new Constant(a.IntValue - b.IntValue)),
 
             new Operator(2, 10, "<<", (a, b) => new Constant(a.IntValue << (int)b.IntValue)),
@@ -158,6 +176,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             if (parentToken == null)
                 parentToken = new Token(input);
 
+            bool skipSpaces = true;
             //Накопительная строка просматриваемого токена
             string currentToken = "";
             //Накопительная строка просматриваемого оператора
@@ -186,6 +205,11 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             //Проход по каждому символу строки...
             for (int i = 0; i < input.Length; i++)
             {
+                if (input[i] == ' ' && skipSpaces)
+                    continue;
+
+                if (input[i] == '"') skipSpaces = !skipSpaces;
+
                 //Октрытая скобка означает, что нам больше не стоит проверять ее содержимое,
                 //оставим это для будущих итерраций, пока тупо будем накапливать ее как отдельный токен
                 if (input[i] == '(')
@@ -672,7 +696,7 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
                 InitGlobals();
 
             //Удаляем лишние пробелы, табы и пр.
-            input = input.Replace(" ", "");
+            //input = input.Replace(" ", "");
             input = input.Replace("\t", "");
             input = input.Replace("\r", "");
 
