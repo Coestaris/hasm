@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace HASM
+namespace HASM.Classes
 {
     public static class Formatter
     {
@@ -27,7 +27,7 @@ namespace HASM
         {
             var fileUri = new Uri(filePath);
             var referenceUri = new Uri(referencePath);
-            return referenceUri.MakeRelativeUri(fileUri).ToString();
+			return referenceUri.MakeRelativeUri(fileUri).ToString().NormalizePath();
         }
     }
 }

@@ -1,38 +1,32 @@
-﻿using FastColoredTextBoxNS;
-using HASMLib;
-using HASMLib.Core.BaseTypes;
-using HASMLib.Parser;
-using HASMLib.Parser.SourceParsing;
-using HASMLib.Runtime.Structures;
-using HASMLib.Runtime.Structures.Units;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
+using System.Globalization;
 using System.IO;
-using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using FastColoredTextBoxNS;
+using HASMLib;
+using HASMLib.Parser;
+using HASMLib.Parser.SourceParsing;
 using static System.Windows.Forms.TabControl;
 
 namespace HASM.Classes
 {
-    public partial class TextEditor : TabPage
+	public partial class TextEditor : TabPage
     {
-        
-
         private string ErrorString;
         private ParseError ParseError;
         private string Directory;
         private ParseTaskRunner TaskRunner;
         private AutocompleteMenu popupMenu;
+		private ToolStripLabel toolStripLabel;
+		private Editor Parrent;
 
         public bool IsChanged = false;
         public string DisplayName;
         public string Path;
         public FastColoredTextBox TextBox;
         public int HighlightedLine = -1;
-        private ToolStripLabel toolStripLabel;
-        private Editor Parrent;
 
         public bool Close()
         {
@@ -70,11 +64,12 @@ namespace HASM.Classes
         public TextEditor(string path, Control parent)
         {
             InitPlatformSpecificRegexes();
+			path = path.NormalizePath();
 
             Parrent = parent as Editor;
             if (!File.Exists(path))
             {
-                MessageBox.Show($"Unable to find file {path}");
+                MessageBox.Show($"Unable to find file \"{path}\"");
                 return;
             }
 
@@ -104,10 +99,10 @@ namespace HASM.Classes
             TaskRunner = new ParseTaskRunner(source);
 
             Directory = new FileInfo(path).Directory.FullName;
-            DisplayName = path.Remove(0, path.Replace('\\', '/').LastIndexOf('/') + 1) + "  [x]";
+            DisplayName = path.Remove(0, path.LastIndexOf('/') + 1) + "  [x]";
             Text = DisplayName;
 
-            if (DisplayName.Contains(".cfg"))
+			if (DisplayName.EndsWith(".cfg", true, CultureInfo.InvariantCulture))
             {
                 TextBox.VisibleRangeChanged += (obj, args) =>
                 {

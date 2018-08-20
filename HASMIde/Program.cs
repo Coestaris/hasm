@@ -14,7 +14,8 @@ namespace HASM
         /// </summary>
         [STAThread]
         static void Main()
-        {
+		{
+            PlatformSpecific.GetPlatform();
             RegisterIcon.RegisterHASMIcon();
 
             Application.EnableVisualStyles();

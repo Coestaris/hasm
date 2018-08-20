@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -37,7 +38,7 @@ namespace HASM
         
         public void Save()
         {
-            ToFile(Path + MainConfigPostfix, this);
+			ToFile(PlatformSpecific.CombinePath(Path, MainConfigPostfix), this);
         }
 
         public void SaveUser()
@@ -63,13 +64,13 @@ namespace HASM
             WorkingFolder config = (WorkingFolder)cfg.Clone();
 
             if(!string.IsNullOrEmpty(config.PreferedToCompile.Path))
-                config.PreferedToCompile.Path = Formatter.MakeRelative(config.PreferedToCompile.Path, config.Path + "\\");
+				config.PreferedToCompile.Path = Formatter.MakeRelative(config.PreferedToCompile.Path, config.Path + PlatformSpecific.NameSeparator);
 
             if (!string.IsNullOrEmpty(config.CompileConfigPath))
-                config.CompileConfigPath = Formatter.MakeRelative(config.CompileConfigPath, config.Path + "\\");
+				config.CompileConfigPath = Formatter.MakeRelative(config.CompileConfigPath, config.Path + PlatformSpecific.NameSeparator);
 
             if (!string.IsNullOrEmpty(config.UserConfigPath))
-                config.UserConfigPath = Formatter.MakeRelative(config.UserConfigPath, config.Path + "\\");
+				config.UserConfigPath = Formatter.MakeRelative(config.UserConfigPath, config.Path + PlatformSpecific.NameSeparator);
 
 
             FileStream fs = new FileStream(filename, FileMode.Create);
@@ -94,13 +95,11 @@ namespace HASM
 
             WorkingFolder cfg = (WorkingFolder)ser.Deserialize(reader);
             cfg.Path = new DirectoryInfo(directory).Parent.Parent.FullName;
-
-
-            cfg.PreferedToCompile.Path = System.IO.Path.Combine(cfg.Path, cfg.PreferedToCompile.Path);
-            cfg.CompileConfigPath = System.IO.Path.Combine(cfg.Path, cfg.CompileConfigPath);
-            cfg.UserConfigPath = System.IO.Path.Combine(cfg.Path, cfg.UserConfigPath);
-
-
+            
+			cfg.PreferedToCompile.Path = PlatformSpecific.CombinePath(cfg.Path, cfg.PreferedToCompile.Path);
+			cfg.CompileConfigPath = PlatformSpecific.CombinePath(cfg.Path, cfg.CompileConfigPath);
+			cfg.UserConfigPath = PlatformSpecific.CombinePath(cfg.Path, cfg.UserConfigPath);
+            
             fs.Close();
             return cfg;
         }
@@ -114,17 +113,17 @@ namespace HASM
 
         public void SetTreeView(TreeView tv)
         {
-            string removeFunc(string s) => s.Remove(0, s.Replace('\\', '/').LastIndexOf('/') + 1);
+			string removeFunc(string s) => new FileInfo(s.NormalizePath()).Name;
 
             SourceFiles = new List<SourceFile>();
 
             tv.Nodes.Clear();
 
             il = new ImageList();
-            il.Images.Add("dir", new Bitmap("icons\\dirIcon.png"));
-            il.Images.Add("idedir", new Bitmap("icons\\ideDirIcon.png"));
-            il.Images.Add(".hasm", new Icon("icons\\hasm.ico"));
-            il.Images.Add(".cfg", new Bitmap("icons\\cfg.png"));
+			il.Images.Add("dir", new Bitmap($"Icons{PlatformSpecific.NameSeparator}dirIcon.png"));
+			il.Images.Add("idedir", new Bitmap($"Icons{PlatformSpecific.NameSeparator}ideDirIcon.png"));
+			il.Images.Add(".hasm", new Icon($"Icons{PlatformSpecific.NameSeparator}hasm.ico"));
+			il.Images.Add(".cfg", new Bitmap($"Icons{PlatformSpecific.NameSeparator}cfg.png"));
 
             _imgIndex = 1;
             TreeNode parent = new FileNode(removeFunc(Path), Path, true)
@@ -170,7 +169,7 @@ namespace HASM
                     parent.Nodes.Add(new FileNode(removeFunc(file), file, false));
                 }
 
-                if(file.EndsWith(".hasm"))
+				if(file.EndsWith(".hasm", true, CultureInfo.CurrentCulture))
                     SourceFiles.Add(new SourceFile(Formatter.MakeRelative(file, Path + "\\"), file));
             }
         }

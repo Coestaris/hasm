@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HASM
+namespace HASM.Classes
 {
     [Serializable]
     public class Define

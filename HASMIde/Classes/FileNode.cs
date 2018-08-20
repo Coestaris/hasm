@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace HASM
+namespace HASM.Classes
 {
     public class FileNode : TreeNode
     {

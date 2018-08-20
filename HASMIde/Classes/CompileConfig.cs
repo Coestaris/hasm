@@ -1,12 +1,11 @@
 ﻿using HASMLib;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace HASM
+namespace HASM.Classes
 {
     [XmlRoot("CompileConfig", Namespace = "http://CompileConfig", IsNullable = false)]
     public class CompileConfig

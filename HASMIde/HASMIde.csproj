@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -34,9 +34,6 @@
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FastColoredTextBox, Version=2.16.23.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL" />
-    <Reference Include="MRG.Controls.UI, Version=1.0.2601.14400, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
@@ -53,6 +50,15 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="FastColoredTextBox">
+      <HintPath>libs\FastColoredTextBox.dll</HintPath>
+    </Reference>
+    <Reference Include="MRG.Controls.UI">
+      <HintPath>libs\MRG.Controls.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="FastColoredTextBox">
+      <HintPath>libs\FastColoredTextBox.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\CompileConfig.cs" />
@@ -120,6 +126,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Classes\PlatformSpecific.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -199,7 +206,7 @@
     <None Include="Resources\Save_6530.png" />
     <None Include="Resources\Open_6529.png" />
     <None Include="Resources\Files_7954.png" />
-    <None Include="Resources\BuildSolution_104.png" />
+    <None Include="Resources\buildsolution_104.png" />
     <None Include="Resources\creaete_file.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

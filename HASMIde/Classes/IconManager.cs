@@ -2,18 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
-namespace HASM
+namespace HASM.Classes
 {
-    public static class IconManager
+	public static class IconManager
     {
         private static readonly Dictionary<string, Icon> _smallIconCache = new Dictionary<string, Icon>();
         private static readonly Dictionary<string, Icon> _largeIconCache = new Dictionary<string, Icon>();
@@ -36,18 +29,8 @@ namespace HASM
             cache.Add(extension, icon);
             return icon;
         }
-        /// <summary>
-        /// http://stackoverflow.com/a/6580799/1943849
-        /// </summary>
-        static ImageSource ToImageSource(this Icon icon)
-        {
-            var imageSource = Imaging.CreateBitmapSourceFromHIcon(
-                icon.Handle,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
-            return imageSource;
-        }
-        /// <summary>
+  
+		/// <summary>
         /// Provides static methods to read system icons for both folders and files.
         /// </summary>
         /// <example>

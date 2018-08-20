@@ -50,21 +50,21 @@ namespace HASM.Classes
 
         private static readonly Dictionary<int, Bitmap> AutocompleteImages = new Dictionary<int, Bitmap>()
         {
-            { class_public, new Bitmap("Icons\\Class_public.bmp") },
-            { class_protected, new Bitmap("Icons\\Class_protected.bmp") },
-            { class_private, new Bitmap("Icons\\Class_private.bmp") },
-            { field_public, new Bitmap("Icons\\Field_public.bmp") },
-            { field_protected, new Bitmap("Icons\\Field_protected.bmp") },
-            { field_private, new Bitmap("Icons\\Field_private.bmp") },
-            { method_public, new Bitmap("Icons\\Method_public.bmp") },
-            { method_protected, new Bitmap("Icons\\Method_protected.bmp") },
-            { method_private, new Bitmap("Icons\\Method_private.bmp") },
-            { keyword, new Bitmap("Icons\\Keyword.bmp") },
-            { define, new Bitmap("Icons\\Define.bmp") },
-            { type, new Bitmap("Icons\\Type.bmp") },
-            { function, new Bitmap("Icons\\BuiltinFunction.bmp") },
-            { instruction, new Bitmap("Icons\\Instruction.bmp") },
-            { preprocessorDir, new Bitmap("Icons\\PreprocessorDirective.bmp") },
+			{ class_public,     new Bitmap($"Icons{PlatformSpecific.NameSeparator}Class_public.bmp")            },
+			{ class_protected,  new Bitmap($"Icons{PlatformSpecific.NameSeparator}Class_protected.bmp")         },
+			{ class_private,    new Bitmap($"Icons{PlatformSpecific.NameSeparator}Class_private.bmp")           },
+			{ field_public,     new Bitmap($"Icons{PlatformSpecific.NameSeparator}Field_public.bmp")            },
+			{ field_protected,  new Bitmap($"Icons{PlatformSpecific.NameSeparator}Field_protected.bmp")         },
+			{ field_private,    new Bitmap($"Icons{PlatformSpecific.NameSeparator}Field_private.bmp")           },
+			{ method_public,    new Bitmap($"Icons{PlatformSpecific.NameSeparator}Method_public.bmp")           },
+			{ method_protected, new Bitmap($"Icons{PlatformSpecific.NameSeparator}Method_protected.bmp")        },
+			{ method_private,   new Bitmap($"Icons{PlatformSpecific.NameSeparator}Method_private.bmp")          },
+			{ keyword,          new Bitmap($"Icons{PlatformSpecific.NameSeparator}Keyword.bmp")                 },
+			{ define,           new Bitmap($"Icons{PlatformSpecific.NameSeparator}Define.bmp")                  },
+			{ type,             new Bitmap($"Icons{PlatformSpecific.NameSeparator}Type.bmp")                    },
+			{ function,         new Bitmap($"Icons{PlatformSpecific.NameSeparator}BuiltinFunction.bmp")         },
+			{ instruction,      new Bitmap($"Icons{PlatformSpecific.NameSeparator}Instruction.bmp")             },
+			{ preprocessorDir,  new Bitmap($"Icons{PlatformSpecific.NameSeparator}PreprocessorDirective.bmp")   },
         };
 
         private static ImageList AutocompleteImageList;

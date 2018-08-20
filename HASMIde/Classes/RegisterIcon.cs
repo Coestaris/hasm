@@ -11,6 +11,8 @@ namespace HASM.Classes
         {
             try
             {
+				if (PlatformSpecific.IsUNIX) return;
+
                 if (Registry.ClassesRoot.GetSubKeyNames().Contains(".hasm"))
                     return;
 

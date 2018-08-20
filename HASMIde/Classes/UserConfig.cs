@@ -31,7 +31,7 @@ namespace HASM.Classes
             UserConfig config = (UserConfig)cfg.Clone();
 
             for (int i = 0; i < config.OpenedTabs.Count; i++)
-                config.OpenedTabs[i] = Formatter.MakeRelative(config.OpenedTabs[i], config.Path + "\\");
+				config.OpenedTabs[i] = Formatter.MakeRelative(config.OpenedTabs[i], config.Path + PlatformSpecific.NameSeparator);
 
             FileStream fs = new FileStream(filename, FileMode.Create);
             XmlTextWriter writer = new XmlTextWriter(fs, Encoding.UTF8)
@@ -59,7 +59,7 @@ namespace HASM.Classes
             if (cfg.OpenedTabs != null)
                 for (int i = 0; i < cfg.OpenedTabs.Count; i++)
                 {
-                    cfg.OpenedTabs[i] = System.IO.Path.Combine(cfg.Path, cfg.OpenedTabs[i]);
+				    cfg.OpenedTabs[i] = PlatformSpecific.CombinePath(cfg.Path, cfg.OpenedTabs[i]);
                 }
 
             fs.Close();
@@ -72,7 +72,7 @@ namespace HASM.Classes
             {
                 EditorSplitterDistance = EditorSplitterDistance,
                 MainSplitterDistance = MainSplitterDistance,
-                OpenedTabs = OpenedTabs.Select(p => new string(p.ToCharArray())).ToList(),
+				OpenedTabs = OpenedTabs.Select(p => (string)p.Clone()).ToList(),
                 OutputType = OutputType,
                 Path = Path,
                 SelectedTab = SelectedTab,

@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace HASM
+namespace HASM.Classes
 {
     public struct SourceFile : ICloneable
     {
@@ -24,11 +25,18 @@ namespace HASM
 
         public override bool Equals(object obj)
         {
-            return obj is SourceFile file && 
-                Path.ToLower().Replace('/','\\') == file.Path.ToLower().Replace('/', '\\');
+            return obj is SourceFile file && file.Path.CompareAsPath(Path);
         }
 
-        public override string ToString()
+		public override int GetHashCode()
+		{
+			var hashCode = -1931686138;
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(DisplayNumber);
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Path);
+			return hashCode;
+		}
+
+		public override string ToString()
         {
             return DisplayNumber;
         }
