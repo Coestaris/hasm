@@ -82,7 +82,25 @@ namespace HASMLib.Parser.SyntaxTokens.Expressions
             new Function(8, "log2", (a) => new Constant((Integer)(long)Math.Log((long)a.IntValue, 2))),
             new Function(2, "abs", (a) => new Constant(new Integer((ulong)Math.Abs((long)a.IntValue), a.IntValue.Type))),
             new Function(1, "defined", (a) => a), //TODO!
-            new Function(1, "strlen", (a) => new Constant(BaseIntegerType.CommonType)),
+            new Function(1, "strlenof", (a) =>
+            {
+                if(a.Type == TypeReferenceType.Integer)
+                    return new Constant(1UL);
+                if(a.Type == TypeReferenceType.Array)
+                    return new Constant((ulong)a.ArrayValue.Collection.Count);
+
+                return new Constant(0UL);
+            }),
+            new Function(1, "sizeof", (a) =>
+            {
+                if(a.Type == TypeReferenceType.Integer)
+                    return new Constant((ulong)(a.IntValue.Type.Base / HASMBase.Base));
+
+                if(a.Type == TypeReferenceType.Array)
+                    return new Constant((ulong)(a.ArrayValue.Collection.Count * a.ArrayValue.Type.BaseType.Size));
+
+                return new Constant(0UL);
+            }),
         };
 
         /// <summary>

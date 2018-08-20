@@ -67,9 +67,8 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
 
                 if (flashElement.Expression.TokenTree.Value != null)
                 {
-                    //Integer constIndex = (Integer)(++source._constIndex);
-
-                    Integer constIndex = (Integer)0;
+                    Integer constIndex = (Integer)(++function.CompileCache.ConstIndex);
+                    //Integer constIndex = (Integer)0;
 
                     function.CompileCache.Compiled.Add(new FlashElementConstant(
                         flashElement.Expression.TokenTree.Value,

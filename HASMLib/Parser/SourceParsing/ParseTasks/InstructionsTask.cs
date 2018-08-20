@@ -204,7 +204,7 @@ namespace HASMLib.Parser.SourceParsing.ParseTasks
                             /*,(c) =>
                             {
                                 //Расчет нового индекса константы	
-                                int constIndex = ++source._constIndex;
+                                int constIndex = ++function.CompileCache.ConstIndex;
                                 //Записываем его во флеш память
                                 var flashElement = c.ToFlashElement((Integer)constIndex);
 

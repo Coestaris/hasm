@@ -1,6 +1,8 @@
-﻿using HASMLib.Core.BaseTypes;
+﻿using HASMLib.Core;
+using HASMLib.Core.BaseTypes;
 using HASMLib.Runtime.Structures.Units;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HASMLib.Runtime.Structures
 {
@@ -32,6 +34,26 @@ namespace HASMLib.Runtime.Structures
                 case TypeReferenceType.Void:
                 default:
                     return Function.NoReturnableValueKeyword;
+            }
+        }
+
+        public int Size
+        {
+            get
+            {
+                if (Type == TypeReferenceType.Integer)
+                    return IntegerType.Base / HASMBase.Base;
+
+                if (Type == TypeReferenceType.Array)
+                    return ArrayType.BaseType.Size;
+
+                if (Type == TypeReferenceType.Class)
+                    return ClassType.Fields.Sum(p => p.Type.Size);
+
+                if (Type == TypeReferenceType.Void)
+                    return 0;
+
+                return 0;
             }
         }
 

@@ -212,8 +212,8 @@ namespace HASM
 			{
 				TimeSpan timeSpan = TimeSpan.Zero;
 				Tasks.ForEach(p => timeSpan += p.Length);
-
 				richTextBox1.Text =
+                    $"Building file: {workingFolder.PreferedToCompile.DisplayNumber}\n" +
 					$" ==== Build started at {Tasks[0].StartTime} ====\n" +
 					string.Join("\n", Tasks.Select((p) =>
 					{

@@ -99,7 +99,7 @@ namespace HASM.Classes
             TaskRunner = new ParseTaskRunner(source);
 
             Directory = new FileInfo(path).Directory.FullName;
-            DisplayName = path.Remove(0, path.LastIndexOf('/') + 1) + "  [x]";
+            DisplayName = path.Remove(0, path.LastIndexOf(PlatformSpecific.NameSeparator) + 1) + "  [x]";
             Text = DisplayName;
 
 			if (DisplayName.EndsWith(".cfg", true, CultureInfo.InvariantCulture))
